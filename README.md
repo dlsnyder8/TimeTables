@@ -13,4 +13,3 @@ Employees can request days off
 Text/Email notifications when the schedule is posted
 Simple Web UI that is easy to navigate
 
-
