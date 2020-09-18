@@ -1,6 +1,6 @@
 # TimeTables
 
-Authors: Dylan Snyder, Bates Brodie, Batya Stein, and AJ Kawczynski
+Authors: Dylan Snyder, Bates Brodie, Batya Stein, Kevin Zheng, and AJ Kawczynski
 
 About: Time Tables is a employee scheduling application for use by Princeton University Staff and Students through CAS authentication.
 
