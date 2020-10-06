@@ -19,22 +19,34 @@ def index():
 
 @app.route('/profile',methods=['GET'])
 def profile():
-    return "profile page"
+    html = render_template('profile.html')
+    response = make_response(html)
+
+    return response
 
 
 
 @app.route('/schedule', methods=['GET'])
 def schedule():
-    return "schedule page"
+    html = render_template('schedule.html')
+    response = make_response(html)
+
+    return response
 
 @app.route('/groupInfo', methods=['GET'])
 def groupInfo():
-    return "Group info"
+    html = render_template('groupInfo.html')
+    response = make_response(html)
+
+    return response
 
 
 @app.route('/createProfile',methods=['GET'])
 def createProfile():
-    return "Create Profile Page"
+    html = render_template('setupProfile.html')
+    response = make_response(html)
+
+    return response
 
 
 if __name__ == '__main__':
