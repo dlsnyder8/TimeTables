@@ -13,16 +13,16 @@ DATABASE_URL = os.environ['DATABASE_URL']
 app = Flask(__name__)
 
 # create engine (db object basically)
-engine = create_engine(DATABASE_URL)
+#engine = create_engine(DATABASE_URL)
 #start automap and create session with automap
-Base = automap_base()
-Base.prepare(engine, reflect=True)
+#Base = automap_base()
+#Base.prepare(engine, reflect=True)
 
-session = create_session(bind=engine)
+#session = create_session(bind=engine)
 
-users = Base.classes.users
-groups = Base.classes.groups
-group_members = Base.classes.groupmembers
+#users = Base.classes.users
+# groups = Base.classes.groups
+#group_members = Base.classes.groupmembers
 
 
 
@@ -32,8 +32,8 @@ def index():
     
     html = render_template('index.html')
     response = make_response(html)
-    for u in users:
-        print(u.firstname)
+    #for u in users.firstname:
+        #print(u)
 
     return response
 
