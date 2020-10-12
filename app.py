@@ -5,37 +5,20 @@ import os
 from sys import stderr, exit
 import urllib.parse as urlparse
 
-from sqlalchemy import create_engine, MetaData
-from sqlalchemy.orm import sessionmaker, scoped_session, create_session, Session
-from sqlalchemy.ext.automap import automap_base
 
-DATABASE_URL = os.environ['DATABASE_URL']
-print(DATABASE_URL)
+
 
 app = Flask(__name__)
-
-# create engine (db object basically)
-engine = create_engine(DATABASE_URL)
-#start automap and create session with automap
-Base = automap_base()
-Base.prepare(engine, reflect=True)
-
-session = Session(engine)
-
-users = Base.classes.users
-groups = Base.classes.groups
-group_members = Base.classes.groupmembers
 
 
 
 @app.route('/',methods=['GET'])
 @app.route('/index',methods=['GET'])
 def index():
-    print(DATABASE_URL, file=stderr)
+    username = CASClient().authenticate()
     html = render_template('index.html')
     response = make_response(html)
-    """ for u in session.query(users):
-        print(u.firstname,flush=True) """
+    
 
     return response
 
@@ -43,6 +26,8 @@ def index():
 
 @app.route('/profile',methods=['GET'])
 def profile():
+    username = CASClient().authenticate()
+
     html = render_template('profile.html')
     response = make_response(html)
 
@@ -52,6 +37,7 @@ def profile():
 
 @app.route('/schedule', methods=['GET'])
 def schedule():
+    username = CASClient().authenticate()
     html = render_template('schedule.html')
     response = make_response(html)
 
@@ -59,6 +45,7 @@ def schedule():
 
 @app.route('/groupInfo', methods=['GET'])
 def groupInfo():
+    username = CASClient().authenticate()
     html = render_template('groupInfo.html')
     response = make_response(html)
 
@@ -67,6 +54,7 @@ def groupInfo():
 
 @app.route('/createProfile',methods=['GET'])
 def createProfile():
+    username = CASClient().authenticate()
     html = render_template('setupProfile.html')
     response = make_response(html)
 
