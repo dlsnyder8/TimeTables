@@ -5,17 +5,28 @@ import os
 from sys import stderr, exit
 import urllib.parse as urlparse
 
+#-------------------
+# CAS Authentication cannot be run locally unfortunately
+# Set this variable to False if local, and change to True before pushing
+PROD_ENV = True
 
+
+#----------
 
 
 app = Flask(__name__)
+app.secret_key = b'\x06)\x8e\xa3BW"\x9d\xcd\x1d5)\xd6\xd1b1'
+
 
 
 
 @app.route('/',methods=['GET'])
 @app.route('/index',methods=['GET'])
 def index():
-    username = CASClient().authenticate()
+    if(PROD_ENV):
+        username = CASClient().authenticate()
+    else:
+        username = 'test123'
     html = render_template('index.html')
     response = make_response(html)
     
@@ -26,7 +37,10 @@ def index():
 
 @app.route('/profile',methods=['GET'])
 def profile():
-    username = CASClient().authenticate()
+    if(PROD_ENV):
+        username = CASClient().authenticate()
+    else:
+        username = 'test123'
 
     html = render_template('profile.html')
     response = make_response(html)
@@ -37,7 +51,11 @@ def profile():
 
 @app.route('/schedule', methods=['GET'])
 def schedule():
-    username = CASClient().authenticate()
+    if(PROD_ENV):
+        username = CASClient().authenticate()
+    else:
+        username = 'test123'
+
     html = render_template('schedule.html')
     response = make_response(html)
 
@@ -45,7 +63,11 @@ def schedule():
 
 @app.route('/groupInfo', methods=['GET'])
 def groupInfo():
-    username = CASClient().authenticate()
+    if(PROD_ENV):
+        username = CASClient().authenticate()
+    else:
+        username = 'test123'
+
     html = render_template('groupInfo.html')
     response = make_response(html)
 
@@ -54,7 +76,11 @@ def groupInfo():
 
 @app.route('/createProfile',methods=['GET'])
 def createProfile():
-    username = CASClient().authenticate()
+    if(PROD_ENV):
+        username = CASClient().authenticate()
+    else:
+        username = 'test123'
+
     html = render_template('setupProfile.html')
     response = make_response(html)
 
