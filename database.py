@@ -15,8 +15,8 @@ LOCAL_ENV = 0
 
 
 #----------
-#DATABASE_URL = os.environ['DATABASE_URL']
-DATABASE_URL = 'tt.sqlite'
+DATABASE_URL = os.environ['DATABASE_URL']
+
 # create engine (db object basically)
 engine = create_engine(DATABASE_URL)
 #start automap and create session with automap
@@ -26,7 +26,6 @@ Base.prepare(engine, reflect=True)
 session = Session(engine)
 
 Users = Base.classes.users
-'''
 Groups = Base.classes.groups
 Group_members = Base.classes.groupmembers
 
@@ -122,10 +121,9 @@ def change_group_notifications(groupid, netid, emailnotif = False, textnotif = F
     session.commit()
     return
 
-'''
 # retrieve name, email, phone from user table & notif prefs from group table
-def get_profile_info(netid):
-    pref = session.query(Users.firstname).filter_by(netid=netid).first()
-    return(pref)
-if __name__=='__main__':
-    print(get_profile_info)
+def get_profile_info(netid, groupid):
+    userInfo = session.query(Users.firstname, Users.lastname, Users.email, Users.phone).filter_by(netid=netid).first()
+    userid = get_user_id(groupid,netid)
+    notifPrefs = session.query(Group_members.emailnotif, Group_members.textnotif).filter_by(inc=userid).first()
+    return userInfo, notifPrefs

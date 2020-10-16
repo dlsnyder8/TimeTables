@@ -1,6 +1,7 @@
 from flask import Flask
 from flask import render_template, make_response, request, redirect, url_for
 from CASClient import CASClient
+from database import get_profile_info
 import os
 from sys import stderr, exit
 import urllib.parse as urlparse
@@ -41,8 +42,11 @@ def profile():
         username = CASClient().authenticate()
     else:
         username = 'test123'
+    # is netid = username?
+    # get groupid from cookie that takes info from input into index page
 
-    html = render_template('profile.html')
+    userInfo, notifPrefs = get_profile_info(username, groupid)
+    html = render_template('profile.html', firstName = userInfo.firstname, lastName = userInfo.lastName, netid=username, )
     response = make_response(html)
 
     return response
