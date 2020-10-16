@@ -32,7 +32,7 @@ Group_members = Base.classes.groupmembers
 
 # adds a user to the database
 def add_user(firstName, lastName, netid, email=None, phone=None, preferences=None):
-    session.add(Users(firstname=firstName,lastname=lastName,netid=netid,email=email,phone=phone,global_preferences=preferences))
+    session.add(Users(firstname=firstName,lastname=lastName,netid=netid,email=email,phone=phone,globalpreferences=preferences))
     session.commit()
     return
 
@@ -46,12 +46,12 @@ def remove_user(netid, groupid):
 
 #replaces the personal preferences of a user, global
 def change_user_preferences_global(netid, preferences):
-    session.add(Users(netid=netid, global_preferences=preferences))
+    session.add(Users(netid=netid, globalpreferences=preferences))
     session.commit()
     return
 
 def get_global_preferences(netid):
-    pref = session.query(Users.global_preferences).filter_by(netid=netid).first()
+    pref = session.query(Users.globalpreferences).filter_by(netid=netid).first()
     return pref 
 
 # replaces weekly preferences of user. If none specified, 
@@ -59,7 +59,7 @@ def get_global_preferences(netid):
 def change_user_preferences_group(groupid, netid, preferences = None):
     if(preferences==None):
        preferences = get_global_preferences
-
+       # preferences = get_global_preferences(netid) ?
     
     userid = get_user_id(groupid,netid)
     session.add(Group_members(inc=userid, grouppreferences = preferences))
@@ -68,7 +68,8 @@ def change_user_preferences_group(groupid, netid, preferences = None):
 
 #used in above function to access primary key
 def get_user_id(groupid,netid):
-    userid = session.query(Users.inc).filter_by(groupid=groupid,netid=netid).first()
+    userid = session.query(Group_members.inc).filter_by(groupid=groupid,netid=netid).first()
+    # there's no inc key in users table?
     return userid
 
 # Adds a group, shiftSchedule is optional argument if known
@@ -119,3 +120,16 @@ def change_group_notifications(groupid, netid, emailnotif = False, textnotif = F
     session.add(Group_members(inc=userid,emailnotif=emailnotif,textnotif=textnotif))
     session.commit()
     return
+
+# retrieve name, email, phone from user table & notif prefs from group table
+def get_profile_info(netid, groupid):
+    userInfo = session.query(Users.firstname, Users.lastname, Users.email, Users.phone).filter_by(netid=netid).first()
+    notifPrefs = session.query(Group_members.emailnotif, Group_members.textnotif).filter_by(netid=netid, groupid=groupid).first()
+    return userInfo, notifPrefs
+
+if __name__=="__main__":
+    # test
+    # add_user('batya','stein','batyas',email='batyas@princeton.edu',phone='7327660532')
+    #add_user_to_group(1, 'batyas','member')
+    print(get_user_id(1,'batyas').inc)
+    print(get_profile_info('batyas',1))
