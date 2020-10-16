@@ -45,8 +45,8 @@ def profile():
     # is netid = username?
     # get groupid from cookie that takes info from input into index page
 
-    userInfo, notifPrefs = get_profile_info(username, groupid)
-    html = render_template('profile.html', firstName = userInfo.firstname, lastName = userInfo.lastName, netid=username, )
+    userInfo, notifPrefs = get_profile_info(username)
+    html = render_template('profile.html', firstName = userInfo.firstname, lastName = userInfo.lastname, netid=username, email=userInfo.email, phoneNum=userInfo.phone, phonePref=notifPrefs.emailnotif, emailPref=notifPrefs.textnotif)
     response = make_response(html)
 
     return response
