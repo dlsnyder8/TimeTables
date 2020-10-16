@@ -1,11 +1,35 @@
 <!-- User profile. Lists their global availability, email, phone number, and has also an 'edit profile' button-->
 <!DOCTYPE html>
 <html lang='en'>
-   
 
-    {% include 'header.html' %}  <br>
 
-    <b>Profile</b>
-    
-    
+{% include 'header.html' %} <br>
+
+<h1>Profile</h1>
+
+Hi, {{firstName}} {{lastName}}!
+<br>
+<br>
+<strong>Netid:</strong> {{netid}}
+<br>
+<strong>Email:</strong> {{email}}
+<br>
+<strong>Phone number:</strong> {{phoneNum}}
+<hr>
+<h2>Notification Preferences</h2>
+Phone notifications: {{phonePref}}
+<br>
+Email notifications: {{emailPref}}
+<hr>
+<h2>Global Schedule Preferences</h2>
+Global preferences are your default availability times for the semester
+(times you're free to work every week).
+If you have a one-off change in availability, like a doctors appointment,
+you can change your availability for the week in the non-reccuring preferences page,
+and it will not affect your global preferences.
+
+<!-- can you process json directly in html? -->
+
+{% include 'footer.html' %}
+
 </html>

@@ -15,8 +15,8 @@ LOCAL_ENV = 0
 
 
 #----------
-DATABASE_URL = os.environ['DATABASE_URL']
-
+#DATABASE_URL = os.environ['DATABASE_URL']
+DATABASE_URL = 'tt.sqlite'
 # create engine (db object basically)
 engine = create_engine(DATABASE_URL)
 #start automap and create session with automap
@@ -26,6 +26,7 @@ Base.prepare(engine, reflect=True)
 session = Session(engine)
 
 Users = Base.classes.users
+'''
 Groups = Base.classes.groups
 Group_members = Base.classes.groupmembers
 
@@ -59,7 +60,7 @@ def get_global_preferences(netid):
 def change_user_preferences_group(groupid, netid, preferences = None):
     if(preferences==None):
        preferences = get_global_preferences
-
+       # preferences = get_global_preferences(netid) ?
     
     userid = get_user_id(groupid,netid)
     session.add(Group_members(inc=userid, grouppreferences = preferences))
@@ -69,6 +70,7 @@ def change_user_preferences_group(groupid, netid, preferences = None):
 #used in above function to access primary key
 def get_user_id(groupid,netid):
     userid = session.query(Users.inc).filter_by(groupid=groupid,netid=netid).first()
+    # no inc key in users table?
     return userid
 
 # Adds a group, shiftSchedule is optional argument if known
@@ -119,3 +121,11 @@ def change_group_notifications(groupid, netid, emailnotif = False, textnotif = F
     session.add(Group_members(inc=userid,emailnotif=emailnotif,textnotif=textnotif))
     session.commit()
     return
+
+'''
+# retrieve name, email, phone from user table & notif prefs from group table
+def get_profile_info(netid):
+    pref = session.query(Users.firstname).filter_by(netid=netid).first()
+    return(pref)
+if __name__=='__main__':
+    print(get_profile_info)
