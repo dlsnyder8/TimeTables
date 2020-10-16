@@ -1,6 +1,7 @@
 from flask import Flask
 from flask import render_template, make_response, request, redirect, url_for
 from CASClient import CASClient
+from database import get_profile_info
 import os
 from sys import stderr, exit
 import urllib.parse as urlparse
@@ -8,7 +9,7 @@ import urllib.parse as urlparse
 #-------------------
 # CAS Authentication cannot be run locally unfortunately
 # Set this variable to False if local, and change to True before pushing
-PROD_ENV = True
+PROD_ENV = False
 
 
 #----------
@@ -41,8 +42,11 @@ def profile():
         username = CASClient().authenticate()
     else:
         username = 'test123'
+    # is netid = username?
+    # get groupid from cookie that takes info from input into index page
 
-    html = render_template('profile.html')
+    userInfo, notifPrefs = get_profile_info(username)
+    html = render_template('profile.html', firstName = userInfo.firstname, lastName = userInfo.lastname, netid=username, email=userInfo.email, phoneNum=userInfo.phone, phonePref=notifPrefs.emailnotif, emailPref=notifPrefs.textnotif)
     response = make_response(html)
 
     return response
