@@ -1,12 +1,39 @@
 <!-- The first time someone signs in, they'll be redirected to this page to input their Name and Email (mandatory), and optionally their 
 global preferences and phone number-->
-
-
 <!DOCTYPE html>
 <html lang='en'>
-   
-
-    {% include 'header.html' %}   
-
-
+<head>
+    <title> Edit Profile </title>
+</head>
+<style>
+    .allRight {text-align: right;}
+</style>
+<body>
+    {% include 'header.html' %}
+    <hr>
+    <table>
+    <form action='primary' method='get'>
+        <tr>
+            <td class="allRight">Employee Name</td>
+            <td><input type="text" name="name" value=''></td>
+        </tr>
+        <tr>
+            <td class="allRight">Employee Email</td>
+            <td><input type="text" name="email" value=''></td>
+        </tr>
+        <tr>
+            <td class="allRight">Employee Phone Number</td>
+            <td><input type="text" name="pnumber" value=''></td>
+        </tr>
+        <tr>
+            <td class="allRight">Prefer Text Notifications</td>
+            <td><input type="checkbox" name="preftext" value=''></td>
+        </tr>
+        <tr>
+            <td class="allRight">Prefer Email Notifications</td>
+            <td><input type="checkbox" name="prefemail" value=''></td>
+        </tr>
+    </form>
+    </table>
+</body>
 </html>
