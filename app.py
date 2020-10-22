@@ -31,8 +31,35 @@ def parseSchedule():
                 split = "0"
             else:
                 split = "1"
-            str_call = (1+(time % 12)) + "-" + (1+((time + 1) % 12)) + "-" + split + "-" + day
+            str_call = str(1+(time % 12)) + "-" + str(1+((time + 1) % 12)) + "-" + str(split) + "-" + str(day)
             week.append(request.form[str_call])
+        table_values.append(week)
+    return table_values
+
+
+# creates a test schedule
+def testSchedule():
+    table_values = []
+    slot_num = 24  # number of time slots in schedule, should be even
+    for i in range(slot_num):  # iterates through time slots
+        week = []
+        for day in range(7):  # iterates through days in a week
+            if day % 2 == 0:
+                week.append(True)
+            else:
+                week.append(False)
+        table_values.append(week)
+    return table_values
+
+
+# creates a blank schedule
+def blankSchedule():
+    table_values = []
+    slot_num = 24  # number of time slots in schedule, should be even
+    for i in range(slot_num):  # iterates through time slots
+        week = []
+        for day in range(7):  # iterates through days in a week
+            week.append(False)
         table_values.append(week)
     return table_values
 
@@ -61,7 +88,10 @@ def profile():
     # get groupid from cookie that takes info from input into index page
     groupid = 1
     userInfo, notifPrefs = get_profile_info(username, groupid)
-    html = render_template('profile.html', firstName = userInfo.firstname, lastName = userInfo.lastname, netid=username, email=userInfo.email, phoneNum=userInfo.phone, phonePref=notifPrefs.emailnotif, emailPref=notifPrefs.textnotif)
+
+    globalpreferences=testSchedule()
+
+    html = render_template('profile.html', firstName = userInfo.firstname, lastName = userInfo.lastname, netid=username, email=userInfo.email, phoneNum=userInfo.phone, phonePref=notifPrefs.emailnotif, emailPref=notifPrefs.textnotif, schedule=globalpreferences, editable=False)
     response = make_response(html)
 
     return response
@@ -75,7 +105,9 @@ def schedule():
     else:
         username = 'test123'
 
-    html = render_template('schedule.html')
+    globalpreferences = testSchedule()
+
+    html = render_template('schedule.html', schedule=globalpreferences, editable=False)
     response = make_response(html)
 
     return response
@@ -104,7 +136,7 @@ def createProfile():
     # add error handling if username already exists in database
 
     if request.method == 'GET':
-        html = render_template('createProfile.html')
+        html = render_template('createProfile.html', schedule=blankSchedule(), editable=True)
         response = make_response(html)
         return response
 
@@ -133,13 +165,14 @@ def editProfile():
     userInfo, notifPrefs = get_profile_info(username, groupid)
     prevfirstName = userInfo.firstname
     prevlastName = userInfo.lastname
-    prevemail=userInfo.email 
-    prevphoneNum=userInfo.phone
-    prevphonePref=notifPrefs.emailnotif
-    prevemailPref=notifPrefs.textnotif
+    prevemail = userInfo.email
+    prevphoneNum = userInfo.phone
+    prevphonePref = notifPrefs.emailnotif
+    prevemailPref = notifPrefs.textnotif
+    globalpreferences = testSchedule()
 
     if request.method == 'GET':
-        html = render_template('editProfile.html', prevfname=prevfirstName, prevlname=prevlastName, prevemail=prevemail, prevphoneNum=prevphoneNum, prevphonePref=prevphonePref, prevemailPref=prevemailPref)
+        html = render_template('editProfile.html', prevfname=prevfirstName, prevlname=prevlastName, prevemail=prevemail, prevphoneNum=prevphoneNum, prevphonePref=prevphonePref, prevemailPref=prevemailPref, schedule=globalpreferences, editable=True)
         response = make_response(html)
         return response
 
@@ -151,7 +184,7 @@ def editProfile():
         pnum = request.form['pnumber']
         #preftext = request.args.get('preftext')
         #prefemail = request.args.get('prefemail')
-        update_user(fname, lname, username, email, pnum)
+        update_user(fname, lname, username, email, pnum, globalpreferences)
 
         return redirect(url_for('profile'))
 
