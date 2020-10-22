@@ -4,7 +4,7 @@ global preferences and phone number-->
 <html lang='en'>
 
 <head>
-    <title> Edit Profile </title>
+    <title> Create Profile </title>
 </head>
 <style>
     .allR {
@@ -18,11 +18,11 @@ global preferences and phone number-->
 
 <body>
     {% include 'header.html' %}
-    <h1>Edit Profile</h1>
+    <h1>Create Profile</h1>
     <hr>
-    <h2>Edit Information</h2>
+    <h2>Information</h2>
     <hr>
-    <form action='primary' method='get'>
+    <form action='' method="post">
         <table>
             <tr>
                 <td class="allR">Employee First Name</td>
@@ -41,19 +41,21 @@ global preferences and phone number-->
                 <td><input type="text" name="pnumber" value=''></td>
             </tr>
             <tr>
-                <td class="allR">Prefer Text Notifications</td>
+                <td class="allR">Text Notifications (optional)</td>
                 <td><input type="checkbox" name="preftext" value=''></td>
             </tr>
             <tr>
-                <td class="allR">Prefer Email Notifications</td>
+                <td class="allR">Email Notifications (optional)</td>
                 <td><input type="checkbox" name="prefemail" value=''></td>
             </tr>
         </table>
+        <hr>
+        <input type="submit" value="Save">
     </form>
     <hr>
-    <h2>Edit Time Preferences</h2>
+    <h2>Time Preferences</h2>
     <hr>
-    <form action='primary' method='get'>
+    <form action='' method='get'>
         <table>
             <tr>
                 <td></td>

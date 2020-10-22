@@ -1,7 +1,7 @@
 from flask import Flask
 from flask import render_template, make_response, request, redirect, url_for
 from CASClient import CASClient
-from database import get_profile_info
+from database import get_profile_info, add_user
 import os
 from sys import stderr, exit
 import urllib.parse as urlparse
@@ -78,17 +78,32 @@ def groupInfo():
     return response
 
 
-@app.route('/createProfile',methods=['GET'])
+@app.route('/createProfile',methods=['GET','POST'])
 def createProfile():
     if(PROD_ENV):
         username = CASClient().authenticate()
     else:
-        username = 'test123'
+        # for test purposes
+        username = 'batyas'
 
-    html = render_template('setupProfile.html')
-    response = make_response(html)
+    # add error handling if username already exists in database
 
-    return response
+    if request.method == 'GET':
+        html = render_template('createProfile.html')
+        response = make_response(html)
+        return response
+
+    else:
+        fname = request.form['fname']
+        lname = request.form['lname']
+
+        email = request.form['email']
+        pnum = request.form['pnumber']
+        #preftext = request.args.get('preftext')
+        #prefemail = request.args.get('prefemail')
+        add_user(fname, lname, username, email, pnum)
+
+        return redirect(url_for('profile'))
 
 
 if __name__ == '__main__':
