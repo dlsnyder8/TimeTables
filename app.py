@@ -20,7 +20,7 @@ app.secret_key = b'\x06)\x8e\xa3BW"\x9d\xcd\x1d5)\xd6\xd1b1'
 
 
 # takes a request and returns the schedule values
-def parseSchedule(request):
+def parseSchedule():
     table_values = []
     slot_num = 24  # number of time slots in schedule, should be even
     for i in range(slot_num):  # iterates through time slots
@@ -32,7 +32,7 @@ def parseSchedule(request):
             else:
                 split = "1"
             str_call = (1+(time % 12)) + "-" + (1+((time + 1) % 12)) + "-" + split + "-" + day
-            week.append(request.form(str_call))
+            week.append(request.form[str_call])
         table_values.append(week)
     return table_values
 
