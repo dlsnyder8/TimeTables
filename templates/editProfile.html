@@ -14,8 +14,8 @@ global preferences and phone number-->
     <hr>
     <h1>Edit Preferences</h1>
     <hr>
-    <table>
     <form action='primary' method='get'>
+    <table>
         <tr>
             <td class="allR">Employee Name</td>
             <td><input type="text" name="name" value=''></td>
@@ -36,13 +36,13 @@ global preferences and phone number-->
             <td class="allR">Prefer Email Notifications</td>
             <td><input type="checkbox" name="prefemail" value=''></td>
         </tr>
-    </form>
     </table>
+    </form>
     <hr>
     <h1>Edit Time Preferences</h1>
     <hr>
-    <table>
     <form action='primary' method='get'>
+    <table>
         <tr>
             <td></td>
             <td>Sunday</td>
@@ -293,8 +293,10 @@ global preferences and phone number-->
             <td class="allC"><input type="checkbox" name="11-12P-Fri" value=''></td>
             <td class="allC"><input type="checkbox" name="11-12P-Sat" value=''></td>
         </tr>
-    </form>
     </table>
+        <hr>
+        <input type="submit" value="Save">
+    </form>
     <hr>
     {% include 'footer.html' %}
 </body>
