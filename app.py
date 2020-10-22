@@ -19,6 +19,22 @@ app = Flask(__name__)
 app.secret_key = b'\x06)\x8e\xa3BW"\x9d\xcd\x1d5)\xd6\xd1b1'
 
 
+# takes a request and returns the schedule values
+def parseSchedule(request):
+    table_values = []
+    slot_num = 24  # number of time slots in schedule, should be even
+    for i in range(slot_num):  # iterates through time slots
+        time = 11
+        week = []
+        for day in range(7):  # iterates through days in a week
+            if i < (slot_num/2):
+                split = "0"
+            else:
+                split = "1"
+            str_call = (1+(time % 12)) + "-" + (1+((time + 1) % 12)) + "-" + split + "-" + day
+            week.append(request.form(str_call))
+        table_values.append(week)
+    return table_values
 
 
 @app.route('/',methods=['GET'])
@@ -30,7 +46,6 @@ def index():
         username = 'test123'
     html = render_template('index.html')
     response = make_response(html)
-    
 
     return response
 
