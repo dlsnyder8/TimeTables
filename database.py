@@ -18,7 +18,9 @@ LOCAL_ENV = 0
 DATABASE_URL = os.environ['DATABASE_URL']
 
 # create engine (db object basically)
-engine = create_engine(DATABASE_URL)
+#engine = create_engine(DATABASE_URL)
+#fix for windows
+engine = create_engine("postgres://pheepicuurwuqg:fc272975e122789ac91401d8c19152c7ea716f2d935b3a28ad3d2e34e7131229@ec2-52-72-221-20.compute-1.amazonaws.com:5432/d7t82iju2c7ela")
 #start automap and create session with automap
 Base = automap_base()
 Base.prepare(engine, reflect=True)
