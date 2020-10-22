@@ -139,7 +139,7 @@ def editProfile():
     prevemailPref=notifPrefs.textnotif
 
     if request.method == 'GET':
-        html = render_template('editProfile.html', prevfirstName, prevlastName, prevemail, prevphoneNum, prevphonePref, prevemailPref)
+        html = render_template('editProfile.html', prevfname=prevfirstName, prevlname=prevlastName, prevemail=prevemail, prevphoneNum=prevphoneNum, prevphonePref=prevphonePref, prevemailPref=prevemailPref)
         response = make_response(html)
         return response
 

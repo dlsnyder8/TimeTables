@@ -127,6 +127,18 @@ def get_profile_info(netid, groupid):
     notifPrefs = session.query(Group_members.emailnotif, Group_members.textnotif).filter_by(netid=netid, groupid=groupid).first()
     return userInfo, notifPrefs
 
+# adds a user to the database
+def add_user(firstName, lastName, netid, email=None, phone=None, preferences=None):
+    session.add(Users(firstname=firstName,lastname=lastName,netid=netid,email=email,phone=phone,globalpreferences=preferences))
+    session.commit()
+    return
+
+# adds a user to the database
+def update_user(firstName, lastName, netid, email=None, phone=None, preferences=None):
+    session.query(Users).filter_by(netid=netid).update({Users.firstname : firstName, Users.lastname: lastName, Users.email: email, Users.phone: phone, Users.globalpreferences: preferences})
+    session.commit()
+    return
+
 if __name__=="__main__":
     # test
     # add_user('batya','stein','batyas',email='batyas@princeton.edu',phone='7327660532')

@@ -26,27 +26,28 @@ global preferences and phone number-->
         <table>
             <tr>
                 <td class="allR">Employee First Name</td>
-                <td><input type="text" name="fname" value=''></td>
+                <td><input type="text" name="fname" value={{prevfname}}></td>
             </tr>
             <tr>
                 <td class="allR">Employee Last Name</td>
-                <td><input type="text" name="lname" value=''></td>
+                <td><input type="text" name="lname" value={{prevlname}}></td>
             </tr>
             <tr>
                 <td class="allR">Employee Email</td>
-                <td><input type="text" name="email" value=''></td>
+                <td><input type="email" name="email" value={{prevemail}}></td>
             </tr>
             <tr>
                 <td class="allR">Employee Phone Number</td>
-                <td><input type="text" name="pnumber" value=''></td>
+                <td><input type="tel" name="pnumber" value={{prevphoneNum}}></td>
             </tr>
             <tr>
                 <td class="allR">Prefer Text Notifications</td>
-                <td><input type="checkbox" name="preftext" value=''></td>
+                <td><input type="checkbox" name="preftext" {% if prevphonePref %} checked {% endif %}></td>
             </tr>
             <tr>
                 <td class="allR">Prefer Email Notifications</td>
-                <td><input type="checkbox" name="prefemail" value=''></td>
+                <td><input type="checkbox" name="prefemail" value={{prevemailPref}} {% if prevemailPref %} checked
+                        {% endif %}></td>
             </tr>
         </table>
         <input type="submit" value="Save">
