@@ -49,7 +49,9 @@ def add_user(firstName, lastName, netid, email=None, phone=None, preferences=Non
     session.commit()
     return
 
-
+def user_exists(netid):
+    return session.query(Users).filter(Users.netid == netid).scalar() is not None
+    
 # removes a user from a group
 def remove_user(netid, groupid):
     session.delete(Users(netid=netid))
@@ -153,8 +155,5 @@ if __name__=="__main__":
     # test
     # add_user('batya','stein','batyas',email='batyas@princeton.edu',phone='7327660532')
     #add_user_to_group(1, 'batyas','member')
-    prefs = [[True,False,True,False],[True,True,True,False]]
-    update_user('test', 'user', 'test123', preferences = create_preferences(prefs))
-    
-    print(get_global_preferences('test123'))
-    print(get_double_array(get_global_preferences('test123')))
+    update_user('test', 'user', 'test123', email = 'test@test.com', emailPref = True, preferences=create_preferences([[1,2],[1,2]]))
+    print(user_exists('test2'))

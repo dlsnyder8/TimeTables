@@ -99,7 +99,11 @@ def profile():
     groupid = 1
     userInfo, notifPrefs = get_profile_info(username, groupid)
 
-    globalPreferences = get_double_array(get_global_preferences(username))
+    globalPreferences = blankSchedule()
+    try:
+        globalPreferences = get_double_array(get_global_preferences(username))
+    except Exception:
+        pass
 
     html = render_template('profile.html', firstName=userInfo.firstname, lastName=userInfo.lastname, netid=username, email=userInfo.email, phoneNum=userInfo.phone, phonePref=notifPrefs.emailnotif, emailPref=notifPrefs.textnotif, schedule=globalPreferences, editable=False)
     response = make_response(html)
@@ -156,8 +160,8 @@ def createProfile():
 
         email = request.form['email']
         pnum = request.form['pnumber']
-        preftext = request.form['preftext']
-        prefemail = request.form['prefemail']
+        preftext = request.form.get('preftext')
+        prefemail = request.form.get('prefemail')
         
         if preftext == 'on': 
             preftext = True
@@ -167,13 +171,17 @@ def createProfile():
             prefemail = True
         else:
             prefemail = False
-        
-        print(preftext,prefemail)
+
         globalPreferences = parseSchedule()
+        print(globalPreferences)
 
         groupid = 1 # for prototype - add user to group one
-        add_user(fname, lname, username, email, pnum, create_preferences(globalPreferences))
-        add_user_to_group(groupid, username, "member", prefemail, preftext, globalPreferences)
+        if not (user_exists(username)):
+            add_user(fname, lname, username, email, pnum, create_preferences(globalPreferences))
+            add_user_to_group(groupid, username, "member", preftext, prefemail, create_preferences(globalPreferences))
+        else:
+            update_user(fname, lname, username, email, pnum, preftext, prefemail, create_preferences(globalPreferences))
+        
 
         return redirect(url_for('profile'))
 
@@ -194,10 +202,17 @@ def editProfile():
     prevphoneNum = userInfo.phone
     prevphonePref = notifPrefs.emailnotif
     prevemailPref = notifPrefs.textnotif
-    prevGlobalPreferences = get_double_array(get_global_preferences(username))
+
+    prevGlobalPreferences = blankSchedule()
+    try:
+        prevGlobalPreferences = get_double_array(get_global_preferences(username))
+    except Exception:
+        pass
 
     if request.method == 'GET':
-        html = render_template('editProfile.html', prevfname=prevfirstName, prevlname=prevlastName, prevemail=prevemail, prevphoneNum=prevphoneNum, prevphonePref=prevphonePref, prevemailPref=prevemailPref, schedule=prevGlobalPreferences, editable=True)
+        html = render_template('editProfile.html', prevfname=prevfirstName, prevlname=prevlastName, \
+            prevemail=prevemail, prevphoneNum=prevphoneNum, prevphonePref=prevphonePref, prevemailPref=prevemailPref, \
+                schedule=prevGlobalPreferences, editable=True)
         response = make_response(html)
         return response
 
