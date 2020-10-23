@@ -95,9 +95,9 @@ def profile():
     groupid = 1
     userInfo, notifPrefs = get_profile_info(username, groupid)
 
-    globalpreferences = testSchedule()
+    globalPreferences = testSchedule()
 
-    html = render_template('profile.html', firstName=userInfo.firstname, lastName=userInfo.lastname, netid=username, email=userInfo.email, phoneNum=userInfo.phone, phonePref=notifPrefs.emailnotif, emailPref=notifPrefs.textnotif, schedule=globalpreferences, editable=False)
+    html = render_template('profile.html', firstName=userInfo.firstname, lastName=userInfo.lastname, netid=username, email=userInfo.email, phoneNum=userInfo.phone, phonePref=notifPrefs.emailnotif, emailPref=notifPrefs.textnotif, schedule=globalPreferences, editable=False)
     response = make_response(html)
 
     return response
@@ -111,9 +111,9 @@ def schedule():
     else:
         username = 'test123'
 
-    globalpreferences = testSchedule()
+    globalPreferences = testSchedule()
 
-    html = render_template('schedule.html', schedule=globalpreferences, editable=False)
+    html = render_template('schedule.html', schedule=globalPreferences, editable=False)
     response = make_response(html)
 
     return response
@@ -155,7 +155,9 @@ def createProfile():
         #preftext = request.args.get('preftext')
         #prefemail = request.args.get('prefemail')
 
-        add_user(fname, lname, username, email, pnum)
+        globalPreferences = parseSchedule()
+
+        add_user(fname, lname, username, email, pnum, globalPreferences)
 
         return redirect(url_for('profile'))
 
@@ -176,10 +178,10 @@ def editProfile():
     prevphoneNum = userInfo.phone
     prevphonePref = notifPrefs.emailnotif
     prevemailPref = notifPrefs.textnotif
-    globalpreferences = testSchedule()
+    prevGlobalPreferences = testSchedule()
 
     if request.method == 'GET':
-        html = render_template('editProfile.html', prevfname=prevfirstName, prevlname=prevlastName, prevemail=prevemail, prevphoneNum=prevphoneNum, prevphonePref=prevphonePref, prevemailPref=prevemailPref, schedule=globalpreferences, editable=True)
+        html = render_template('editProfile.html', prevfname=prevfirstName, prevlname=prevlastName, prevemail=prevemail, prevphoneNum=prevphoneNum, prevphonePref=prevphonePref, prevemailPref=prevemailPref, schedule=prevGlobalPreferences, editable=True)
         response = make_response(html)
         return response
 
@@ -192,7 +194,9 @@ def editProfile():
         #preftext = request.args.get('preftext')
         #prefemail = request.args.get('prefemail')
 
-        update_user(fname, lname, username, email, pnum)
+        globalPreferences = parseSchedule()
+
+        update_user(fname, lname, username, email, pnum, globalPreferences)
 
         return redirect(url_for('profile'))
 
