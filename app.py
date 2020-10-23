@@ -9,7 +9,7 @@ import urllib.parse as urlparse
 #-------------------
 # CAS Authentication cannot be run locally unfortunately
 # Set this variable to False if local, and change to True before pushing
-PROD_ENV = False
+PROD_ENV = True
 
 
 #----------
