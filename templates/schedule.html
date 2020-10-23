@@ -3,25 +3,39 @@
 
 <!DOCTYPE html>
 <html lang='en'>
+
 <head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+
     <title> Schedule </title>
 
-        <!-- Bootstrap core CSS -->
+    <!-- Bootstrap core CSS -->
     <link href="../static/vendor/bootstrap/css/bootstrap.css" rel="stylesheet">
-    
+
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 </head>
 <style>
-    .allR {text-align: right;}
-    .allC {text-align: center;}
+    .allR {
+        text-align: right;
+    }
+
+    .allC {
+        text-align: center;
+    }
 </style>
+
 <body>
     {% include 'header.html' %}
 
-    <b>Schedule</b><br>
+    <h1>Schedule</h1><br>
     <p>Input your availability in your profile to get shifts assigned.<br>
-    To be scheduled, you must be available for the entirety of a shift.<br>
-    There are 3 shifts each day this week:
+        To be scheduled, you must be available for the entirety of a shift.<br>
+        There are 3 shifts each day this week:
     <ul>
         <li> 8:00 am - 11:00 am</li>
         <li> 11:00 am - 2:00 pm</li>
@@ -32,5 +46,11 @@
     {% include 'scheduleElement.html' %}
     <hr>
     {% include 'footer.html' %}
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="../static/vendor/jquery/jquery.min.js"></script>
+    <script src="../static/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
 </body>
+
 </html>

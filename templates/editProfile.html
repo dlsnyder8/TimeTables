@@ -4,10 +4,18 @@ global preferences and phone number-->
 <html lang='en'>
 
 <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
     <title> Edit Profile </title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="../static/vendor/bootstrap/css/bootstrap.css" rel="stylesheet">
+
 </head>
 <style>
-
     .allR {
         text-align: right;
     }
@@ -27,11 +35,11 @@ global preferences and phone number-->
         <table>
             <tr>
                 <td class="allR">Employee First Name</td>
-                <td><input type="text" name="fname"  required value={{prevfname}}></td>
+                <td><input type="text" name="fname" required value={{prevfname}}></td>
             </tr>
             <tr>
                 <td class="allR">Employee Last Name</td>
-                <td><input type="text" name="lname"  required value={{prevlname}}></td>
+                <td><input type="text" name="lname" required value={{prevlname}}></td>
             </tr>
             <tr>
                 <td class="allR">Employee Email</td>
@@ -61,7 +69,12 @@ global preferences and phone number-->
     </form>
     <hr>
     {% include 'footer.html' %}
+
+    <!-- Bootstrap core JavaScript -->
+
+    <script src="../static/vendor/jquery/jquery.min.js"></script>
+    <script src="../static/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
 </body>
 
 </html>
-
