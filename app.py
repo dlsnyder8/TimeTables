@@ -2,6 +2,7 @@ from flask import Flask
 from flask import render_template, make_response, request, redirect, url_for
 from CASClient import CASClient
 from database import *
+from shifttest import *
 import os
 from sys import stderr, exit
 import urllib.parse as urlparse
@@ -125,10 +126,14 @@ def schedule():
     if not (user_exists(username)):
         return redirect(url_for('createProfile'))
 
-
+    
+    
+    
     globalPreferences = get_double_array(get_global_preferences(username))
+    edict = solve_shift_scheduling("", "", 10, 1, ['O', 'M', 'A', 'N'], [], create_requests(globalPreferences, 0))
+    
 
-    html = render_template('schedule.html', schedule=globalPreferences, editable=False)
+    html = render_template('schedule.html', schedule=create_schedule(edict, 0), editable=False)
     response = make_response(html)
 
     return response
@@ -182,7 +187,6 @@ def createProfile():
             prefemail = False
 
         globalPreferences = parseSchedule()
-        print(globalPreferences)
 
         groupid = 1 # for prototype - add user to group one
         if not (user_exists(username)):
