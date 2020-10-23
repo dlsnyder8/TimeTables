@@ -157,7 +157,7 @@ def createProfile():
 
         globalPreferences = parseSchedule()
 
-        add_user(fname, lname, username, email, pnum)
+        add_user(fname, lname, username, email, pnum, globalPreferences)
 
         return redirect(url_for('profile'))
 
@@ -196,7 +196,7 @@ def editProfile():
 
         globalPreferences = parseSchedule()
 
-        update_user(fname, lname, username, email, pnum)
+        update_user(fname, lname, username, email, pnum, globalPreferences)
 
         return redirect(url_for('profile'))
 
