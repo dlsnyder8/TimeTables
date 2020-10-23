@@ -18,12 +18,6 @@ PROD_ENV = False
 app = Flask(__name__)
 app.secret_key = b'\x06)\x8e\xa3BW"\x9d\xcd\x1d5)\xd6\xd1b1'
 
-
-def testParse():
-    return request.args.get("12-1-0-0")
-
-
-
 # takes a request and returns the schedule values
 def parseSchedule():
     table_values = []
@@ -94,9 +88,9 @@ def profile():
     groupid = 1
     userInfo, notifPrefs = get_profile_info(username, groupid)
 
-    globalpreferences=testSchedule()
+    globalpreferences = testSchedule()
 
-    html = render_template('profile.html', firstName = userInfo.firstname, lastName = userInfo.lastname, netid=username, email=userInfo.email, phoneNum=userInfo.phone, phonePref=notifPrefs.emailnotif, emailPref=notifPrefs.textnotif, schedule=globalpreferences, editable=False)
+    html = render_template('profile.html', firstName=userInfo.firstname, lastName=userInfo.lastname, netid=username, email=userInfo.email, phoneNum=userInfo.phone, phonePref=notifPrefs.emailnotif, emailPref=notifPrefs.textnotif, schedule=globalpreferences, editable=False)
     response = make_response(html)
 
     return response
@@ -130,7 +124,7 @@ def groupInfo():
     return response
 
 
-@app.route('/createProfile',methods=['GET','POST'])
+@app.route('/createProfile', methods=['GET', 'POST'])
 def createProfile():
     if(PROD_ENV):
         username = CASClient().authenticate()
@@ -153,6 +147,7 @@ def createProfile():
         pnum = request.form['pnumber']
         #preftext = request.args.get('preftext')
         #prefemail = request.args.get('prefemail')
+
         add_user(fname, lname, username, email, pnum)
 
         return redirect(url_for('profile'))
@@ -189,6 +184,9 @@ def editProfile():
         pnum = request.form['pnumber']
         #preftext = request.args.get('preftext')
         #prefemail = request.args.get('prefemail')
+
+        print("test value =")
+        print(request.form["12-1-0-0"])
 
         update_user(fname, lname, username, email, pnum)
 
