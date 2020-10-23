@@ -1,7 +1,7 @@
 from flask import Flask
 from flask import render_template, make_response, request, redirect, url_for
 from CASClient import CASClient
-from database import get_profile_info, add_user, update_user
+from database import get_profile_info, add_user, update_user, create_preferences
 import os
 from sys import stderr, exit
 import urllib.parse as urlparse
@@ -157,7 +157,7 @@ def createProfile():
 
         globalPreferences = parseSchedule()
 
-        add_user(fname, lname, username, email, pnum, globalPreferences)
+        add_user(fname, lname, username, email, pnum, create_preferences(globalPreferences))
 
         return redirect(url_for('profile'))
 
@@ -196,7 +196,7 @@ def editProfile():
 
         globalPreferences = parseSchedule()
 
-        update_user(fname, lname, username, email, pnum, globalPreferences)
+        update_user(fname, lname, username, email, pnum, create_preferences(globalPreferences))
 
         return redirect(url_for('profile'))
 
