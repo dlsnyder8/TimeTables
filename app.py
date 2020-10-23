@@ -77,7 +77,7 @@ def index():
     if(PROD_ENV):
         username = CASClient().authenticate()
     else:
-        username = 'test123'
+        username = 'test2'
     html = render_template('index.html')
     response = make_response(html)
 
@@ -90,7 +90,7 @@ def profile():
     if(PROD_ENV):
         username = CASClient().authenticate()
     else:
-        username = 'test123'
+        username = 'test2'
     # is netid = username?
     # get groupid from cookie that takes info from input into index page
     groupid = 1
@@ -112,7 +112,7 @@ def schedule():
     if(PROD_ENV):
         username = CASClient().authenticate()
     else:
-        username = 'test123'
+        username = 'test2'
 
     globalPreferences = get_double_array(get_global_preferences(username))
 
@@ -126,7 +126,7 @@ def groupInfo():
     if(PROD_ENV):
         username = CASClient().authenticate()
     else:
-        username = 'test123'
+        username = 'test2'
 
     html = render_template('groupInfo.html')
     response = make_response(html)
@@ -140,7 +140,7 @@ def createProfile():
         username = CASClient().authenticate()
     else:
         # for test purposes
-        username = 'batyas'
+        username = 'test2'
 
     # add error handling if username already exists in database
 
@@ -155,9 +155,19 @@ def createProfile():
 
         email = request.form['email']
         pnum = request.form['pnumber']
-        preftext = request.args.get('preftext')
-        prefemail = request.args.get('prefemail')
-
+        preftext = request.form['preftext']
+        prefemail = request.form['prefemail']
+        
+        if preftext == 'on': 
+            preftext = True
+        else:
+            preftext = False
+        if prefemail == 'on': 
+            prefemail = True
+        else:
+            prefemail = False
+        
+        print(preftext,prefemail)
         globalPreferences = parseSchedule()
 
         groupid = 1 # for prototype - add user to group one
@@ -171,7 +181,7 @@ def editProfile():
     if(PROD_ENV):
         username = CASClient().authenticate()
     else:
-        username = 'test123'
+        username = 'test2'
 
     # add error handling if username already exists in database
 
@@ -196,12 +206,21 @@ def editProfile():
 
         email = request.form['email']
         pnum = request.form['pnumber']
-        #preftext = request.args.get('preftext')
-        #prefemail = request.args.get('prefemail')
+        preftext = request.form.get('preftext')
+        prefemail = request.form.get('prefemail')
 
         globalPreferences = parseSchedule()
 
-        update_user(fname, lname, username, email, pnum, create_preferences(globalPreferences))
+        if preftext == 'on': 
+            preftext = True
+        else:
+            preftext = False
+        if prefemail == 'on': 
+            prefemail = True
+        else:
+            prefemail = False
+
+        update_user(fname, lname, username, email, pnum, preftext, prefemail, create_preferences(globalPreferences))
 
         return redirect(url_for('profile'))
 

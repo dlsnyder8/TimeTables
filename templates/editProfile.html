@@ -43,13 +43,12 @@ global preferences and phone number-->
                         {% endif %}></td>
             </tr>
             <tr>
-                <td class="allR">Prefer Text Notifications</td>
-                <td><input type="checkbox" name="preftext" {% if prevphonePref %} checked {% endif %}></td>
+                <td class="allR">Receive Text Notifications</td>
+                <td><input type="checkbox" name="preftext" {% if prevphonePref %} checked {% endif %} value="on"></td>
             </tr>
             <tr>
-                <td class="allR">Prefer Email Notifications</td>
-                <td><input type="checkbox" name="prefemail" value={{prevemailPref}} {% if prevemailPref %} checked
-                        {% endif %}></td>
+                <td class="allR">Receive Email Notifications</td>
+                <td><input type="checkbox" name="prefemail" {% if prevemailPref %} checked {% endif %} value="on"></td>
             </tr>
         </table>
         <hr>
