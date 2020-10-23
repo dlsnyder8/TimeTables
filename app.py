@@ -30,7 +30,10 @@ def parseSchedule():
                 split = "0"
             else:
                 split = "1"
-            str_call = str(1+(time % 12)) + "-" + str(1+((time + 1) % 12)) + "-" + str(split) + "-" + str(day)
+            hour = time % 12
+            if hour == 0:
+                hour = 12
+            str_call = str(hour) + "-" + str(1+((time) % 12)) + "-" + str(split) + "-" + str(day)
             week.append(request.form.get(str_call))
         table_values.append(week)
 
@@ -95,8 +98,6 @@ def profile():
     # get groupid from cookie that takes info from input into index page
     groupid = 1
     userInfo, notifPrefs = get_profile_info(username, groupid)
-
-    print(get_double_array(get_global_preferences(username)))
 
     globalPreferences = get_double_array(get_global_preferences(username))
 
