@@ -146,7 +146,8 @@ def get_profile_info(netid, groupid):
     return userInfo, notifPrefs
 
 
-# adds a user to the database
+# updates all user info that's saved when profile is edited 
+# (name, email, phone, glocabl preferences, notif preferences(group specific))
 def update_user(firstName, lastName, netid, email=None, phone=None, textPref=False, emailPref=False, preferences=None):
     session.query(Users).filter_by(netid=netid).update({Users.firstname : firstName, Users.lastname: lastName, Users.email: email, Users.phone: phone, Users.globalpreferences: preferences})
     session.query(Group_members).filter_by(netid=netid).update({Group_members.emailnotif: emailPref, Group_members.textnotif: textPref})
