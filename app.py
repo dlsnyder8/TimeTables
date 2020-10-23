@@ -95,6 +95,8 @@ def profile():
     groupid = 1
     userInfo, notifPrefs = get_profile_info(username, groupid)
 
+    print(get_double_array(get_global_preferences(username)))
+
     globalPreferences = get_double_array(get_global_preferences(username))
 
     html = render_template('profile.html', firstName=userInfo.firstname, lastName=userInfo.lastname, netid=username, email=userInfo.email, phoneNum=userInfo.phone, phonePref=notifPrefs.emailnotif, emailPref=notifPrefs.textnotif, schedule=globalPreferences, editable=False)
@@ -111,7 +113,7 @@ def schedule():
     else:
         username = 'test123'
 
-    globalPreferences = testSchedule()
+    globalPreferences = get_double_array(get_global_preferences(username))
 
     html = render_template('schedule.html', schedule=globalPreferences, editable=False)
     response = make_response(html)
@@ -178,7 +180,7 @@ def editProfile():
     prevphoneNum = userInfo.phone
     prevphonePref = notifPrefs.emailnotif
     prevemailPref = notifPrefs.textnotif
-    prevGlobalPreferences = testSchedule()
+    prevGlobalPreferences = get_double_array(get_global_preferences(username))
 
     if request.method == 'GET':
         html = render_template('editProfile.html', prevfname=prevfirstName, prevlname=prevlastName, prevemail=prevemail, prevphoneNum=prevphoneNum, prevphonePref=prevphonePref, prevemailPref=prevemailPref, schedule=prevGlobalPreferences, editable=True)
