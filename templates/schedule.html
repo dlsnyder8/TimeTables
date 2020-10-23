@@ -3,9 +3,34 @@
 
 <!DOCTYPE html>
 <html lang='en'>
-   
+<head>
+    <title> Schedule </title>
 
-    {% include 'header.html' %}   <br>
+        <!-- Bootstrap core CSS -->
+    <link href="../static/vendor/bootstrap/css/bootstrap.css" rel="stylesheet">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+</head>
+<style>
+    .allR {text-align: right;}
+    .allC {text-align: center;}
+</style>
+<body>
+    {% include 'header.html' %}
 
     <b>Schedule</b><br>
+    <p>Input your availability in your profile to get shifts assigned.<br>
+    To be scheduled, you must be available for the entirety of a shift.<br>
+    There are 3 shifts each day this week:
+    <ul>
+        <li> 8:00 am - 11:00 am</li>
+        <li> 11:00 am - 2:00 pm</li>
+        <li> 2:00 pm - 5:00 pm</li>
+    </ul>
+    </p>
+
+    {% include 'scheduleElement.html' %}
+    <hr>
+    {% include 'footer.html' %}
+</body>
 </html>

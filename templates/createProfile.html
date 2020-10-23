@@ -4,10 +4,15 @@ global preferences and phone number-->
 <html lang='en'>
 
 <head>
-    <title> Edit Profile </title>
+    <title> Create Profile </title>
+
+
+    <!-- Bootstrap core CSS -->
+    <link href="../static/vendor/bootstrap/css/bootstrap.css" rel="stylesheet">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 </head>
 <style>
-
     .allR {
         text-align: right;
     }
@@ -19,41 +24,40 @@ global preferences and phone number-->
 
 <body>
     {% include 'header.html' %}
-    <h1>Edit Profile</h1>
+    <h1>First, Create Your Profile</h1>
     <hr>
-    <h2>Edit Information</h2>
+    <h2>Information</h2>
     <hr>
     <form action='' method="post">
         <table>
             <tr>
                 <td class="allR">Employee First Name</td>
-                <td><input type="text" name="fname"  required value={{prevfname}}></td>
+                <td><input type="text" name="fname" value='' required></td>
             </tr>
             <tr>
                 <td class="allR">Employee Last Name</td>
-                <td><input type="text" name="lname"  required value={{prevlname}}></td>
+                <td><input type="text" name="lname" value='' required></td>
             </tr>
             <tr>
                 <td class="allR">Employee Email</td>
-                <td><input type="email" multiple name="email" {% if prevemail: %} value={{prevemail}} {% else %}
-                        value="" {% endif %}></td>
+                <td><input type="email" multiple name="email" value=''></td>
             </tr>
             <tr>
                 <td class="allR">Employee Phone Number</td>
-                <td><input type="tel" name="pnumber" {% if prevemail: %} value={{prevphoneNum}} {% else %} value=""
-                        {% endif %}></td>
+                <td><input type="tel" name="pnumber" value=''></td>
             </tr>
             <tr>
-                <td class="allR">Receive Text Notifications</td>
-                <td><input type="checkbox" name="preftext" {% if prevphonePref %} checked {% endif %} value="on"></td>
+                <td class="allR">Text Notifications (optional)</td>
+                <td><input type="checkbox" name="preftext" value="on"></td>
             </tr>
             <tr>
-                <td class="allR">Receive Email Notifications</td>
-                <td><input type="checkbox" name="prefemail" {% if prevemailPref %} checked {% endif %} value="on"></td>
+                <td class="allR">Email Notifications (optional)</td>
+                <td><input type="checkbox" name="prefemail" value="on"></td>
             </tr>
         </table>
         <hr>
-        <h2>Edit Time Preferences</h2>
+        <hr>
+        <h2>Time Preferences</h2>
         <hr>
         {% include 'scheduleElement.html' %}
         <hr>
@@ -64,4 +68,3 @@ global preferences and phone number-->
 </body>
 
 </html>
-

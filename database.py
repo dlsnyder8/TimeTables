@@ -29,6 +29,19 @@ Users = Base.classes.users
 Groups = Base.classes.groups
 Group_members = Base.classes.groupmembers
 
+# call this function on the preferences array
+def create_preferences(hoursList):
+    output = {}
+    for i in range(len(hoursList)):
+        output[i] = hoursList[i]
+    return output
+
+# dict to double array
+def get_double_array(preferences):
+    output = []
+    for i in range(len(preferences)):
+        output.append(preferences[str(i)])
+    return output
 
 # adds a user to the database
 def add_user(firstName, lastName, netid, email=None, phone=None, preferences=None):
@@ -36,7 +49,9 @@ def add_user(firstName, lastName, netid, email=None, phone=None, preferences=Non
     session.commit()
     return
 
-
+def user_exists(netid):
+    return session.query(Users).filter(Users.netid == netid).scalar() is not None
+    
 # removes a user from a group
 def remove_user(netid, groupid):
     session.delete(Users(netid=netid))
@@ -50,9 +65,12 @@ def change_user_preferences_global(netid, preferences):
     session.commit()
     return
 
+# this could break if we change database row names!
 def get_global_preferences(netid):
     pref = session.query(Users.globalpreferences).filter_by(netid=netid).first()
-    return pref 
+
+    return pref._asdict()['globalpreferences']
+
 
 # replaces weekly preferences of user. If none specified, 
 # replaces it with global preferences
@@ -127,9 +145,21 @@ def get_profile_info(netid, groupid):
     notifPrefs = session.query(Group_members.emailnotif, Group_members.textnotif).filter_by(netid=netid, groupid=groupid).first()
     return userInfo, notifPrefs
 
+
+# adds a user to the database
+def update_user(firstName, lastName, netid, email=None, phone=None, textPref=False, emailPref=False, preferences=None):
+    session.query(Users).filter_by(netid=netid).update({Users.firstname : firstName, Users.lastname: lastName, Users.email: email, Users.phone: phone, Users.globalpreferences: preferences})
+    session.query(Group_members).filter_by(netid=netid).update({Group_members.emailnotif: emailPref, Group_members.textnotif: textPref})
+
+    session.commit()
+    return
+
+
 if __name__=="__main__":
     # test
     # add_user('batya','stein','batyas',email='batyas@princeton.edu',phone='7327660532')
     #add_user_to_group(1, 'batyas','member')
-    print(get_user_id(1,'batyas').inc)
-    print(get_profile_info('batyas',1))
+
+    update_user('test', 'user', 'test123', email = 'test@test.com', emailPref = True, preferences=create_preferences([[1,2],[1,2]]))
+    print(user_exists('test2'))
+
