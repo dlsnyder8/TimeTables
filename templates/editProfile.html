@@ -34,11 +34,13 @@ global preferences and phone number-->
             </tr>
             <tr>
                 <td class="allR">Employee Email</td>
-                <td><input type="email" name="email" value={{prevemail}}></td>
+                <td><input type="email" multiple name="email" {% if prevemail: %} value={{prevemail}} {% else %}
+                        value="" {% endif %}></td>
             </tr>
             <tr>
                 <td class="allR">Employee Phone Number</td>
-                <td><input type="tel" name="pnumber" value={{prevphoneNum}}></td>
+                <td><input type="tel" name="pnumber" {% if prevemail: %} value={{prevphoneNum}} {% else %} value=""
+                        {% endif %}></td>
             </tr>
             <tr>
                 <td class="allR">Prefer Text Notifications</td>
@@ -50,9 +52,9 @@ global preferences and phone number-->
                         {% endif %}></td>
             </tr>
         </table>
-    <hr>
-    <h2>Edit Time Preferences</h2>
-    <hr>
+        <hr>
+        <h2>Edit Time Preferences</h2>
+        <hr>
         {% include 'scheduleElement.html' %}
         <hr>
         <input type="submit" value="Save">

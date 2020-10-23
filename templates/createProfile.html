@@ -5,6 +5,12 @@ global preferences and phone number-->
 
 <head>
     <title> Create Profile </title>
+
+    
+        <!-- Bootstrap core CSS -->
+    <link href="../static/vendor/bootstrap/css/bootstrap.css" rel="stylesheet">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 </head>
 <style>
     .allR {
@@ -34,11 +40,11 @@ global preferences and phone number-->
             </tr>
             <tr>
                 <td class="allR">Employee Email</td>
-                <td><input type="text" name="email" value=''></td>
+                <td><input type="email" multiple name="email" value=''></td>
             </tr>
             <tr>
                 <td class="allR">Employee Phone Number</td>
-                <td><input type="text" name="pnumber" value=''></td>
+                <td><input type="tel" name="pnumber" value=''></td>
             </tr>
             <tr>
                 <td class="allR">Text Notifications (optional)</td>
@@ -50,9 +56,9 @@ global preferences and phone number-->
             </tr>
         </table>
         <hr>
-    <hr>
-    <h2>Time Preferences</h2>
-    <hr>
+        <hr>
+        <h2>Time Preferences</h2>
+        <hr>
         <table>
             <tr>
                 <td></td>
