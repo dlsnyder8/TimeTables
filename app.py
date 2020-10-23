@@ -94,6 +94,9 @@ def profile():
         username = CASClient().authenticate()
     else:
         username = 'test2'
+
+    if not (user_exists(username)):
+        return redirect(url_for('createProfile'))
     # is netid = username?
     # get groupid from cookie that takes info from input into index page
     groupid = 1
@@ -118,6 +121,10 @@ def schedule():
         username = CASClient().authenticate()
     else:
         username = 'test2'
+    
+    if not (user_exists(username)):
+        return redirect(url_for('createProfile'))
+
 
     globalPreferences = get_double_array(get_global_preferences(username))
 
@@ -150,6 +157,8 @@ def createProfile():
     # add error handling if username already exists in database
 
     if request.method == 'GET':
+        if (user_exists(username)):
+            return redirect(url_for('profile'))
         html = render_template('createProfile.html', schedule=blankSchedule(), editable=True)
         response = make_response(html)
         return response
