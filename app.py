@@ -23,7 +23,7 @@ def parseSchedule():
     table_values = []
     slot_num = 24  # number of time slots in schedule, should be even
     for i in range(slot_num):  # iterates through time slots
-        time = 11
+        time = i
         week = []
         for day in range(7):  # iterates through days in a week
             if i < (slot_num/2):
@@ -33,6 +33,7 @@ def parseSchedule():
             str_call = str(1+(time % 12)) + "-" + str(1+((time + 1) % 12)) + "-" + str(split) + "-" + str(day)
             week.append(request.form.get(str_call))
         table_values.append(week)
+
     for i in range(len(table_values)):
         for j in range(len(table_values[i])):
             if table_values[i][j] is None:
