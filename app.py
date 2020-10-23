@@ -1,7 +1,7 @@
 from flask import Flask
 from flask import render_template, make_response, request, redirect, url_for
 from CASClient import CASClient
-from database import get_profile_info, add_user, update_user, create_preferences, get_double_array, get_global_preferences
+from database import *
 import os
 from sys import stderr, exit
 import urllib.parse as urlparse
@@ -155,11 +155,14 @@ def createProfile():
 
         email = request.form['email']
         pnum = request.form['pnumber']
-        #preftext = request.args.get('preftext')
-        #prefemail = request.args.get('prefemail')
+        preftext = request.args.get('preftext')
+        prefemail = request.args.get('prefemail')
 
         globalPreferences = parseSchedule()
+
+        groupid = 1 # for prototype - add user to group one
         add_user(fname, lname, username, email, pnum, create_preferences(globalPreferences))
+        add_user_to_group(groupid, username, "member", prefemail, preftext, globalPreferences)
 
         return redirect(url_for('profile'))
 
