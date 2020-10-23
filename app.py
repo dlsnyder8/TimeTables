@@ -31,8 +31,15 @@ def parseSchedule():
             else:
                 split = "1"
             str_call = str(1+(time % 12)) + "-" + str(1+((time + 1) % 12)) + "-" + str(split) + "-" + str(day)
-            week.append(request.form[str_call])
+            week.append(request.form.get(str_call))
         table_values.append(week)
+    for i in range(len(table_values)):
+        for j in range(len(table_values[i])):
+            if table_values[i][j] is None:
+                table_values[i][j] = False
+            else:
+                table_values[i][j] = True
+
     return table_values
 
 
@@ -184,9 +191,6 @@ def editProfile():
         pnum = request.form['pnumber']
         #preftext = request.args.get('preftext')
         #prefemail = request.args.get('prefemail')
-
-        print("test value =")
-        print(request.form["12-1-0-0"])
 
         update_user(fname, lname, username, email, pnum)
 
