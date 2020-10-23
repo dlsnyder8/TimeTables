@@ -19,6 +19,11 @@ app = Flask(__name__)
 app.secret_key = b'\x06)\x8e\xa3BW"\x9d\xcd\x1d5)\xd6\xd1b1'
 
 
+def testParse():
+    return request.args.get("12-1-0-0")
+
+
+
 # takes a request and returns the schedule values
 def parseSchedule():
     table_values = []
@@ -184,7 +189,8 @@ def editProfile():
         pnum = request.form['pnumber']
         #preftext = request.args.get('preftext')
         #prefemail = request.args.get('prefemail')
-        update_user(fname, lname, username, email, pnum, globalpreferences)
+
+        update_user(fname, lname, username, email, pnum)
 
         return redirect(url_for('profile'))
 
