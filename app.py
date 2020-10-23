@@ -159,7 +159,6 @@ def createProfile():
         #prefemail = request.args.get('prefemail')
 
         globalPreferences = parseSchedule()
-
         add_user(fname, lname, username, email, pnum, create_preferences(globalPreferences))
 
         return redirect(url_for('profile'))
