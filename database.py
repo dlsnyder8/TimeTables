@@ -68,7 +68,9 @@ def change_user_preferences_global(netid, preferences):
 # this could break if we change database row names!
 def get_global_preferences(netid):
     pref = session.query(Users.globalpreferences).filter_by(netid=netid).first()
+
     return pref._asdict()['globalpreferences']
+
 
 # replaces weekly preferences of user. If none specified, 
 # replaces it with global preferences
@@ -143,6 +145,7 @@ def get_profile_info(netid, groupid):
     notifPrefs = session.query(Group_members.emailnotif, Group_members.textnotif).filter_by(netid=netid, groupid=groupid).first()
     return userInfo, notifPrefs
 
+
 # adds a user to the database
 def update_user(firstName, lastName, netid, email=None, phone=None, textPref=False, emailPref=False, preferences=None):
     session.query(Users).filter_by(netid=netid).update({Users.firstname : firstName, Users.lastname: lastName, Users.email: email, Users.phone: phone, Users.globalpreferences: preferences})
@@ -151,9 +154,12 @@ def update_user(firstName, lastName, netid, email=None, phone=None, textPref=Fal
     session.commit()
     return
 
+
 if __name__=="__main__":
     # test
     # add_user('batya','stein','batyas',email='batyas@princeton.edu',phone='7327660532')
     #add_user_to_group(1, 'batyas','member')
+
     update_user('test', 'user', 'test123', email = 'test@test.com', emailPref = True, preferences=create_preferences([[1,2],[1,2]]))
     print(user_exists('test2'))
+

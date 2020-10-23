@@ -1,8 +1,10 @@
 from flask import Flask
 from flask import render_template, make_response, request, redirect, url_for
 from CASClient import CASClient
+
 from database import *
 from shifttest import *
+
 import os
 from sys import stderr, exit
 import urllib.parse as urlparse
@@ -94,7 +96,8 @@ def profile():
     if(PROD_ENV):
         username = CASClient().authenticate()
     else:
-        username = 'test2'
+
+        username = 'test2' # or test123
 
     if not (user_exists(username)):
         return redirect(url_for('createProfile'))
@@ -110,6 +113,7 @@ def profile():
         pass
 
     html = render_template('profile.html', firstName=userInfo.firstname, lastName=userInfo.lastname, netid=username, email=userInfo.email, phoneNum=userInfo.phone, phonePref=notifPrefs.emailnotif, emailPref=notifPrefs.textnotif, schedule=globalPreferences, editable=False)
+
     response = make_response(html)
 
     return response
