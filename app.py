@@ -77,13 +77,17 @@ def blankSchedule():
     return table_values
 
 
-@app.route('/',methods=['GET'])
-@app.route('/index',methods=['GET'])
+@app.route('/', methods=['GET'])
+@app.route('/index', methods=['GET'])
 def index():
-    if(PROD_ENV):
+    if (PROD_ENV):
         username = CASClient().authenticate()
     else:
         username = 'test2'
+
+    if not (user_exists(username)):
+        return redirect(url_for('createProfile'))
+
     html = render_template('index.html')
     response = make_response(html)
 
