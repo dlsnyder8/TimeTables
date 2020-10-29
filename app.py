@@ -155,6 +155,31 @@ def groupInfo():
     return response
 
 
+@app.route('/weekly', methods=['GET', 'POST'])
+def weeklyPreferences():
+    if (PROD_ENV):
+        username = CASClient().authenticate()
+    else:
+        username = 'test2'
+
+    if request.method == 'GET':
+        if not (user_exists(username)):
+            return redirect(url_for('createProfile'))
+        globalPreferences = get_double_array(get_global_preferences(username))
+        html = render_template('weekly.html', schedule=globalPreferences, editable=True)
+        response = make_response(html)
+        return response
+
+    else:
+        prefs = parseSchedule()
+
+        groupid = 1  # for prototype - add user to group one
+        # update_user(fname, lname, username, email, pnum, preftext, prefemail, create_preferences(globalPreferences))
+
+    return redirect(url_for('index'))
+
+
+
 @app.route('/createProfile', methods=['GET', 'POST'])
 def createProfile():
     if(PROD_ENV):
