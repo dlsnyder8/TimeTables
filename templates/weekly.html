@@ -26,8 +26,11 @@
     <p>Input your availability in your profile to get shifts assigned.<br>
         To be scheduled, you must be available for the entirety of a shift.<br>
     </p>
+    <form action='' method="post">
+        {% include 'scheduleElement.html' %}
+        <input type="submit" value="Save">
+    </form>
 
-    {% include 'scheduleElement.html' %}
     <hr>
     {% include 'footer.html' %}
 
