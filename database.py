@@ -195,7 +195,7 @@ def change_group_role(groupid, netid, role):
 # change the notifications of a person in a group
 # email and text should always be specified when calling this function
 def change_group_notifications(groupid, netid, emailnotif = False, textnotif = False):
-    userid=get_user_id(groupid,netid)
+    userid = get_user_id(groupid,netid)
     if userid == -1:
         return -1
     try:
@@ -206,23 +206,28 @@ def change_group_notifications(groupid, netid, emailnotif = False, textnotif = F
         return -1
     return
 
-# retrieve name, email, phone from user table & notif prefs from group table
-def get_profile_info(netid, groupid):
+# retrieve name, email, phone from user table
+def get_profile_info(netid):
     try:
         userInfo = session.query(Users.firstname, Users.lastname, Users.email, Users.phone).filter_by(netid=netid).first()
-        notifPrefs = session.query(Group_members.emailnotif, Group_members.textnotif).filter_by(netid=netid, groupid=groupid).first()
-        return userInfo, notifPrefs
+        return userInfo
     except:
         return -1
 
+# retrieve user's notification preferences from specific group
+def get_group_notifications(netid, grouid):
+    try:
+        userid = get_user_id(grouid, netid)
+        notifPrefs = session.query(Group_members.emailnotif, Group_members.textnotif).filter_by(userid=userid).first()
+        return notifPrefs
+    except:
+        return -1
 
-# updates all user info that's saved when profile is edited 
-# (name, email, phone, glocabl preferences, notif preferences(group specific))
-def update_user(firstName, lastName, netid, email=None, phone=None, textPref=False, emailPref=False, preferences=None):
+# updates profile info
+# (name, email, phone)
+def update_profile_info(firstName, lastName, netid, email=None, phone=None, preferences=None):
     try:
         session.query(Users).filter_by(netid=netid).update({Users.firstname : firstName, Users.lastname: lastName, Users.email: email, Users.phone: phone, Users.globalpreferences: preferences})
-        session.query(Group_members).filter_by(netid=netid).update({Group_members.emailnotif: emailPref, Group_members.textnotif: textPref})
-
         session.commit()
     except:
         session.rollback()
@@ -238,6 +243,6 @@ if __name__=="__main__":
     # add_user('batya','stein','batyas',email='batyas@princeton.edu',phone='7327660532')
     #add_user_to_group(1, 'batyas','member')
 
-    update_user('test', 'user', 'test123', email = 'test@test.com', emailPref = True, preferences=create_preferences([[1,2],[1,2]]))
+    update_profile_info('test', 'user', 'test123', email = 'test@test.com', preferences=create_preferences([[1,2],[1,2]]))
     print(user_exists('test2'))
 

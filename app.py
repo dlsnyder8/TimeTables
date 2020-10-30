@@ -108,7 +108,8 @@ def profile():
     # is netid = username?
     # get groupid from cookie that takes info from input into index page
     groupid = 1
-    userInfo, notifPrefs = get_profile_info(username, groupid)
+    userInfo = get_profile_info(username)
+    notifPrefs = get_group_notifications(username, groupid)
 
     globalPreferences = blankSchedule()
     try:
@@ -240,7 +241,8 @@ def editProfile():
     # add error handling if username already exists in database
 
     groupid = 1
-    userInfo, notifPrefs = get_profile_info(username, groupid)
+    userInfo = get_profile_info(username)
+    notifPrefs = get_group_notifications(username, groupid)
     prevfirstName = userInfo.firstname
     prevlastName = userInfo.lastname
     prevemail = userInfo.email
@@ -281,7 +283,8 @@ def editProfile():
         else:
             prefemail = False
 
-        update_user(fname, lname, username, email, pnum, preftext, prefemail, create_preferences(globalPreferences))
+        update_profile_info(fname, lname, username, email, pnum, create_preferences(globalPreferences))
+        change_group_notifications(groupid, username, prefemail, preftext)
 
         return redirect(url_for('profile'))
 
