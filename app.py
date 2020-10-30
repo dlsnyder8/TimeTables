@@ -167,18 +167,20 @@ def weeklyPreferences():
     else:
         username = 'test2'
 
+    groupid = 1  # will be changed
+
     if request.method == 'GET':
         if not (user_exists(username)):
             return redirect(url_for('createProfile'))
-        globalPreferences = get_double_array(get_global_preferences(username))
-        html = render_template('weekly.html', schedule=globalPreferences, editable=True)
+        #  weeklyPreferences = get_user_preferences_group(groupid, username) unimplemented, but will be used eventually
+        weeklyPreferences = get_double_array(get_global_preferences(username))  # will be removed upon ^^ implementation
+        html = render_template('weekly.html', schedule=weeklyPreferences, editable=True)
         response = make_response(html)
         return response
 
     else:
         prefs = create_preferences(parseSchedule())
-        groupid = 1  # for prototype - add user to group one
-        # change_group_schedule(groupid, prefs) needs method for updating weekly
+        change_user_preferences_group(groupid, username, prefs)
 
     return redirect(url_for('index'))
 
