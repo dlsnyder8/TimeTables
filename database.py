@@ -226,7 +226,7 @@ def update_user(firstName, lastName, netid, email=None, phone=None, textPref=Fal
         session.commit()
     except:
         session.rollback()
-        return -1
+        return
     return
 
 def rollback():
