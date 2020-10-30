@@ -150,7 +150,7 @@ def add_group(owner, groupName, shiftSchedule = None):
 # removes a group
 def remove_group(groupid):
     try:
-        session.delete(Groups(grouid=groupid))
+        session.delete(Groups(groupid=groupid))
         session.commit()
     except:
         session.rollback()
@@ -215,9 +215,9 @@ def get_profile_info(netid):
         return -1
 
 # retrieve user's notification preferences from specific group
-def get_group_notifications(netid, grouid):
+def get_group_notifications(netid, groupid):
     try:
-        userid = get_user_id(grouid, netid)
+        userid = get_user_id(groupid, netid)
         notifPrefs = session.query(Group_members.emailnotif, Group_members.textnotif).filter_by(inc=userid).first()
         return notifPrefs
     except:
@@ -233,6 +233,17 @@ def update_profile_info(firstName, lastName, netid, email=None, phone=None, pref
         session.rollback()
     return
 
+# get all groups that user is part of 
+# (queries with netid instead of inc b/c each group that a user is in has different inc in groupmembers table)
+# returns list of groupids
+def get_user_groups(netid):
+    try:
+        groups = session.query(Group_members.groupid).filter_by(netid=netid).all()
+        return groups
+    except:
+        return -1
+
+
 def rollback():
     session.rollback()
     return
@@ -242,6 +253,13 @@ if __name__=="__main__":
     # add_user('batya','stein','batyas',email='batyas@princeton.edu',phone='7327660532')
     #add_user_to_group(1, 'batyas','member')
 
-    update_profile_info('test', 'user', 'test123', email = 'test@test.com', preferences=create_preferences([[1,2],[1,2]]))
-    print(user_exists('test2'))
+    #update_profile_info('test', 'user', 'test123', email = 'test@test.com', preferences=create_preferences([[1,2],[1,2]]))
+    #print(user_exists('test2'))
+    #add_group('dlsnyder', 'Test Group 2')
+    #add_user_to_group(2, 'test2', 'user')
+    groups = get_user_groups('test2')
+    print(len(groups))
+    for g in groups:
+       print(g.groupid)
+    #remove_group(2)
 
