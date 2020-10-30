@@ -99,8 +99,20 @@ def get_global_preferences(netid):
         pref = session.query(Users.globalpreferences).filter_by(netid=netid).first()
 
         return pref._asdict()['globalpreferences']
+        print(pref)
     except:
         print('get_global_preferences() failed',file=stderr)
+        return -1
+
+# get user's group preferences 
+def get_group_preferences(groupid, netid):
+    try:
+        userid = get_user_id(groupid, netid)
+        pref = session.query(Group_members.grouppreferences).filter_by(inc=userid).first()
+
+        return pref._asdict()['grouppreferences']
+    except:
+        print('get_group_preferences() failed',file=stderr)
         return -1
 
 
@@ -157,7 +169,14 @@ def add_group(owner, groupName, shiftSchedule = None):
 # removes a group
 def remove_group(groupid):
     try:
-        session.delete(Groups(groupid=groupid))
+        session.execute(
+            "DELETE FROM groupmembers WHERE groupid=:param", {"param":groupid}
+        )
+        session.execute(
+            "DELETE FROM groups WHERE groupid=:param", {"param":groupid}
+        )
+        # session.delete(Group_members(inc=get_user_id(groupid,netid)))
+        session.flush()
         session.commit()
     except:
         session.rollback()
@@ -252,16 +271,18 @@ def update_profile_info(firstName, lastName, netid, email=None, phone=None, pref
         return -1
     return
 
-# get all groups that user is part of 
+# get all groupids of groups that user is part of 
 # (queries with netid instead of inc b/c each group that a user is in has different inc in groupmembers table)
 # returns list of groupids
 def get_user_groups(netid):
     try:
         groups = session.query(Group_members.groupid).filter_by(netid=netid).all()
-        return groups
+        group_names = []
+        for g in groups:
+            group_names.append(session.query(Groups.groupname).filter_by(groupid=g.groupid).first())
+        return group_names
     except:
         return -1
-
 
 def rollback():
     session.rollback()
@@ -275,10 +296,13 @@ if __name__=="__main__":
     #update_profile_info('test', 'user', 'test123', email = 'test@test.com', preferences=create_preferences([[1,2],[1,2]]))
     #print(user_exists('test2'))
     #add_group('dlsnyder', 'Test Group 2')
-    #add_user_to_group(2, 'test2', 'user')
+    #add_user_to_group(3, 'test2', 'user')
     groups = get_user_groups('test2')
+    '''
     print(len(groups))
     for g in groups:
-       print(g.groupid)
+       print(g.groupname)
     #remove_group(2)
-
+    remove_user('test2',3)
+    '''
+    print(get_group_preferences(1,'test2'))
