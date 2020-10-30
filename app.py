@@ -177,7 +177,7 @@ def weeklyPreferences():
     else:
         prefs = create_preferences(parseSchedule())
         groupid = 1  # for prototype - add user to group one
-        change_group_schedule(groupid, prefs)
+        # change_group_schedule(groupid, prefs) needs method for updating weekly
 
     return redirect(url_for('index'))
 
