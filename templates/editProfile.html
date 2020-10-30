@@ -27,47 +27,58 @@ global preferences and phone number-->
 
 <body>
     {% include 'header.html' %}
-    <h1>Edit Profile</h1>
-    <hr>
-    <h2>Edit Information</h2>
-    <hr>
-    <form action='' method="post">
-        <table>
-            <tr>
-                <td class="allR">Employee First Name</td>
-                <td><input type="text" name="fname" required value={{prevfname}}></td>
-            </tr>
-            <tr>
-                <td class="allR">Employee Last Name</td>
-                <td><input type="text" name="lname" required value={{prevlname}}></td>
-            </tr>
-            <tr>
-                <td class="allR">Employee Email</td>
-                <td><input type="email" multiple name="email" {% if prevemail: %} value={{prevemail}} {% else %}
-                        value="" {% endif %}></td>
-            </tr>
-            <tr>
-                <td class="allR">Employee Phone Number</td>
-                <td><input type="tel" name="pnumber" {% if prevemail: %} value={{prevphoneNum}} {% else %} value=""
-                        {% endif %}></td>
-            </tr>
-            <tr>
-                <td class="allR">Receive Text Notifications</td>
-                <td><input type="checkbox" name="preftext" {% if prevphonePref %} checked {% endif %} value="on"></td>
-            </tr>
-            <tr>
-                <td class="allR">Receive Email Notifications</td>
-                <td><input type="checkbox" name="prefemail" {% if prevemailPref %} checked {% endif %} value="on"></td>
-            </tr>
-        </table>
-        <hr>
-        <h2>Edit Time Preferences</h2>
-        <hr>
-        {% include 'scheduleElement.html' %}
-        <hr>
-        <input type="submit" value="Save">
-    </form>
-    <hr>
+
+    <!-- Page Content -->
+    <div class="container">
+
+        <div class="row">
+            <div class="col-lg-12 text-center">
+                <h1>Edit Profile</h1>
+                <hr>
+                <h2>Edit Information</h2>
+                <hr>
+                <form action='' method="post">
+                    <table>
+                        <tr>
+                            <td class="allR">Employee First Name</td>
+                            <td><input type="text" name="fname" required value={{prevfname}}></td>
+                        </tr>
+                        <tr>
+                            <td class="allR">Employee Last Name</td>
+                            <td><input type="text" name="lname" required value={{prevlname}}></td>
+                        </tr>
+                        <tr>
+                            <td class="allR">Employee Email</td>
+                            <td><input type="email" multiple name="email" {% if prevemail: %} value={{prevemail}} {% else %}
+                                    value="" {% endif %}></td>
+                        </tr>
+                        <tr>
+                            <td class="allR">Employee Phone Number</td>
+                            <td><input type="tel" name="pnumber" {% if prevemail: %} value={{prevphoneNum}} {% else %} value=""
+                                    {% endif %}></td>
+                        </tr>
+                        <tr>
+                            <td class="allR">Receive Text Notifications</td>
+                            <td><input type="checkbox" name="preftext" {% if prevphonePref %} checked {% endif %} value="on"></td>
+                        </tr>
+                        <tr>
+                            <td class="allR">Receive Email Notifications</td>
+                            <td><input type="checkbox" name="prefemail" {% if prevemailPref %} checked {% endif %} value="on"></td>
+                        </tr>
+                    </table>
+                    <hr>
+                    <h2>Edit Time Preferences</h2>
+                    <hr>
+                    {% include 'scheduleElement.html' %}
+                    <hr>
+                    <input type="submit" value="Save">
+                </form>
+                <hr>
+                
+            </div>
+        </div>
+        
+    </div>
     {% include 'footer.html' %}
 
     <!-- Bootstrap core JavaScript -->
