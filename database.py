@@ -136,6 +136,18 @@ def change_user_preferences_group(groupid, netid, preferences = None):
         return -1
     return
 
+# obtains user weekly preferences
+# I have no clue how to make this work so help would be good
+def get_user_preferences_group(groupid, netid):
+    userid = get_user_id(groupid,netid)
+    if userid == -1:
+        return -1
+    try:
+        return session.query(Group_members.inc)
+    except:
+        print("get_user_preferences_group failed")
+        return -1
+
 #used in above function to access primary key
 #not intended for use in standalone function
 def get_user_id(groupid,netid):
