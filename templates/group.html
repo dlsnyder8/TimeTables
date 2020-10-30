@@ -1,0 +1,76 @@
+<!--This is for people to put in their weekly preferences-->
+
+<!-- Main page after logging in, shows an employee's schedule for the week/month-->
+<!DOCTYPE html>
+<html lang='en'>
+
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title> Group </title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="../static/vendor/bootstrap/css/bootstrap.css" rel="stylesheet">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+</head>
+
+<body>
+    {% include 'header.html' %}
+
+    <!-- Page Content -->
+    <div class="container">
+
+        <div class="row">
+            <div class="col-lg-12 text-center">
+                <h1>{{groupname}} Preferences</h1>
+                <form action="/editGroup">
+                    <input type="submit" value="Edit Group Preferences" />
+                </form>
+                <hr>
+                <h2> Notification Preferences</h2><br>
+                <p>Your notification preferences for <strong>{{groupname}}</strong>. <br> </p>
+                <form action='' method="post">
+                    <table style="
+                    margin-left: auto;
+                    margin-right: auto;">
+                        <tr>
+                            <td class="allR">Receive Text Notifications</td>
+                            <td><input type="checkbox" name="preftext" {% if prevphonePref %} checked {% endif %}
+                                    value="on" disabled>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="allR">Receive Email Notifications</td>
+                            <td><input type="checkbox" name="prefemail" {% if prevemailPref %} checked {% endif %}
+                                    value="on" disabled>
+                            </td>
+                        </tr>
+                    </table>
+                    <hr>
+                    <h2> Weekly Preferences</h2><br>
+                    <p>Your weekly preferences for <strong>{{groupname}}</strong>. <br>
+                        Resets to your global preferences every Sunday after a new
+                        schedule is released.<br>
+                        To be scheduled, you must be available for the entirety of a shift.<br>
+                    </p>
+                    {% include 'scheduleElement.html' %}
+                </form>
+
+                <hr>
+
+            </div>
+        </div>
+        {% include 'footer.html' %}
+
+        <!-- Bootstrap core JavaScript -->
+        <script src="../static/vendor/jquery/jquery.min.js"></script>
+        <script src="../static/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+</body>
+
+</html>

@@ -150,14 +150,17 @@ def schedule():
     if not (user_exists(username)):
         return redirect(url_for('createProfile'))
 
+    groupname = request.cookies.get('groupname')
+    if groupname == None:
+        groups = get_user_groups(username)
+        groupaname = get_group_id(groups[0])
     
     
-    
-    globalPreferences = get_double_array(get_global_preferences(username))
+    globalPreferences = get_double_array(get_group_preferences(username))
     edict = solve_shift_scheduling("", "", 10, 1, ['O', 'M', 'A', 'N'], [], create_requests(globalPreferences, 0))
     
 
-    html = render_template('schedule.html', schedule=create_schedule(edict, 0), editable=False)
+    html = render_template('schedule.html', schedule=create_schedule(edict, 0), groupname=groupname, editable=False)
     response = make_response(html)
 
     return response
@@ -175,12 +178,15 @@ def groupInfo():
     return response
 
 
-@app.route('/weekly', methods=['GET', 'POST'])
-def weeklyPreferences():
+@app.route('/group', methods=['GET'])
+def group():
     if (PROD_ENV):
         username = CASClient().authenticate()
     else:
         username = 'test2'
+
+    if not (user_exists(username)):
+        return redirect(url_for('createProfile'))
 
     groupid = request.cookies.get('groupid')
     if groupid == None:
@@ -188,21 +194,80 @@ def weeklyPreferences():
         groupid = get_group_id(groups[0])
     else: groupid = int(groupid)
 
+    groupname = request.cookies.get('groupname')
+    if groupname == None:
+        groups = get_user_groups(username)
+        groupaname = get_group_id(groups[0])
+
+    groupprefs = get_group_preferences(groupid, username)
+    if groupprefs == None:
+        groupprefs = get_global_preferences(username)
+    weeklyPref = get_double_array(groupprefs)
         
+    # later add code to reset groupprefs to global prefs on sunday
+
+    notifPrefs = get_group_notifications(username, groupid)
+    prevphonePref = notifPrefs.textnotif
+    prevemailPref = notifPrefs.emailnotif
+
+    html = render_template('group.html', schedule=weeklyPref, groupname=groupname, prevphonePref=prevphonePref, prevemailPref=prevemailPref, editable=False)
+    response = make_response(html)
+    return response
+
+@app.route('/editGroup',methods=['GET', 'POST'])
+def editGroup():
+    if (PROD_ENV):
+        username = CASClient().authenticate()
+    else:
+        username = 'test2'
+
+    if not (user_exists(username)):
+        return redirect(url_for('createProfile'))
+
+    groupid = request.cookies.get('groupid')
+    if groupid == None:
+        groups = get_user_groups(username)
+        groupid = get_group_id(groups[0])
+    else: groupid = int(groupid)
+
+    groupname = request.cookies.get('groupname')
+    if groupname == None:
+        groups = get_user_groups(username)
+        groupaname = get_group_id(groups[0])
+
+    groupprefs = get_group_preferences(groupid, username)
+    if groupprefs == None:
+        groupprefs = get_global_preferences(username)
+    weeklyPref = get_double_array(groupprefs)
+        
+    # later add code to reset groupprefs to global prefs on sunday
+
+    notifPrefs = get_group_notifications(username, groupid)
+    prevphonePref = notifPrefs.textnotif
+    prevemailPref = notifPrefs.emailnotif
+
     if request.method == 'GET':
-        if not (user_exists(username)):
-            return redirect(url_for('createProfile'))
-        weeklyPref = get_double_array(get_group_preferences(groupid, username))
-        html = render_template('weekly.html', schedule=weeklyPref, editable=True)
+        html = render_template('editGroup.html', schedule=weeklyPref, groupname=groupname, prevphonePref=prevphonePref, prevemailPref=prevemailPref, editable=True)
         response = make_response(html)
         return response
-
     else:
+        preftext = request.form.get('preftext')
+        prefemail = request.form.get('prefemail')
+        
+        if preftext == 'on': 
+            preftext = True
+        else:
+            preftext = False
+        if prefemail == 'on': 
+            prefemail = True
+        else:
+            prefemail = False
+        change_group_notifications(groupid, username, prefemail, preftext)
+
         prefs = create_preferences(parseSchedule())
         change_user_preferences_group(groupid, username, prefs)
-
-    return redirect(url_for('index'))
-
+        
+        return redirect(url_for('group'))
 
 
 @app.route('/createProfile', methods=['GET', 'POST'])
@@ -270,13 +335,10 @@ def editProfile():
 
 
     userInfo = get_profile_info(username)
-    notifPrefs = get_group_notifications(username, groupid)
     prevfirstName = userInfo.firstname
     prevlastName = userInfo.lastname
     prevemail = userInfo.email
     prevphoneNum = userInfo.phone
-    prevphonePref = notifPrefs.emailnotif
-    prevemailPref = notifPrefs.textnotif
 
     prevGlobalPreferences = blankSchedule()
     try:
@@ -286,8 +348,7 @@ def editProfile():
 
     if request.method == 'GET':
         html = render_template('editProfile.html', prevfname=prevfirstName, prevlname=prevlastName, \
-            prevemail=prevemail, prevphoneNum=prevphoneNum, prevphonePref=prevphonePref, prevemailPref=prevemailPref, \
-                schedule=prevGlobalPreferences, editable=True)
+            prevemail=prevemail, prevphoneNum=prevphoneNum, schedule=prevGlobalPreferences, editable=True)
         response = make_response(html)
         return response
 
@@ -297,22 +358,10 @@ def editProfile():
 
         email = request.form['email']
         pnum = request.form['pnumber']
-        preftext = request.form.get('preftext')
-        prefemail = request.form.get('prefemail')
 
         globalPreferences = parseSchedule()
 
-        if preftext == 'on': 
-            preftext = True
-        else:
-            preftext = False
-        if prefemail == 'on': 
-            prefemail = True
-        else:
-            prefemail = False
-
         update_profile_info(fname, lname, username, email, pnum, create_preferences(globalPreferences))
-        change_group_notifications(groupid, username, prefemail, preftext)
 
         return redirect(url_for('profile'))
 

@@ -99,7 +99,6 @@ def get_global_preferences(netid):
         pref = session.query(Users.globalpreferences).filter_by(netid=netid).first()
 
         return pref._asdict()['globalpreferences']
-        print(pref)
     except:
         print('get_global_preferences() failed',file=stderr)
         return -1

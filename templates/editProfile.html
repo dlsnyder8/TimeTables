@@ -38,7 +38,7 @@ global preferences and phone number-->
                 <h2>Edit Information</h2>
                 <hr>
                 <form action='' method="post">
-                    <table style = "
+                    <table style="
                       margin-left: auto;
                       margin-right: auto;">
                         <tr>
@@ -51,21 +51,13 @@ global preferences and phone number-->
                         </tr>
                         <tr>
                             <td class="allR">Employee Email</td>
-                            <td><input type="email" multiple name="email" {% if prevemail: %} value={{prevemail}} {% else %}
-                                    value="" {% endif %}></td>
+                            <td><input type="email" multiple name="email" {% if prevemail: %} value={{prevemail}}
+                                    {% else %} value="" {% endif %}></td>
                         </tr>
                         <tr>
                             <td class="allR">Employee Phone Number</td>
-                            <td><input type="tel" name="pnumber" {% if prevemail: %} value={{prevphoneNum}} {% else %} value=""
-                                    {% endif %}></td>
-                        </tr>
-                        <tr>
-                            <td class="allR">Receive Text Notifications</td>
-                            <td><input type="checkbox" name="preftext" {% if prevphonePref %} checked {% endif %} value="on"></td>
-                        </tr>
-                        <tr>
-                            <td class="allR">Receive Email Notifications</td>
-                            <td><input type="checkbox" name="prefemail" {% if prevemailPref %} checked {% endif %} value="on"></td>
+                            <td><input type="tel" name="pnumber" {% if prevemail: %} value={{prevphoneNum}} {% else %}
+                                    value="" {% endif %}></td>
                         </tr>
                     </table>
                     <hr>
@@ -79,7 +71,7 @@ global preferences and phone number-->
 
             </div>
         </div>
-        
+
     </div>
     {% include 'footer.html' %}
 

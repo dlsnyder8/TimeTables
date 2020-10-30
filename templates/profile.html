@@ -11,7 +11,6 @@
     <meta name="author" content="">
 
     <title> Profile </title>
-
     <!-- Bootstrap core CSS -->
     <link href="../static/vendor/bootstrap/css/bootstrap.css" rel="stylesheet">
 
@@ -20,7 +19,6 @@
 
 <body>
     {% include 'header.html' %}
-
 
     <!-- Page Content -->
     <div class="container">
@@ -41,11 +39,6 @@
                 <br>
                 <strong>Phone number:</strong> {{phoneNum}}
                 <hr>
-                <h2>Notification Preferences</h2>
-                Phone notifications: {{phonePref}}
-                <br>
-                Email notifications: {{emailPref}}
-                <hr>
                 <h2>Global Schedule Preferences</h2>
                 Global preferences are your default availability times for the semester
                 (times you're free to work every week).
@@ -58,11 +51,11 @@
                 <hr>
             </div>
         </div>
-    {% include 'footer.html' %}
+        {% include 'footer.html' %}
 
-    <!-- Bootstrap core JavaScript -->
-    <script src="../static/vendor/jquery/jquery.min.js"></script>
-    <script src="../static/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+        <!-- Bootstrap core JavaScript -->
+        <script src="../static/vendor/jquery/jquery.min.js"></script>
+        <script src="../static/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 
 </body>
 
