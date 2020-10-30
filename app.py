@@ -77,8 +77,8 @@ def blankSchedule():
     return table_values
 
 
-@app.route('/', methods=['GET'])
-@app.route('/index', methods=['GET'])
+@app.route('/', methods=['GET', 'POST'])
+@app.route('/index', methods=['GET','POST'])
 def index():
     if (PROD_ENV):
         username = CASClient().authenticate()
@@ -90,26 +90,39 @@ def index():
 
     groups = get_user_groups(username)
     numGroups = len(groups)
-    html = render_template('index.html', groups=groups, numGroups=numGroups)
-    response = make_response(html)
 
-    return response
+    if request.method == 'GET':
+        html = render_template('index.html', groups=groups, numGroups=numGroups)
+        response = make_response(html)
+        return response
 
+    else:
+        groupname = request.form['groupname']
+        groupid = get_group_id(groupname)
 
+        html = render_template('index.html',groups=groups, numGroups=numGroups)
+        response = make_response(html)
+        response.set_cookie('groupname',groupname)
+        response.set_cookie('groupid', str(groupid))
+        return response
 
 @app.route('/profile',methods=['GET'])
 def profile():
     if(PROD_ENV):
         username = CASClient().authenticate()
     else:
-
         username = 'test2' # or test123
 
     if not (user_exists(username)):
         return redirect(url_for('createProfile'))
-    # is netid = username?
+    
     # get groupid from cookie that takes info from input into index page
-    groupid = 1
+    groupid = request.cookies.get('groupid')
+    if groupid == None:
+        groups = get_user_groups(username)
+        groupid = get_group_id(groups[0])
+    else: groupid = int(groupid)
+
     userInfo = get_profile_info(username)
     notifPrefs = get_group_notifications(username, groupid)
 
@@ -169,8 +182,13 @@ def weeklyPreferences():
     else:
         username = 'test2'
 
-    groupid = 1  # will be changed
+    groupid = request.cookies.get('groupid')
+    if groupid == None:
+        groups = get_user_groups(username)
+        groupid = get_group_id(groups[0])
+    else: groupid = int(groupid)
 
+        
     if request.method == 'GET':
         if not (user_exists(username)):
             return redirect(url_for('createProfile'))
@@ -244,7 +262,14 @@ def editProfile():
 
     # add error handling if username already exists in database
 
-    groupid = 1
+    groupid = request.cookies.get('groupid')
+    if groupid == None:
+        groups = get_user_groups(username)
+        groupid = get_group_id(groups[0])
+    
+    else: groupid = int(groupid)
+
+
     userInfo = get_profile_info(username)
     notifPrefs = get_group_notifications(username, groupid)
     prevfirstName = userInfo.firstname

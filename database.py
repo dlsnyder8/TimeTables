@@ -233,7 +233,7 @@ def change_group_notifications(groupid, netid, emailnotif = False, textnotif = F
         print('failed to change group notifications',file=stderr)
         return -1
     try:
-        session.add(Group_members(inc=userid,emailnotif=emailnotif,textnotif=textnotif))
+        session.query(Group_members).filter_by(inc=userid).update({Group_members.emailnotif: emailnotif, Group_members.textnotif:textnotif})
         session.commit()
     except:
         session.rollback()
@@ -280,9 +280,18 @@ def get_user_groups(netid):
         groups = session.query(Group_members.groupid).filter_by(netid=netid).all()
         group_names = []
         for g in groups:
-            group_names.append(session.query(Groups.groupname).filter_by(groupid=g.groupid).first())
+            group_names.append(session.query(Groups.groupname).filter_by(groupid=g.groupid).first().groupname)
         return group_names
     except:
+        print('get user groups failed')
+        return -1
+
+def get_group_id(groupname):
+    try:
+        groupid = session.query(Groups.groupid).filter_by(groupname=groupname).first()
+        return groupid.groupid
+    except:
+        print('failed to get groupid')
         return -1
 
 def rollback():
@@ -299,11 +308,9 @@ if __name__=="__main__":
     #add_group('dlsnyder', 'Test Group 2')
     #add_user_to_group(3, 'test2', 'user')
     groups = get_user_groups('test2')
-    '''
-    print(len(groups))
-    for g in groups:
-       print(g.groupname)
-    #remove_group(2)
-    remove_user('test2',3)
-    '''
-    print(get_group_preferences(1,'test2'))
+    print(groups)
+    print(get_group_notifications('test2',1))
+    #change_group_notifications(1, 'test2')
+    print(get_group_notifications('test2',1))
+
+    #print(get_group_preferences(1,'test2'))
