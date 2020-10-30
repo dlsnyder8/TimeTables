@@ -31,7 +31,7 @@
                 </ul>
                 <hr>
                 <h3>Choose your group:</h3>
-                </br>The schedule and group pages will display your informaion for this group.
+                </br>The schedule and group pages will display your information for this group.
                 </br>
                 you can come back here and switch groups at any time.
                 </br>
@@ -41,12 +41,12 @@
                 <input type="radio" id={{g}} name="groupname" value={{g}}>
                 <label for={{g}}>{{g}}</label><br>
                 {% endfor %}
-                {% else %}
-                Input your weekly preferences: <br>
+                {% endif %}
+                <hr>
+                Input your weekly preferences: <br> <!-- should be shown regardless of group count? -->
                 <form action="/weekly">
                     <input type="submit" value="weekly preferences">
                 </form>
-                {% endif %}
             </div>
         </div>
     </div>

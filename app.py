@@ -174,9 +174,8 @@ def weeklyPreferences():
     if request.method == 'GET':
         if not (user_exists(username)):
             return redirect(url_for('createProfile'))
-        #  weeklyPreferences = get_user_preferences_group(groupid, username) unimplemented, but will be used eventually
-        weeklyPreferences = get_double_array(get_global_preferences(username))  # will be removed upon ^^ implementation
-        html = render_template('weekly.html', schedule=weeklyPreferences, editable=True)
+        weeklyPref = get_double_array(get_group_preferences(groupid, username))
+        html = render_template('weekly.html', schedule=weeklyPref, editable=True)
         response = make_response(html)
         return response
 
