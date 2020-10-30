@@ -290,17 +290,10 @@ def createProfile():
 
         email = request.form['email']
         pnum = request.form['pnumber']
-        preftext = request.form.get('preftext')
-        prefemail = request.form.get('prefemail')
-        
-        if preftext == 'on': 
-            preftext = True
-        else:
-            preftext = False
-        if prefemail == 'on': 
-            prefemail = True
-        else:
-            prefemail = False
+
+        # notification preferences default to false currently - can change if wanted
+        preftext = False
+        prefemail = False
 
         globalPreferences = parseSchedule()
 
@@ -310,7 +303,6 @@ def createProfile():
             add_user_to_group(groupid, username, "member", preftext, prefemail, create_preferences(globalPreferences))
         else:
             update_profile_info(fname, lname, username, email, pnum, create_preferences(globalPreferences))
-            change_group_notifications(groupid, username, prefemail, preftext)
 
         return redirect(url_for('profile'))
 
