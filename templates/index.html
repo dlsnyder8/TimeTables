@@ -31,16 +31,11 @@
                 </ul>
                 <hr>
                 <h3>Choose your group:</h3>
-<<<<<<< HEAD
                 </br>The schedule and weekly preferences will display your information for this group.
-=======
-                </br>The schedule and group pages will display your information for this group.
->>>>>>> 5a5999feb4830b60b19f10f10ae42653bc1202b1
                 </br>
                 You can come back here and switch groups at any time.
                 </br>
                 </br>
-<<<<<<< HEAD
                 <form action="" method="post">
                     {% for g in groups %}
                     <input type="radio" id={{g}} name="groupname" value="{{g}}">
@@ -53,16 +48,6 @@
                 <script>var group = document.querySelector('input[name = "groupname"]:checked').value;
                     document.writeln("for" + group + ":<br>");</script>
                 <br>
-=======
-                {% if numGroups > 1 %}
-                {% for g in groups %}
-                <input type="radio" id={{g}} name="groupname" value={{g}}>
-                <label for={{g}}>{{g}}</label><br>
-                {% endfor %}
-                {% endif %}
-                <hr>
-                Input your weekly preferences: <br> <!-- should be shown regardless of group count? -->
->>>>>>> 5a5999feb4830b60b19f10f10ae42653bc1202b1
                 <form action="/weekly">
                     <input type="submit" value="weekly preferences">
                 </form>

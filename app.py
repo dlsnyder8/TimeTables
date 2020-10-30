@@ -132,7 +132,7 @@ def profile():
     except Exception:
         pass
 
-    html = render_template('profile.html', firstName=userInfo.firstname, lastName=userInfo.lastname, netid=username, email=userInfo.email, phoneNum=userInfo.phone, phonePref=notifPrefs.emailnotif, emailPref=notifPrefs.textnotif, schedule=globalPreferences, editable=False)
+    html = render_template('profile.html', firstName=userInfo.firstname, lastName=userInfo.lastname, netid=username, email=userInfo.email, phoneNum=userInfo.phone, phonePref=notifPrefs.textnotif, emailPref=notifPrefs.emailnotif, schedule=globalPreferences, editable=False)
 
     response = make_response(html)
 
