@@ -30,6 +30,7 @@
                 <ul class="list-unstyled">
                 </ul>
                 <hr>
+                {% if numGroups > 1 %}
                 <h3>Choose your group:</h3>
                 </br>The schedule and weekly preferences will display your information for this group.
                 </br>
@@ -45,6 +46,7 @@
                     <input type="submit" value="submit">
                 </form>
                 <hr>
+                {% endif %}
                 Remember to input your weekly preferences:
                 <br>
                 <form action="/editGroup">
