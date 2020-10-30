@@ -234,7 +234,7 @@ def get_profile_info(netid):
 def get_group_notifications(netid, grouid):
     try:
         userid = get_user_id(grouid, netid)
-        notifPrefs = session.query(Group_members.emailnotif, Group_members.textnotif).filter_by(userid=userid).first()
+        notifPrefs = session.query(Group_members.emailnotif, Group_members.textnotif).filter_by(inc=userid).first()
         return notifPrefs
     except:
         print('Failed to get group notifications',file=stderr)

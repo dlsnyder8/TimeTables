@@ -226,8 +226,8 @@ def createProfile():
             add_user(fname, lname, username, email, pnum, create_preferences(globalPreferences))
             add_user_to_group(groupid, username, "member", preftext, prefemail, create_preferences(globalPreferences))
         else:
-            update_user(fname, lname, username, email, pnum, preftext, prefemail, create_preferences(globalPreferences))
-        
+            update_profile_info(fname, lname, username, email, pnum, create_preferences(globalPreferences))
+            change_group_notifications(groupid, username, prefemail, preftext)
 
         return redirect(url_for('profile'))
 
