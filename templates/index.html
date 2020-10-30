@@ -38,15 +38,14 @@
                 </br>
                 <form action="" method="post">
                     {% for g in groups %}
-                    <input type="radio" id={{g}} name="groupname" value="{{g}}">
+                    <input type="radio" id={{g}} name="groupname" value="{{g}}" {% if groupname == g %} checked
+                        {% endif %}>
                     <label for={{g}}>{{g}}</label><br>
                     {% endfor %}
                     <input type="submit" value="submit">
                 </form>
                 <hr>
-                Remeber to input your weekly preferences:
-                <script>var group = document.querySelector('input[name = "groupname"]:checked').value;
-                    document.writeln("for" + group + ":<br>");</script>
+                Remember to input your weekly preferences:
                 <br>
                 <form action="/editGroup">
                     <input type="submit" value="weekly preferences">

@@ -91,8 +91,13 @@ def index():
     groups = get_user_groups(username)
     numGroups = len(groups)
 
+    groupname = request.cookies.get('groupname')
+    if groupname == None:
+        groups = get_user_groups(username)
+        groupaname = get_group_id(groups[0])
+
     if request.method == 'GET':
-        html = render_template('index.html', groups=groups, numGroups=numGroups)
+        html = render_template('index.html', groups=groups, groupname=groupname, numGroups=numGroups)
         response = make_response(html)
         return response
 
@@ -100,7 +105,7 @@ def index():
         groupname = request.form['groupname']
         groupid = get_group_id(groupname)
 
-        html = render_template('index.html',groups=groups, numGroups=numGroups)
+        html = render_template('index.html',groups=groups, groupname=groupname, numGroups=numGroups)
         response = make_response(html)
         response.set_cookie('groupname',groupname)
         response.set_cookie('groupid', str(groupid))
@@ -154,9 +159,14 @@ def schedule():
     if groupname == None:
         groups = get_user_groups(username)
         groupaname = get_group_id(groups[0])
+
+    groupid = request.cookies.get('groupid')
+    if groupid == None:
+        groups = get_user_groups(username)
+        groupid = get_group_id(groups[0])
+    else: groupid = int(groupid)
     
-    
-    globalPreferences = get_double_array(get_group_preferences(username))
+    globalPreferences = get_double_array(get_group_preferences(groupid, username))
     edict = solve_shift_scheduling("", "", 10, 1, ['O', 'M', 'A', 'N'], [], create_requests(globalPreferences, 0))
     
 
