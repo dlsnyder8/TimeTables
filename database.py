@@ -58,8 +58,9 @@ def add_user(firstName, lastName, netid, email=None, phone=None, preferences=Non
         return
     except:
         session.rollback()
+        print('Add User Failed',file=stderr)
         return -1
-        return
+        
 
 def user_exists(netid):
     return session.query(Users).filter(Users.netid == netid).scalar() is not None
@@ -76,6 +77,7 @@ def remove_user(netid, groupid):
         session.commit()
     except:
         session.rollback()
+        print('Remove User Failed',file=stderr)
         return -1
     return
 
@@ -87,6 +89,7 @@ def change_user_preferences_global(netid, preferences):
         session.commit()
     except:
         session.rollback()
+        print('Failed to change users global preferences',file=stderr)
         return -1
     return
 
@@ -97,6 +100,7 @@ def get_global_preferences(netid):
 
         return pref._asdict()['globalpreferences']
     except:
+        print('get_global_preferences() failed',file=stderr)
         return -1
 
 
@@ -116,6 +120,7 @@ def change_user_preferences_group(groupid, netid, preferences = None):
         session.commit()
     except:
         session.rollback()
+        print('Change_user_preferences_group() failed',file=stderr)
         return -1
     return
 
@@ -127,6 +132,7 @@ def get_user_id(groupid,netid):
         # there's no inc key in users table? -> inc key is in groupmembers
         return userid
     except:
+        print('get_user_id() failed',file=stderr)
         return -1
 
 # Adds a group, shiftSchedule is optional argument if known
@@ -141,6 +147,7 @@ def add_group(owner, groupName, shiftSchedule = None):
         session.commit()
     except:
         session.rollback()
+        print('Failed to add_group()',file=stderr)
         return -1
         
     return
@@ -154,6 +161,7 @@ def remove_group(groupid):
         session.commit()
     except:
         session.rollback()
+        print('Failed to remove group',file=stderr)
         return -1
     return
 
@@ -165,6 +173,7 @@ def change_group_schedule(groupid, schedule):
         session.commit()
     except:
         session.rollback()
+        print('change_group_schedule() failed',file=stderr)
         return -1
     return
 
@@ -177,18 +186,22 @@ def add_user_to_group(groupid, netid, role, email=False,text=False,preferences =
         session.commit()
     except:
         session.rollback()
+        print('Failed to add user to group',file=stderr)
+        return -1
     return
 
 # changes the role of a person (netid) in a group (groupid) to 'role'
 def change_group_role(groupid, netid, role):
     userid=get_user_id(groupid,netid)
     if userid == -1:
+        print('failed to change user role in group',file=stderr)
         return -1
     try:
         session.add(Group_members(inc=userid,role=role))
         session.commit()
     except:
         session.rollback()
+        print('failed to change user role in group',file=stderr)
         return -1
     return
 
@@ -197,12 +210,14 @@ def change_group_role(groupid, netid, role):
 def change_group_notifications(groupid, netid, emailnotif = False, textnotif = False):
     userid = get_user_id(groupid,netid)
     if userid == -1:
+        print('failed to change group notifications',file=stderr)
         return -1
     try:
         session.add(Group_members(inc=userid,emailnotif=emailnotif,textnotif=textnotif))
         session.commit()
     except:
         session.rollback()
+        print('failed to change group notifications',file=stderr)
         return -1
     return
 
@@ -212,6 +227,7 @@ def get_profile_info(netid):
         userInfo = session.query(Users.firstname, Users.lastname, Users.email, Users.phone).filter_by(netid=netid).first()
         return userInfo
     except:
+        print('Failed to get profile info',file=stderr)
         return -1
 
 # retrieve user's notification preferences from specific group
@@ -221,6 +237,7 @@ def get_group_notifications(netid, grouid):
         notifPrefs = session.query(Group_members.emailnotif, Group_members.textnotif).filter_by(userid=userid).first()
         return notifPrefs
     except:
+        print('Failed to get group notifications',file=stderr)
         return -1
 
 # updates profile info
@@ -231,7 +248,8 @@ def update_profile_info(firstName, lastName, netid, email=None, phone=None, pref
         session.commit()
     except:
         session.rollback()
-        return
+        print('Failed to update user profile',file=stderr)
+        return -1
     return
 
 def rollback():
