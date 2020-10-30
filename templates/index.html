@@ -30,10 +30,23 @@
                 <ul class="list-unstyled">
                 </ul>
                 <hr>
+                <h3>Choose your group:</h3>
+                </br>The schedule and group pages will display your informaion for this group.
+                </br>
+                you can come back here and switch groups at any time.
+                </br>
+                </br>
+                {% if numGroups > 1 %}
+                {% for g in groups %}
+                <input type="radio" id={{g}} name="groupname" value={{g}}>
+                <label for={{g}}>{{g}}</label><br>
+                {% endfor %}
+                {% else %}
                 Input your weekly preferences: <br>
                 <form action="/weekly">
                     <input type="submit" value="weekly preferences">
                 </form>
+                {% endif %}
             </div>
         </div>
     </div>

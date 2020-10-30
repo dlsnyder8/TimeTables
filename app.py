@@ -12,7 +12,7 @@ import urllib.parse as urlparse
 #-------------------
 # CAS Authentication cannot be run locally unfortunately
 # Set this variable to False if local, and change to True before pushing
-PROD_ENV = True
+PROD_ENV = False
 
 
 #----------
@@ -88,7 +88,9 @@ def index():
     if not (user_exists(username)):
         return redirect(url_for('createProfile'))
 
-    html = render_template('index.html')
+    groups = get_user_groups(username)
+    numGroups = len(groups)
+    html = render_template('index.html', groups=groups, numGroups=numGroups)
     response = make_response(html)
 
     return response
