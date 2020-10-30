@@ -177,7 +177,6 @@ def add_user_to_group(groupid, netid, role, email=False,text=False,preferences =
         session.commit()
     except:
         session.rollback()
-        return -1
     return
 
 # changes the role of a person (netid) in a group (groupid) to 'role'
@@ -232,7 +231,6 @@ def update_profile_info(firstName, lastName, netid, email=None, phone=None, pref
         session.commit()
     except:
         session.rollback()
-        return -1
     return
 
 def rollback():
