@@ -30,46 +30,58 @@ global preferences and phone number-->
 
 <body>
     {% include 'header.html' %}
-    <h1>First, Create Your Profile</h1>
-    <hr>
-    <h2>Information</h2>
-    <hr>
-    <form action='' method="post">
-        <table>
-            <tr>
-                <td class="allR">Employee First Name</td>
-                <td><input type="text" name="fname" value='' required></td>
-            </tr>
-            <tr>
-                <td class="allR">Employee Last Name</td>
-                <td><input type="text" name="lname" value='' required></td>
-            </tr>
-            <tr>
-                <td class="allR">Employee Email</td>
-                <td><input type="email" multiple name="email" value=''></td>
-            </tr>
-            <tr>
-                <td class="allR">Employee Phone Number</td>
-                <td><input type="tel" name="pnumber" value=''></td>
-            </tr>
-            <tr>
-                <td class="allR">Text Notifications (optional)</td>
-                <td><input type="checkbox" name="preftext" value="on"></td>
-            </tr>
-            <tr>
-                <td class="allR">Email Notifications (optional)</td>
-                <td><input type="checkbox" name="prefemail" value="on"></td>
-            </tr>
-        </table>
-        <hr>
-        <hr>
-        <h2>Time Preferences</h2>
-        <hr>
-        {% include 'scheduleElement.html' %}
-        <hr>
-        <input type="submit" value="Save">
-    </form>
-    <hr>
+
+
+    <!-- Page Content -->
+    <div class="container">
+
+        <div class="row">
+            <div class="col-lg-12 text-center">
+                <h1>First, Create Your Profile</h1>
+                <hr>
+                <h2>Information</h2>
+                <hr>
+                <form action='' method="post">
+                    <table>
+                        <tr>
+                            <td class="allR">Employee First Name</td>
+                            <td><input type="text" name="fname" value='' required></td>
+                        </tr>
+                        <tr>
+                            <td class="allR">Employee Last Name</td>
+                            <td><input type="text" name="lname" value='' required></td>
+                        </tr>
+                        <tr>
+                            <td class="allR">Employee Email</td>
+                            <td><input type="email" multiple name="email" value=''></td>
+                        </tr>
+                        <tr>
+                            <td class="allR">Employee Phone Number</td>
+                            <td><input type="tel" name="pnumber" value=''></td>
+                        </tr>
+                        <tr>
+                            <td class="allR">Text Notifications (optional)</td>
+                            <td><input type="checkbox" name="preftext" value="on"></td>
+                        </tr>
+                        <tr>
+                            <td class="allR">Email Notifications (optional)</td>
+                            <td><input type="checkbox" name="prefemail" value="on"></td>
+                        </tr>
+                    </table>
+                    <hr>
+                    <hr>
+                    <h2>Time Preferences</h2>
+                    <hr>
+                    {% include 'scheduleElement.html' %}
+                    <hr>
+                    <input type="submit" value="Save">
+                </form>
+                <hr>
+                
+            </div>
+        </div>
+        
+    </div>
     {% include 'footer.html' %}
 
     <!-- Bootstrap core JavaScript -->

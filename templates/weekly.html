@@ -22,16 +22,24 @@
 <body>
     {% include 'header.html' %}
 
-    <h1>Weekly Preferences</h1><br>
-    <p>Input your availability in your profile to get shifts assigned.<br>
-        To be scheduled, you must be available for the entirety of a shift.<br>
-    </p>
-    <form action='' method="post">
-        {% include 'scheduleElement.html' %}
-        <input type="submit" value="Save">
-    </form>
+    <!-- Page Content -->
+    <div class="container">
 
-    <hr>
+        <div class="row">
+            <div class="col-lg-12 text-center">
+                <h1>Weekly Preferences</h1><br>
+                <p>Input your availability in your profile to get shifts assigned.<br>
+                    To be scheduled, you must be available for the entirety of a shift.<br>
+                </p>
+                <form action='' method="post">
+                    {% include 'scheduleElement.html' %}
+                    <input type="submit" value="Save">
+                </form>
+
+                <hr>
+                
+            </div>
+        </div>
     {% include 'footer.html' %}
 
     <!-- Bootstrap core JavaScript -->

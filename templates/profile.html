@@ -21,35 +21,43 @@
 <body>
     {% include 'header.html' %}
 
-    <h1>Profile</h1>
-    <form action="/editProfile">
-        <input type="submit" value="Edit Profile" />
-    </form>
-    <hr>
-    Hi <strong>{{firstName}} {{lastName}}!</strong>
-    <br>
-    <br>
-    <strong>Netid:</strong> {{netid}}
-    <br>
-    <strong>Email:</strong> {{email}}
-    <br>
-    <strong>Phone number:</strong> {{phoneNum}}
-    <hr>
-    <h2>Notification Preferences</h2>
-    Phone notifications: {{phonePref}}
-    <br>
-    Email notifications: {{emailPref}}
-    <hr>
-    <h2>Global Schedule Preferences</h2>
-    Global preferences are your default availability times for the semester
-    (times you're free to work every week).
-    If you have a one-off change in availability, like a doctors appointment,
-    you can change your availability for the week in the non-reccuring preferences page,
-    and it will not affect your global preferences.
-    <br>
-    <br>
-    {% include 'scheduleElement.html' %}
-    <hr>
+
+    <!-- Page Content -->
+    <div class="container">
+
+        <div class="row">
+            <div class="col-lg-12 text-center">
+                <h1>Profile</h1>
+                <form action="/editProfile">
+                    <input type="submit" value="Edit Profile" />
+                </form>
+                <hr>
+                Hi <strong>{{firstName}} {{lastName}}!</strong>
+                <br>
+                <br>
+                <strong>Netid:</strong> {{netid}}
+                <br>
+                <strong>Email:</strong> {{email}}
+                <br>
+                <strong>Phone number:</strong> {{phoneNum}}
+                <hr>
+                <h2>Notification Preferences</h2>
+                Phone notifications: {{phonePref}}
+                <br>
+                Email notifications: {{emailPref}}
+                <hr>
+                <h2>Global Schedule Preferences</h2>
+                Global preferences are your default availability times for the semester
+                (times you're free to work every week).
+                If you have a one-off change in availability, like a doctors appointment,
+                you can change your availability for the week in the non-reccuring preferences page,
+                and it will not affect your global preferences.
+                <br>
+                <br>
+                {% include 'scheduleElement.html' %}
+                <hr>
+            </div>
+        </div>
     {% include 'footer.html' %}
 
     <!-- Bootstrap core JavaScript -->
