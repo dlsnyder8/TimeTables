@@ -165,19 +165,6 @@ def schedule():
 
     return response
 
-@app.route('/groupInfo', methods=['GET'])
-def groupInfo():
-    if(PROD_ENV):
-        username = CASClient().authenticate()
-    else:
-        username = 'test2'
-
-    html = render_template('groupInfo.html')
-    response = make_response(html)
-
-    return response
-
-
 @app.route('/group', methods=['GET'])
 def group():
     if (PROD_ENV):
