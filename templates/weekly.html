@@ -1,3 +1,5 @@
+<!--This is for people to put in their weekly preferences-->
+
 <!-- Main page after logging in, shows an employee's schedule for the week/month-->
 <!DOCTYPE html>
 <html lang='en'>
@@ -9,8 +11,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-
-    <title> Schedule </title>
+    <title> Weekly Preferences </title>
 
     <!-- Bootstrap core CSS -->
     <link href="../static/vendor/bootstrap/css/bootstrap.css" rel="stylesheet">
@@ -21,18 +22,15 @@
 <body>
     {% include 'header.html' %}
 
-    <h1>Schedule</h1><br>
+    <h1>Weekly Preferences</h1><br>
     <p>Input your availability in your profile to get shifts assigned.<br>
         To be scheduled, you must be available for the entirety of a shift.<br>
-        There are 3 shifts each day this week:
-    <ul>
-        <li> 8:00 am - 11:00 am</li>
-        <li> 11:00 am - 2:00 pm</li>
-        <li> 2:00 pm - 5:00 pm</li>
-    </ul>
     </p>
+    <form action='' method="post">
+        {% include 'scheduleElement.html' %}
+        <input type="submit" value="Save">
+    </form>
 
-    {% include 'scheduleElement.html' %}
     <hr>
     {% include 'footer.html' %}
 

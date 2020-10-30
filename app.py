@@ -77,13 +77,17 @@ def blankSchedule():
     return table_values
 
 
-@app.route('/',methods=['GET'])
-@app.route('/index',methods=['GET'])
+@app.route('/', methods=['GET'])
+@app.route('/index', methods=['GET'])
 def index():
-    if(PROD_ENV):
+    if (PROD_ENV):
         username = CASClient().authenticate()
     else:
         username = 'test2'
+
+    if not (user_exists(username)):
+        return redirect(url_for('createProfile'))
+
     html = render_template('index.html')
     response = make_response(html)
 
@@ -104,7 +108,8 @@ def profile():
     # is netid = username?
     # get groupid from cookie that takes info from input into index page
     groupid = 1
-    userInfo, notifPrefs = get_profile_info(username, groupid)
+    userInfo = get_profile_info(username)
+    notifPrefs = get_group_notifications(username, groupid)
 
     globalPreferences = blankSchedule()
     try:
@@ -153,6 +158,30 @@ def groupInfo():
     response = make_response(html)
 
     return response
+
+
+@app.route('/weekly', methods=['GET', 'POST'])
+def weeklyPreferences():
+    if (PROD_ENV):
+        username = CASClient().authenticate()
+    else:
+        username = 'test2'
+
+    if request.method == 'GET':
+        if not (user_exists(username)):
+            return redirect(url_for('createProfile'))
+        globalPreferences = get_double_array(get_global_preferences(username))
+        html = render_template('weekly.html', schedule=globalPreferences, editable=True)
+        response = make_response(html)
+        return response
+
+    else:
+        prefs = create_preferences(parseSchedule())
+        groupid = 1  # for prototype - add user to group one
+        # change_group_schedule(groupid, prefs) needs method for updating weekly
+
+    return redirect(url_for('index'))
+
 
 
 @app.route('/createProfile', methods=['GET', 'POST'])
@@ -212,7 +241,8 @@ def editProfile():
     # add error handling if username already exists in database
 
     groupid = 1
-    userInfo, notifPrefs = get_profile_info(username, groupid)
+    userInfo = get_profile_info(username)
+    notifPrefs = get_group_notifications(username, groupid)
     prevfirstName = userInfo.firstname
     prevlastName = userInfo.lastname
     prevemail = userInfo.email
@@ -253,7 +283,8 @@ def editProfile():
         else:
             prefemail = False
 
-        update_user(fname, lname, username, email, pnum, preftext, prefemail, create_preferences(globalPreferences))
+        update_profile_info(fname, lname, username, email, pnum, create_preferences(globalPreferences))
+        change_group_notifications(groupid, username, prefemail, preftext)
 
         return redirect(url_for('profile'))
 
