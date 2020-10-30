@@ -123,12 +123,11 @@ def change_user_preferences_group(groupid, netid, preferences = None):
        preferences = get_global_preferences(netid)
        # preferences = get_global_preferences(netid) ?
     
-
     userid = get_user_id(groupid,netid)
     if(userid == -1):
         return -1
     try:
-        session.add(Group_members(inc=userid, grouppreferences = preferences))
+        session.query(Group_members).filter_by(inc=userid).update({Group_members.grouppreferences : preferences})
         session.commit()
     except:
         session.rollback()
@@ -307,10 +306,14 @@ if __name__=="__main__":
     #print(user_exists('test2'))
     #add_group('dlsnyder', 'Test Group 2')
     #add_user_to_group(3, 'test2', 'user')
-    groups = get_user_groups('test2')
-    print(groups)
-    print(get_group_notifications('test2',1))
+    #groups = get_user_groups('test2')
+    #print(groups)
+    #print(get_group_notifications('test2',1))
     #change_group_notifications(1, 'test2')
-    print(get_group_notifications('test2',1))
+    #print(get_group_notifications('test2',1))
 
     #print(get_group_preferences(1,'test2'))
+
+    print(get_group_preferences(1, 'test2'))
+    change_user_preferences_group(1, 'test2')
+    print(get_group_preferences(1, 'test2'))
