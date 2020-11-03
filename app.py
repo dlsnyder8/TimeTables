@@ -120,13 +120,6 @@ def profile():
 
     if not (user_exists(username)):
         return redirect(url_for('createProfile'))
-    
-    # get groupid from cookie that takes info from input into index page
-    groupid = request.cookies.get('groupid')
-    if groupid == None:
-        groups = get_user_groups(username)
-        groupid = get_group_id(groups[0])
-    else: groupid = int(groupid)
 
     userInfo = get_profile_info(username)
 
