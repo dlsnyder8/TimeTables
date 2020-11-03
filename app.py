@@ -29,6 +29,30 @@ def get_username():
     else:
         return 'batyas'
 
+# if user in group, gets groupname and id stored in cookie
+# if nothing stored, defaults to first group in list of user's groups
+def getCurrGroupnameAndId(request, groups, inGroup=True):
+    groupname = request.cookies.get('groupname')
+    if groupname == None and inGroup:
+        groupaname = groups[0][1]
+
+    groupid = request.cookies.get('groupid')
+    if groupid == None and inGroup:
+        groupid = groups[0][0]
+    else: groupid = int(groupid)
+    return groupname, groupid
+
+# returns bool - is user owner or manager
+# (used to display manage group tab in navbar if relevant)
+def getIsMgr(username, inGroup, request, groups=None):
+    if inGroup:
+        if groups == None:
+            groups = get_user_groups(username)
+        _, groupid = getCurrGroupnameAndId(request, groups)
+        role = get_user_role(username, groupid)
+        return (role in ['manager','owner'])
+    else:
+        return False
 
 # takes a request and returns the schedule values
 def parseSchedule():
@@ -96,19 +120,14 @@ def index():
 
     groups = get_user_groups(username)
     numGroups = len(groups)
-
-    print(groups)
-
     inGroup = (numGroups != 0)
+    isMgr = getIsMgr(username, inGroup, request, groups)
 
-    groupname = request.cookies.get('groupname')
-    if groupname == None:
-        if numGroups != 0: groupaname = groups[0][1]
-
+    groupname, groupid = getCurrGroupnameAndId(request, groups, inGroup)
     groups_by_name = [g[1] for g in groups]
 
     if request.method == 'GET':
-        html = render_template('index.html', groups=groups_by_name, groupname=groupname, numGroups=numGroups, inGroup=inGroup)
+        html = render_template('index.html', groups=groups_by_name, groupname=groupname, numGroups=numGroups, inGroup=inGroup, isMgr=isMgr)
         response = make_response(html)
         return response
 
@@ -116,7 +135,7 @@ def index():
         groupname = request.form['groupname']
         groupid = get_group_id(groupname)
 
-        html = render_template('index.html',groups=groups_by_name, groupname=groupname, numGroups=numGroups, inGroup=inGroup)
+        html = render_template('index.html',groups=groups_by_name, groupname=groupname, numGroups=numGroups, inGroup=inGroup, isMgr=isMgr)
         response = make_response(html)
         response.set_cookie('groupname',groupname)
         response.set_cookie('groupid', str(groupid))
@@ -131,6 +150,7 @@ def profile():
 
     userInfo = get_profile_info(username)
     inGroup = in_group(username)
+    isMgr = getIsMgr(username, inGroup, request)
 
     globalPreferences = blankSchedule()
     try:
@@ -138,7 +158,8 @@ def profile():
     except Exception:
         pass
 
-    html = render_template('profile.html', firstName=userInfo.firstname, lastName=userInfo.lastname, netid=username, email=userInfo.email, phoneNum=userInfo.phone, schedule=globalPreferences, inGroup=inGroup, editable=False)
+    html = render_template('profile.html', firstName=userInfo.firstname, lastName=userInfo.lastname, netid=username, email=userInfo.email, 
+        phoneNum=userInfo.phone, schedule=globalPreferences, inGroup=inGroup, isMgr=isMgr, editable=False)
 
     response = make_response(html)
 
@@ -158,23 +179,20 @@ def schedule():
     if len(groups) == 0:
         return redirect(url_for('index'))
 
-    groupname = request.cookies.get('groupname')
-    if groupname == None:
-        groupaname = groups[0][1]
-
-    groupid = request.cookies.get('groupid')
-    if groupid == None:
-        groupid = groups[0][0]
-    else: groupid = int(groupid)
+    groupname, groupid = getCurrGroupnameAndId(request, groups)
+    isMgr = getIsMgr(username, True, request, groups)
     
     groupPreferences = get_group_preferences(groupid, username)
-    if groupPreferences == None or groupPreferences == -1:
+    if groupPreferences == None:
+        # only an issue when users not created through createProfile page
+        change_user_preferences_global(username, create_preferences(blankSchedule()))
         groupPreferences = get_global_preferences(username)
+    print(groupPreferences)
     groupPreferences = get_double_array(groupPreferences)
     edict = solve_shift_scheduling("", "", 10, 1, ['O', 'M', 'A', 'N'], [], create_requests(groupPreferences, 0))
     
 
-    html = render_template('schedule.html', schedule=create_schedule(edict, 0), groupname=groupname, inGroup=True, editable=False)
+    html = render_template('schedule.html', schedule=create_schedule(edict, 0), groupname=groupname, inGroup=True, isMgr=isMgr, editable=False)
     response = make_response(html)
 
     return response
@@ -191,17 +209,12 @@ def group():
     if len(groups) == 0:
         return redirect(url_for('index'))
 
-    groupname = request.cookies.get('groupname')
-    if groupname == None:
-        groupaname = groups[0][1]
-
-    groupid = request.cookies.get('groupid')
-    if groupid == None:
-        groupid = groups[0][0]
-    else: groupid = int(groupid)
+    groupname, groupid = getCurrGroupnameAndId(request, groups)
+    isMgr = getIsMgr(username, True, request, groups)
 
     groupprefs = get_group_preferences(groupid, username)
-    if groupprefs == None or groupprefs == -1:
+    if groupprefs == None:
+        change_user_preferences_global(username, create_preferences(blankSchedule()))
         groupprefs = get_global_preferences(username)
     weeklyPref = get_double_array(groupprefs)
         
@@ -215,7 +228,8 @@ def group():
         prevemailPref = False
         prevphonePref = False
 
-    html = render_template('group.html', schedule=weeklyPref, groupname=groupname, prevphonePref=prevphonePref, prevemailPref=prevemailPref, inGroup=True, editable=False)
+    html = render_template('group.html', schedule=weeklyPref, groupname=groupname, prevphonePref=prevphonePref, prevemailPref=prevemailPref, 
+        inGroup=True, isMgr=isMgr, editable=False)
     response = make_response(html)
     return response
 
@@ -231,17 +245,12 @@ def editGroup():
     if len(groups) == 0:
         return redirect(url_for('index'))
 
-    groupname = request.cookies.get('groupname')
-    if groupname == None:
-        groupaname = groups[0][1]
-
-    groupid = request.cookies.get('groupid')
-    if groupid == None:
-        groupid = groups[0][0]
-    else: groupid = int(groupid)
+    groupname, groupid = getCurrGroupnameAndId(request, groups)
+    isMgr = getIsMgr(username, True, request, groups)
 
     groupprefs = get_group_preferences(groupid, username)
     if groupprefs == None:
+        change_user_preferences_global(username, create_preferences(blankSchedule()))
         groupprefs = get_global_preferences(username)
     weeklyPref = get_double_array(groupprefs)
         
@@ -252,7 +261,8 @@ def editGroup():
     prevemailPref = notifPrefs.emailnotif
 
     if request.method == 'GET':
-        html = render_template('editGroup.html', schedule=weeklyPref, groupname=groupname, prevphonePref=prevphonePref, prevemailPref=prevemailPref, inGroup=True, editable=True)
+        html = render_template('editGroup.html', schedule=weeklyPref, groupname=groupname, prevphonePref=prevphonePref, prevemailPref=prevemailPref,  
+            inGroup=True, isMgr=isMgr, editable=True)
         response = make_response(html)
         return response
     else:
@@ -294,6 +304,7 @@ def cleanGroups():
     groups = get_user_groups(username)
     if len(groups) == 0:
         return redirect(url_for('index'))
+    # groups is list of tuples - (groupid, groupname), so create list of groupids from group list
     groupIds = [g[0] for g in groups]
     for groupId in groupIds:
         remove_group(groupId)
@@ -306,6 +317,8 @@ def createGroup():
     username = get_username()
     
     inGroup = in_group(username)
+    isMgr = getIsMgr(username, inGroup, request)
+
 
     # names = {"bob", "joe", "jill", username}
     names = get_all_users()
@@ -316,7 +329,7 @@ def createGroup():
 
     if request.method == 'GET':
 
-        html = render_template('createGroup.html', names=names, inGroup=inGroup)
+        html = render_template('createGroup.html', names=names, inGroup=inGroup, isMgr=isMgr)
         response = make_response(html)
         return response
 
@@ -334,12 +347,13 @@ def createGroup():
 def createProfile():
     username = get_username()
 
-    # add error handling if username already exists in database
+    if user_exists(username):
+        return redirect(url_for('profile'))
 
     if request.method == 'GET':
         if (user_exists(username)):
             return redirect(url_for('profile'))
-        html = render_template('createProfile.html', schedule=blankSchedule(), inGroup=False, editable=True)
+        html = render_template('createProfile.html', schedule=blankSchedule(), inGroup=False, isMgr=False, editable=True)
         response = make_response(html)
         return response
 
@@ -370,8 +384,7 @@ def editProfile():
     username = get_username()
 
     inGroup = in_group(username)
-
-    # add error handling if username already exists in database
+    isMgr = getIsMgr(username, inGroup, request)
 
     userInfo = get_profile_info(username)
     prevfirstName = userInfo.firstname
@@ -387,7 +400,7 @@ def editProfile():
 
     if request.method == 'GET':
         html = render_template('editProfile.html', prevfname=prevfirstName, prevlname=prevlastName, \
-            prevemail=prevemail, prevphoneNum=prevphoneNum, schedule=prevGlobalPreferences, inGroup=inGroup, editable=True)
+            prevemail=prevemail, prevphoneNum=prevphoneNum, schedule=prevGlobalPreferences, inGroup=inGroup, isMgr=isMgr, editable=True)
         response = make_response(html)
         return response
 
@@ -405,4 +418,5 @@ def editProfile():
         return redirect(url_for('profile'))
 
 if __name__ == '__main__':
+    print(create_preferences(blankSchedule()))
     app.run()

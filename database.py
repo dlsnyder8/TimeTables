@@ -141,7 +141,7 @@ def remove_user(netid, groupid):
 #replaces the personal preferences of a user, global
 def change_user_preferences_global(netid, preferences):
     try:
-        session.add(Users(netid=netid, globalpreferences=preferences))
+        session.query(Users).filter_by(netid=netid).update({Users.globalpreferences : preferences})
         session.commit()
     except:
         session.rollback()
@@ -159,12 +159,14 @@ def get_global_preferences(netid):
         print('get_global_preferences() failed',file=stderr)
         return -1
 
-# get user's group preferences 
+# get user's group preferences, gets global preferences if no group preferences set
 def get_group_preferences(groupid, netid):
     try:
         userid = get_user_id(groupid, netid)
         pref = session.query(Group_members.grouppreferences).filter_by(inc=userid).first()
-
+        if pref == None:
+            pref = session.query(Users.globalpreferences).filter_by(netid=netid).first()
+            return pref._asdict()['globalpreferences']
         return pref._asdict()['grouppreferences']
     except:
         print('get_group_preferences() failed',file=stderr)
@@ -264,7 +266,7 @@ def remove_group(groupid):
 # Replaces the schedule of the group specified by groupid
 def change_group_schedule(groupid, schedule):
     try:
-        session.add(Groups(groupid=groupid, shiftSchedule=schedule))
+        session.query(Groups).filter_by(groupid=groupid).update({Groups.shiftSchedule : schedule})
         session.commit()
     except:
         session.rollback()
@@ -292,7 +294,7 @@ def change_group_role(groupid, netid, role):
         print('failed to change user role in group',file=stderr)
         return -1
     try:
-        session.add(Group_members(inc=userid,role=role))
+        session.query(Group_members).filter_by(inc=userid).update({Group_members.role : role})
         session.commit()
     except:
         session.rollback()
