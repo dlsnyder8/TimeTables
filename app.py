@@ -12,7 +12,7 @@ import urllib.parse as urlparse
 #-------------------
 # CAS Authentication cannot be run locally unfortunately
 # Set this variable to False if local, and change to True before pushing
-PROD_ENV = True
+PROD_ENV = False
 
 
 #----------
@@ -82,7 +82,6 @@ def blankSchedule():
 def index():
     if (PROD_ENV):
         username = CASClient().authenticate()
-        username = username.split()[0]
     else:
         username = 'test2'
 
@@ -116,7 +115,6 @@ def index():
 def profile():
     if(PROD_ENV):
         username = CASClient().authenticate()
-        username = username.split()[0]
     else:
         username = 'test2' # or test123
 
@@ -150,7 +148,6 @@ def profile():
 def schedule():
     if(PROD_ENV):
         username = CASClient().authenticate()
-        username = username.split()[0]
     else:
         username = 'test2'
     
@@ -184,7 +181,6 @@ def schedule():
 def group():
     if (PROD_ENV):
         username = CASClient().authenticate()
-        username = username.split()[0]
     else:
         username = 'test2'
 
@@ -225,7 +221,6 @@ def group():
 def editGroup():
     if (PROD_ENV):
         username = CASClient().authenticate()
-        username = username.split()[0]
     else:
         username = 'test2'
 
@@ -281,7 +276,6 @@ def editGroup():
 def cleanGroups():
     if (PROD_ENV):
         username = CASClient().authenticate()
-        username = username.split()[0]
     else:
         # for test purposes
         username = 'test2'
@@ -299,7 +293,6 @@ def cleanGroups():
 def createGroup():
     if (PROD_ENV):
         username = CASClient().authenticate()
-        username = username.split()[0]
     else:
         # for test purposes
         username = 'test2'
@@ -332,7 +325,6 @@ def createGroup():
 def createProfile():
     if(PROD_ENV):
         username = CASClient().authenticate()
-        username = username.split()[0]
     else:
         # for test purposes
         username = 'test2'
@@ -372,7 +364,6 @@ def createProfile():
 def editProfile():
     if(PROD_ENV):
         username = CASClient().authenticate()
-        username = username.split()[0]
     else:
         username = 'test2'
 
