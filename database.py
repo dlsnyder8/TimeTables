@@ -51,6 +51,7 @@ change_group_notifications(groupid, netid, emailnotif = False, textnotif = False
 get_group_notifications(netid, groupid)
 get_user_schedule(netid,groupid)
 update_user_schedule(netid,groupid, schedule = None)
+get_user_role(netid, groupid)
 """
 
 
@@ -406,6 +407,15 @@ def in_group(netid):
         print('in group query failed', file=stderr)
         return -1
 
+def get_user_role(netid, groupid):
+    try:
+        userid = get_user_id(groupid, netid)
+        role = session.query(Group_members.role).filter_by(inc=userid).first()
+        return role.role
+    except:
+        print('get user role failed')
+        return -1
+
 def rollback():
     session.rollback()
     return
@@ -431,4 +441,4 @@ if __name__=="__main__":
     change_user_preferences_group(1, 'test2')
     print(get_group_preferences(1, 'test2'))
     '''
-    print(get_user_groups('batyas'))
+    print(get_user_role('batyas',28))
