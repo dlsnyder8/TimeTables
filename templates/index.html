@@ -30,7 +30,7 @@
                 <ul class="list-unstyled">
                 </ul>
                 <hr>
-                {% if numGroups > 1 %}
+                {% if numGroups > 0 %}
                 <h3>Choose your group:</h3>
                 </br>The schedule and weekly preferences will display your information for this group.
                 </br>
@@ -47,11 +47,18 @@
                 </form>
                 <hr>
                 {% endif %}
+                Create Group:
+                <form action="/createGroup">
+                    <input type="submit" value="create Group">
+                </form>
+                <hr>
+                {% if numGroups > 0 %}
                 Remember to input your weekly preferences:
                 <br>
                 <form action="/editGroup">
                     <input type="submit" value="weekly preferences">
                 </form>
+                {% endif %}
             </div>
         </div>
     </div>

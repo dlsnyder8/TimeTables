@@ -266,6 +266,54 @@ def editGroup():
         
         return redirect(url_for('group'))
 
+@app.route('/cleanGroups',methods=['GET'])
+def cleanGroups():
+    if (PROD_ENV):
+        username = CASClient().authenticate()
+    else:
+        # for test purposes
+        username = 'test2'
+    groups = get_user_groups(username)
+    groupIds = []
+    for grp in groups:
+        groupIds.append(get_group_id(grp))
+    for groupId in groupIds:
+        remove_group(groupId)
+    print("DELETED ALL GROUPS")
+    return redirect(url_for('index'))
+
+
+@app.route('/createGroup', methods=['GET', 'POST'])
+def createGroup():
+    if (PROD_ENV):
+        username = CASClient().authenticate()
+    else:
+        # for test purposes
+        username = 'test2'
+
+    names = {"bob", "joe", "jill", username}
+    # names = get_all_users()
+    names.remove(username)
+
+    if request.method == 'GET':
+
+        html = render_template('createGroup.html', names=names)
+        response = make_response(html)
+        return response
+
+    else:
+        gName = request.form['gName']
+        add_group(username, gName, None)  # make return groupId?
+        groupId = get_group_id(gName)
+
+        for name in names:
+            add_user_to_group(groupId, name, 'member')
+
+        print(groupId)
+
+        return redirect(url_for('index'))
+
+
 
 @app.route('/createProfile', methods=['GET', 'POST'])
 def createProfile():

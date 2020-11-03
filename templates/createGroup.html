@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang='en'>
+
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title> Create Group </title>
+
+
+    <!-- Bootstrap core CSS -->
+    <link href="../static/vendor/bootstrap/css/bootstrap.css" rel="stylesheet">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+</head>
+
+<body>
+    {% include 'header.html' %}
+    <div class="col-lg-12 text-center">
+        <h1>Create Group</h1>
+        <hr>
+        <form action='' method="post">
+            <h2>Group Info</h2>
+            <hr>
+            <table style="margin-left: auto; margin-right: auto;">
+                <tr>
+                    <td>Group Name</td>
+                    <td><input type="text" name="gName" value='' required></td>
+                </tr>
+            </table>
+            <hr>
+            <h2>Group Members</h2>
+            <hr>
+            <table style="margin-left: auto; margin-right: auto;">
+                {% for name in names: %}
+                <tr>
+                    <td>{{name}}</td>
+                    <td><input type="checkbox" name={{name}}></td>
+                </tr>
+                {% endfor %}
+            </table>
+            <hr>
+            <input type="submit" value="Save">
+        </form>
+
+
+
+    </div>
+    {% include 'footer.html' %}
+</body>
+
+</html>
