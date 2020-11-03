@@ -12,7 +12,7 @@ import urllib.parse as urlparse
 #-------------------
 # CAS Authentication cannot be run locally unfortunately
 # Set this variable to False if local, and change to True before pushing
-PROD_ENV = True
+PROD_ENV = False
 
 
 #----------
@@ -129,7 +129,6 @@ def profile():
     else: groupid = int(groupid)
 
     userInfo = get_profile_info(username)
-    notifPrefs = get_group_notifications(username, groupid)
 
     globalPreferences = blankSchedule()
     try:
@@ -137,7 +136,7 @@ def profile():
     except Exception:
         pass
 
-    html = render_template('profile.html', firstName=userInfo.firstname, lastName=userInfo.lastname, netid=username, email=userInfo.email, phoneNum=userInfo.phone, phonePref=notifPrefs.textnotif, emailPref=notifPrefs.emailnotif, schedule=globalPreferences, editable=False)
+    html = render_template('profile.html', firstName=userInfo.firstname, lastName=userInfo.lastname, netid=username, email=userInfo.email, phoneNum=userInfo.phone, schedule=globalPreferences, editable=False)
 
     response = make_response(html)
 
@@ -166,8 +165,11 @@ def schedule():
         groupid = get_group_id(groups[0])
     else: groupid = int(groupid)
     
-    globalPreferences = get_double_array(get_group_preferences(groupid, username))
-    edict = solve_shift_scheduling("", "", 10, 1, ['O', 'M', 'A', 'N'], [], create_requests(globalPreferences, 0))
+    groupPreferences = get_group_preferences(groupid, username)
+    if groupPreferences == None or groupPreferences == -1:
+        groupPreferences = get_global_preferences(username)
+    groupPreferences = get_double_array(groupPreferences)
+    edict = solve_shift_scheduling("", "", 10, 1, ['O', 'M', 'A', 'N'], [], create_requests(groupPreferences, 0))
     
 
     html = render_template('schedule.html', schedule=create_schedule(edict, 0), groupname=groupname, editable=False)
