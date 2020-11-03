@@ -103,10 +103,12 @@ def index():
 
     groupname = request.cookies.get('groupname')
     if groupname == None:
-        if numGroups != 0: groupaname = get_group_id(groups[0])
+        if numGroups != 0: groupaname = groups[0][1]
+
+    groups_by_name = [g[1] for g in groups]
 
     if request.method == 'GET':
-        html = render_template('index.html', groups=groups, groupname=groupname, numGroups=numGroups, inGroup=inGroup)
+        html = render_template('index.html', groups=groups_by_name, groupname=groupname, numGroups=numGroups, inGroup=inGroup)
         response = make_response(html)
         return response
 
@@ -114,7 +116,7 @@ def index():
         groupname = request.form['groupname']
         groupid = get_group_id(groupname)
 
-        html = render_template('index.html',groups=groups, groupname=groupname, numGroups=numGroups, inGroup=inGroup)
+        html = render_template('index.html',groups=groups_by_name, groupname=groupname, numGroups=numGroups, inGroup=inGroup)
         response = make_response(html)
         response.set_cookie('groupname',groupname)
         response.set_cookie('groupid', str(groupid))
@@ -158,11 +160,11 @@ def schedule():
 
     groupname = request.cookies.get('groupname')
     if groupname == None:
-        groupaname = get_group_id(groups[0])
+        groupaname = groups[0][1]
 
     groupid = request.cookies.get('groupid')
     if groupid == None:
-        groupid = get_group_id(groups[0])
+        groupid = groups[0][0]
     else: groupid = int(groupid)
     
     groupPreferences = get_group_preferences(groupid, username)
@@ -191,11 +193,11 @@ def group():
 
     groupname = request.cookies.get('groupname')
     if groupname == None:
-        groupaname = get_group_id(groups[0])
+        groupaname = groups[0][1]
 
     groupid = request.cookies.get('groupid')
     if groupid == None:
-        groupid = get_group_id(groups[0])
+        groupid = groups[0][0]
     else: groupid = int(groupid)
 
     groupprefs = get_group_preferences(groupid, username)
@@ -231,11 +233,11 @@ def editGroup():
 
     groupname = request.cookies.get('groupname')
     if groupname == None:
-        groupaname = get_group_id(groups[0])
+        groupaname = groups[0][1]
 
     groupid = request.cookies.get('groupid')
     if groupid == None:
-        groupid = get_group_id(groups[0])
+        groupid = groups[0][0]
     else: groupid = int(groupid)
 
     groupprefs = get_group_preferences(groupid, username)
@@ -292,9 +294,7 @@ def cleanGroups():
     groups = get_user_groups(username)
     if len(groups) == 0:
         return redirect(url_for('index'))
-    groupIds = []
-    for grp in groups:
-        groupIds.append(get_group_id(grp))
+    groupIds = [g[0] for g in groups]
     for groupId in groupIds:
         remove_group(groupId)
     print("DELETED ALL GROUPS")
@@ -372,14 +372,6 @@ def editProfile():
     inGroup = in_group(username)
 
     # add error handling if username already exists in database
-
-    groupid = request.cookies.get('groupid')
-    if groupid == None:
-        groups = get_user_groups(username)
-        groupid = get_group_id(groups[0])
-    
-    else: groupid = int(groupid)
-
 
     userInfo = get_profile_info(username)
     prevfirstName = userInfo.firstname

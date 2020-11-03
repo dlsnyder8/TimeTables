@@ -374,20 +374,17 @@ def update_profile_info(firstName, lastName, netid, email=None, phone=None, pref
     return
 
 # get all groupids of groups that user is part of 
-# (queries with netid instead of inc b/c each group that a user is in has different inc in groupmembers table)
-# returns list of groupids
+# returns list of tuples, (groupid, groupname)
 def get_user_groups(netid):
     try:
         groups = session.query(Group_members.groupid).filter_by(netid=netid).all()
         if len(groups) == 0:
             return groups
-        group_names = []
+        group_list = []
         for g in groups:
-            
             name = session.query(Groups.groupname).filter_by(groupid=g.groupid).first()
-            group_names.append(name[0])
-
-        return group_names
+            group_list.append((g.groupid,name[0]))
+        return group_list
     except:
         print('get user groups failed',file=stderr)
         return -1
@@ -434,4 +431,4 @@ if __name__=="__main__":
     change_user_preferences_group(1, 'test2')
     print(get_group_preferences(1, 'test2'))
     '''
-    print(in_group('batyas'))
+    print(get_user_groups('batyas'))
