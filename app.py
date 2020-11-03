@@ -97,7 +97,7 @@ def index():
     groups = get_user_groups(username)
     numGroups = len(groups)
 
-    # print(groups)
+    print(groups)
 
     inGroup = (numGroups != 0)
 
