@@ -107,7 +107,10 @@ def add_user(firstName, lastName, netid, email=None, phone=None, preferences=Non
 def get_all_users():
     try: 
         ids = session.query(Users.netid).all()
-        return ids
+        id_array = []
+        for id in ids:
+            id_array.append(id[0])
+        return id_array
     except:
         print("unable to get all users",file=stderr)
         return -1
