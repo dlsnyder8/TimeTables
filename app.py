@@ -21,6 +21,15 @@ PROD_ENV = False
 app = Flask(__name__)
 app.secret_key = b'\x06)\x8e\xa3BW"\x9d\xcd\x1d5)\xd6\xd1b1'
 
+
+# obtains username
+def get_username():
+    if PROD_ENV:
+        return CASClient().authenticate()
+    else:
+        return 'batyas'
+
+
 # takes a request and returns the schedule values
 def parseSchedule():
     table_values = []
@@ -80,10 +89,7 @@ def blankSchedule():
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET','POST'])
 def index():
-    if (PROD_ENV):
-        username = CASClient().authenticate()
-    else:
-        username = 'batyas'
+    username = get_username()
 
     if not (user_exists(username)):
         return redirect(url_for('createProfile'))
@@ -114,10 +120,7 @@ def index():
 
 @app.route('/profile',methods=['GET'])
 def profile():
-    if(PROD_ENV):
-        username = CASClient().authenticate()
-    else:
-        username = 'batyas' # or test123
+    username = get_username()
 
     if not (user_exists(username)):
         return redirect(url_for('createProfile'))
@@ -141,10 +144,7 @@ def profile():
 
 @app.route('/schedule', methods=['GET'])
 def schedule():
-    if(PROD_ENV):
-        username = CASClient().authenticate()
-    else:
-        username = 'batyas'
+    username = get_username()
     
     if not (user_exists(username)):
         return redirect(url_for('createProfile'))
@@ -177,10 +177,7 @@ def schedule():
 
 @app.route('/group', methods=['GET'])
 def group():
-    if (PROD_ENV):
-        username = CASClient().authenticate()
-    else:
-        username = 'batyas'
+    username = get_username()
 
     if not (user_exists(username)):
         return redirect(url_for('createProfile'))
@@ -220,10 +217,7 @@ def group():
 
 @app.route('/editGroup',methods=['GET', 'POST'])
 def editGroup():
-    if (PROD_ENV):
-        username = CASClient().authenticate()
-    else:
-        username = 'batyas'
+    username = get_username()
 
     if not (user_exists(username)):
         return redirect(url_for('createProfile'))
@@ -276,13 +270,23 @@ def editGroup():
         
         return redirect(url_for('group'))
 
-@app.route('/cleanGroups',methods=['GET'])
+
+@app.route('/populateUsers', methods=['GET'])
+def populateUsers():
+    add_user('John', 'Doe', 'jdoe')
+    add_user('Jane', 'Doe', 'jadoe')
+    add_user('Bland', 'Land', 'bland')
+    add_user('Dan', 'Man', 'dman')
+    add_user('Tom', 'Till', 'ttill')
+    add_user('Jen', 'Jill', 'jjill')
+    print("Populated Users")
+    return redirect(url_for('index'))
+
+
+@app.route('/cleanGroups', methods=['GET'])
 def cleanGroups():
-    if (PROD_ENV):
-        username = CASClient().authenticate()
-    else:
-        # for test purposes
-        username = 'batyas'
+    username = get_username()
+
     groups = get_user_groups(username)
     if len(groups) == 0:
         return redirect(url_for('index'))
@@ -297,17 +301,16 @@ def cleanGroups():
 
 @app.route('/createGroup', methods=['GET', 'POST'])
 def createGroup():
-    if (PROD_ENV):
-        username = CASClient().authenticate()
-    else:
-        # for test purposes
-        username = 'batyas'
+    username = get_username()
     
     inGroup = in_group(username)
 
-    names = {"bob", "joe", "jill", username}
-    # names = get_all_users()
-    names.remove(username)
+    # names = {"bob", "joe", "jill", username}
+    names = get_all_users()
+    try:
+        names.remove(username)
+    except:  # remove method errors if element not within
+        ()
 
     if request.method == 'GET':
 
@@ -317,8 +320,7 @@ def createGroup():
 
     else:
         gName = request.form['gName']
-        add_group(username, gName, None)  # make return groupId?
-        groupId = get_group_id(gName)
+        groupId = add_group(username, gName, None)
 
         for name in names:
             add_user_to_group(groupId, name, 'member')
@@ -331,11 +333,7 @@ def createGroup():
 
 @app.route('/createProfile', methods=['GET', 'POST'])
 def createProfile():
-    if(PROD_ENV):
-        username = CASClient().authenticate()
-    else:
-        # for test purposes
-        username = 'batyas'
+    username = get_username()
 
     # add error handling if username already exists in database
 
@@ -370,10 +368,7 @@ def createProfile():
 
 @app.route('/editProfile',methods=['GET','POST'])
 def editProfile():
-    if(PROD_ENV):
-        username = CASClient().authenticate()
-    else:
-        username = 'batyas'
+    username = get_username()
 
     inGroup = in_group(username)
 
