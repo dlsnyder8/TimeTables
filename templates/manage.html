@@ -1,0 +1,78 @@
+<!--This is for people to put in their weekly preferences-->
+
+<!-- Main page after logging in, shows an employee's schedule for the week/month-->
+<!DOCTYPE html>
+<html lang='en'>
+
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title> Manage </title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="../static/vendor/bootstrap/css/bootstrap.css" rel="stylesheet">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+</head>
+
+<body>
+    {% include 'header.html' %}
+
+    <!-- Page Content -->
+    <div class="container">
+
+        <div class="row">
+            <div class="col-lg-12 text-center">
+                <h1>{{groupname}} Shifts</h1>
+                <form action="/editGroup">
+                    <input type="submit" value="Edit Group Preferences" />
+                </form>
+                <hr>
+                <h2> Set a new shift for {{groupname}}</h2><br>
+                <form action='' method="post">
+
+                    <label for="day">Choose a day:</label>
+
+                    <select name="day" id="day">
+                      <option value="Monday">Monday</option>
+                      <option value="Tuesday">Tuesday</option>
+                      <option value="Wednesday">Wednesday</option>
+                      <option value="Thursday">Thursday</option>
+                      <option value="Friday">Friday</option>
+                      <option value="Saturday">Saturday</option>
+                      <option value="Sunday">Sunday</option>
+                    </select>
+
+                    
+                    <label for="start">Choose start:</label>
+                    <input type="time" id="start" name="start"
+                    required>
+                    <label for="end">Choose end:</label>
+                    <input type="time" id="end" name="end"
+                    required>
+
+                    <input type="submit" value="Add">
+                    <hr>
+
+                    <h2> Current Shifts</h2><br>
+                    <p>The current shifts for <strong>{{groupname}}</strong>. <br>
+                        {% get_group_shifts(groupid) %}
+                    </form>
+
+                <hr>
+
+            </div>
+        </div>
+        {% include 'footer.html' %}
+
+        <!-- Bootstrap core JavaScript -->
+        <script src="../static/vendor/jquery/jquery.min.js"></script>
+        <script src="../static/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+</body>
+
+</html>
