@@ -22,6 +22,7 @@ get_all_users()
 get_user_groups(netid)
 user_exists(netid)
 get_profile_info(netid)
+in_group(netid)
 
 change_user_preferences_global(netid, preferences)
 
@@ -375,12 +376,14 @@ def update_profile_info(firstName, lastName, netid, email=None, phone=None, pref
 def get_user_groups(netid):
     try:
         groups = session.query(Group_members.groupid).filter_by(netid=netid).all()
+        if len(groups) == 0:
+            return groups
         group_names = []
         for g in groups:
             group_names.append(session.query(Groups.groupname).filter_by(groupid=g.groupid).first().groupname)
         return group_names
     except:
-        print('get user groups failed')
+        print('get user groups failed',file=stderr)
         return -1
 
 def get_group_id(groupname):
@@ -388,7 +391,16 @@ def get_group_id(groupname):
         groupid = session.query(Groups.groupid).filter_by(groupname=groupname).first()
         return groupid.groupid
     except:
-        print('failed to get groupid')
+        print('failed to get groupid',file=stderr)
+        return -1
+
+# return True if user in 1+ groups, False if in none
+def in_group(netid):
+    try:
+        ingroup = session.query(Group_members.netid).filter_by(netid=netid).first()
+        return (ingroup != None)
+    except:
+        print('in group query failed', file=stderr)
         return -1
 
 def rollback():
@@ -411,7 +423,9 @@ if __name__=="__main__":
     #print(get_group_notifications('test2',1))
 
     #print(get_group_preferences(1,'test2'))
-
+    '''
     print(get_group_preferences(1, 'test2'))
     change_user_preferences_group(1, 'test2')
     print(get_group_preferences(1, 'test2'))
+    '''
+    print(in_group('batyas'))

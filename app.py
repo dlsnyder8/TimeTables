@@ -12,7 +12,7 @@ import urllib.parse as urlparse
 #-------------------
 # CAS Authentication cannot be run locally unfortunately
 # Set this variable to False if local, and change to True before pushing
-PROD_ENV = True
+PROD_ENV = False
 
 
 #----------
@@ -83,7 +83,7 @@ def index():
     if (PROD_ENV):
         username = CASClient().authenticate()
     else:
-        username = 'test2'
+        username = 'batyas'
 
     if not (user_exists(username)):
         return redirect(url_for('createProfile'))
@@ -91,13 +91,14 @@ def index():
     groups = get_user_groups(username)
     numGroups = len(groups)
 
+    inGroup = (numGroups != 0)
+
     groupname = request.cookies.get('groupname')
     if groupname == None:
-        groups = get_user_groups(username)
-        groupaname = get_group_id(groups[0])
+        if numGroups != 0: groupaname = get_group_id(groups[0])
 
     if request.method == 'GET':
-        html = render_template('index.html', groups=groups, groupname=groupname, numGroups=numGroups)
+        html = render_template('index.html', groups=groups, groupname=groupname, numGroups=numGroups, inGroup=inGroup)
         response = make_response(html)
         return response
 
@@ -105,7 +106,7 @@ def index():
         groupname = request.form['groupname']
         groupid = get_group_id(groupname)
 
-        html = render_template('index.html',groups=groups, groupname=groupname, numGroups=numGroups)
+        html = render_template('index.html',groups=groups, groupname=groupname, numGroups=numGroups, inGroup=inGroup)
         response = make_response(html)
         response.set_cookie('groupname',groupname)
         response.set_cookie('groupid', str(groupid))
@@ -116,12 +117,13 @@ def profile():
     if(PROD_ENV):
         username = CASClient().authenticate()
     else:
-        username = 'test2' # or test123
+        username = 'batyas' # or test123
 
     if not (user_exists(username)):
         return redirect(url_for('createProfile'))
 
     userInfo = get_profile_info(username)
+    inGroup = in_group(username)
 
     globalPreferences = blankSchedule()
     try:
@@ -129,7 +131,7 @@ def profile():
     except Exception:
         pass
 
-    html = render_template('profile.html', firstName=userInfo.firstname, lastName=userInfo.lastname, netid=username, email=userInfo.email, phoneNum=userInfo.phone, schedule=globalPreferences, editable=False)
+    html = render_template('profile.html', firstName=userInfo.firstname, lastName=userInfo.lastname, netid=username, email=userInfo.email, phoneNum=userInfo.phone, schedule=globalPreferences, inGroup=inGroup, editable=False)
 
     response = make_response(html)
 
@@ -142,19 +144,22 @@ def schedule():
     if(PROD_ENV):
         username = CASClient().authenticate()
     else:
-        username = 'test2'
+        username = 'batyas'
     
     if not (user_exists(username)):
         return redirect(url_for('createProfile'))
+    
+    groups = get_user_groups(username)
+
+    if len(groups) == 0:
+        return redirect(url_for('index'))
 
     groupname = request.cookies.get('groupname')
     if groupname == None:
-        groups = get_user_groups(username)
         groupaname = get_group_id(groups[0])
 
     groupid = request.cookies.get('groupid')
     if groupid == None:
-        groups = get_user_groups(username)
         groupid = get_group_id(groups[0])
     else: groupid = int(groupid)
     
@@ -165,7 +170,7 @@ def schedule():
     edict = solve_shift_scheduling("", "", 10, 1, ['O', 'M', 'A', 'N'], [], create_requests(groupPreferences, 0))
     
 
-    html = render_template('schedule.html', schedule=create_schedule(edict, 0), groupname=groupname, editable=False)
+    html = render_template('schedule.html', schedule=create_schedule(edict, 0), groupname=groupname, inGroup=True, editable=False)
     response = make_response(html)
 
     return response
@@ -175,21 +180,24 @@ def group():
     if (PROD_ENV):
         username = CASClient().authenticate()
     else:
-        username = 'test2'
+        username = 'batyas'
 
     if not (user_exists(username)):
         return redirect(url_for('createProfile'))
 
-    groupid = request.cookies.get('groupid')
-    if groupid == None:
-        groups = get_user_groups(username)
-        groupid = get_group_id(groups[0])
-    else: groupid = int(groupid)
+    groups = get_user_groups(username)
+
+    if len(groups) == 0:
+        return redirect(url_for('index'))
 
     groupname = request.cookies.get('groupname')
     if groupname == None:
-        groups = get_user_groups(username)
         groupaname = get_group_id(groups[0])
+
+    groupid = request.cookies.get('groupid')
+    if groupid == None:
+        groupid = get_group_id(groups[0])
+    else: groupid = int(groupid)
 
     groupprefs = get_group_preferences(groupid, username)
     if groupprefs == None or groupprefs == -1:
@@ -206,7 +214,7 @@ def group():
         prevemailPref = False
         prevphonePref = False
 
-    html = render_template('group.html', schedule=weeklyPref, groupname=groupname, prevphonePref=prevphonePref, prevemailPref=prevemailPref, editable=False)
+    html = render_template('group.html', schedule=weeklyPref, groupname=groupname, prevphonePref=prevphonePref, prevemailPref=prevemailPref, inGroup=True, editable=False)
     response = make_response(html)
     return response
 
@@ -215,21 +223,24 @@ def editGroup():
     if (PROD_ENV):
         username = CASClient().authenticate()
     else:
-        username = 'test2'
+        username = 'batyas'
 
     if not (user_exists(username)):
         return redirect(url_for('createProfile'))
 
-    groupid = request.cookies.get('groupid')
-    if groupid == None:
-        groups = get_user_groups(username)
-        groupid = get_group_id(groups[0])
-    else: groupid = int(groupid)
+    groups = get_user_groups(username)
+
+    if len(groups) == 0:
+        return redirect(url_for('index'))
 
     groupname = request.cookies.get('groupname')
     if groupname == None:
-        groups = get_user_groups(username)
         groupaname = get_group_id(groups[0])
+
+    groupid = request.cookies.get('groupid')
+    if groupid == None:
+        groupid = get_group_id(groups[0])
+    else: groupid = int(groupid)
 
     groupprefs = get_group_preferences(groupid, username)
     if groupprefs == None:
@@ -243,7 +254,7 @@ def editGroup():
     prevemailPref = notifPrefs.emailnotif
 
     if request.method == 'GET':
-        html = render_template('editGroup.html', schedule=weeklyPref, groupname=groupname, prevphonePref=prevphonePref, prevemailPref=prevemailPref, editable=True)
+        html = render_template('editGroup.html', schedule=weeklyPref, groupname=groupname, prevphonePref=prevphonePref, prevemailPref=prevemailPref, inGroup=True, editable=True)
         response = make_response(html)
         return response
     else:
@@ -271,8 +282,10 @@ def cleanGroups():
         username = CASClient().authenticate()
     else:
         # for test purposes
-        username = 'test2'
+        username = 'batyas'
     groups = get_user_groups(username)
+    if len(groups) == 0:
+        return redirect(url_for('index'))
     groupIds = []
     for grp in groups:
         groupIds.append(get_group_id(grp))
@@ -288,7 +301,9 @@ def createGroup():
         username = CASClient().authenticate()
     else:
         # for test purposes
-        username = 'test2'
+        username = 'batyas'
+    
+    inGroup = in_group(username)
 
     names = {"bob", "joe", "jill", username}
     # names = get_all_users()
@@ -296,7 +311,7 @@ def createGroup():
 
     if request.method == 'GET':
 
-        html = render_template('createGroup.html', names=names)
+        html = render_template('createGroup.html', names=names, inGroup=inGroup)
         response = make_response(html)
         return response
 
@@ -320,14 +335,14 @@ def createProfile():
         username = CASClient().authenticate()
     else:
         # for test purposes
-        username = 'test2'
+        username = 'batyas'
 
     # add error handling if username already exists in database
 
     if request.method == 'GET':
         if (user_exists(username)):
             return redirect(url_for('profile'))
-        html = render_template('createProfile.html', schedule=blankSchedule(), editable=True)
+        html = render_template('createProfile.html', schedule=blankSchedule(), inGroup=False, editable=True)
         response = make_response(html)
         return response
 
@@ -358,7 +373,9 @@ def editProfile():
     if(PROD_ENV):
         username = CASClient().authenticate()
     else:
-        username = 'test2'
+        username = 'batyas'
+
+    inGroup = in_group(username)
 
     # add error handling if username already exists in database
 
@@ -384,7 +401,7 @@ def editProfile():
 
     if request.method == 'GET':
         html = render_template('editProfile.html', prevfname=prevfirstName, prevlname=prevlastName, \
-            prevemail=prevemail, prevphoneNum=prevphoneNum, schedule=prevGlobalPreferences, editable=True)
+            prevemail=prevemail, prevphoneNum=prevphoneNum, schedule=prevGlobalPreferences, inGroup=inGroup, editable=True)
         response = make_response(html)
         return response
 
