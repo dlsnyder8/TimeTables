@@ -97,6 +97,8 @@ def index():
     groups = get_user_groups(username)
     numGroups = len(groups)
 
+    # print(groups)
+
     inGroup = (numGroups != 0)
 
     groupname = request.cookies.get('groupname')
@@ -321,11 +323,8 @@ def createGroup():
     else:
         gName = request.form['gName']
         groupId = add_group(username, gName, None)
-
         for name in names:
             add_user_to_group(groupId, name, 'member')
-
-        print(groupId)
 
         return redirect(url_for('index'))
 
