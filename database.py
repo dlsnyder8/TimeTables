@@ -380,7 +380,10 @@ def get_user_groups(netid):
             return groups
         group_names = []
         for g in groups:
-            group_names.append(session.query(Groups.groupname).filter_by(groupid=g.groupid).first().groupname)
+            
+            name = session.query(Groups.groupname).filter_by(groupid=g.groupid).first()
+            group_names.append(name[0])
+
         return group_names
     except:
         print('get user groups failed',file=stderr)
