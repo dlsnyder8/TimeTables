@@ -17,7 +17,7 @@ LOCAL_ENV = 0
 -------------USER FUNCTIONS-----------------
 add_user(firstName, lastName, netid, email=None, phone=None, preferences=None, createGroup = True)
 remove_user(netid, groupid)
-update_profile_info(firstName, lastName, netid, email=None, phone=None, preferences=None)
+update_profile_info(firstName, lastName, netid, email=None, phone=None, preferences=None,createGroup = True)
 get_all_users()
 get_user_groups(netid)
 user_exists(netid)
