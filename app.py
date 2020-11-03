@@ -197,15 +197,19 @@ def group():
         groupaname = get_group_id(groups[0])
 
     groupprefs = get_group_preferences(groupid, username)
-    if groupprefs == None:
+    if groupprefs == None or groupprefs == -1:
         groupprefs = get_global_preferences(username)
     weeklyPref = get_double_array(groupprefs)
         
     # later add code to reset groupprefs to global prefs on sunday
 
     notifPrefs = get_group_notifications(username, groupid)
-    prevphonePref = notifPrefs.textnotif
-    prevemailPref = notifPrefs.emailnotif
+    if notifPrefs != None and notifPrefs != -1: 
+        prevphonePref = notifPrefs.textnotif
+        prevemailPref = notifPrefs.emailnotif
+    else:
+        prevemailPref = False
+        prevphonePref = False
 
     html = render_template('group.html', schedule=weeklyPref, groupname=groupname, prevphonePref=prevphonePref, prevemailPref=prevemailPref, editable=False)
     response = make_response(html)
