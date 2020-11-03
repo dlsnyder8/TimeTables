@@ -12,6 +12,46 @@ from sqlalchemy.ext.automap import automap_base
 LOCAL_ENV = 0
 
 
+# ALL FUNCTIONS
+"""
+-------------USER FUNCTIONS-----------------
+add_user(firstName, lastName, netid, email=None, phone=None, preferences=None, createGroup = True)
+remove_user(netid, groupid)
+update_profile_info(firstName, lastName, netid, email=None, phone=None, preferences=None,createGroup = True)
+get_all_users()
+get_user_groups(netid)
+user_exists(netid)
+get_profile_info(netid)
+
+change_user_preferences_global(netid, preferences)
+
+get_group_preferences(groupid, netid) 
+change_user_preferences_group(groupid, netid, preferences = None)
+----------------------------------------------
+
+------------GROUP FUNCTIONS-------------------
+
+add_group(owner, groupName, shiftSchedule = None, globalshifts=None)
+remove_group(groupid)
+get_group_id(groupname)
+
+// These are for the 'global' or recurring shifts week to week
+get_group_shifts(groupid)
+change_group_shifts(groupid, shifts = None)
+
+// This is for the weekly schedule
+change_group_schedule(groupid, schedule)
+
+----------------------------------------------
+
+------------GROUP MEMBER FUNCTIONS------------
+change_group_notifications(groupid, netid, emailnotif = False, textnotif = False):
+
+get_group_notifications(netid, groupid)
+get_user_schedule(netid,groupid)
+update_user_schedule(netid,groupid, schedule = None)
+"""
+
 
 
 #----------
@@ -51,9 +91,10 @@ def get_double_array(preferences):
 
 
 # adds a user to the database
-def add_user(firstName, lastName, netid, email=None, phone=None, preferences=None):
+def add_user(firstName, lastName, netid, email=None, phone=None, preferences=None, createGroup = True):
     try:
-        session.add(Users(firstname=firstName,lastname=lastName,netid=netid,email=email,phone=phone,globalpreferences=preferences))
+        session.add(Users(firstname=firstName,lastname=lastName,netid=netid,
+                    email=email,phone=phone,globalpreferences=preferences, can_create_group = createGroup))
         session.commit()
         return
     except:
@@ -61,6 +102,16 @@ def add_user(firstName, lastName, netid, email=None, phone=None, preferences=Non
         print('Add User Failed',file=stderr)
         return -1
         
+# returns the netid's of all users in the db
+def get_all_users():
+    try: 
+        ids = session.query(Users.netid).all()
+        return ids
+    except:
+        print("unable to get all users",file=stderr)
+        return -1
+
+
 
 def user_exists(netid):
     return session.query(Users).filter(Users.netid == netid).scalar() is not None
@@ -148,21 +199,42 @@ def get_user_id(groupid,netid):
 
 # Adds a group, shiftSchedule is optional argument if known
 # should call add_user_to_group with owner role
-def add_group(owner, groupName, shiftSchedule = None):
-    statement = Groups(owner=owner, groupname=groupName,shiftSchedule=shiftSchedule)
+def add_group(owner, groupName, shiftSchedule = None, globalshifts=None):
+    statement = Groups(owner=owner, groupname=groupName,shiftSchedule=shiftSchedule, globalschedule=globalshifts)
     try:
         session.add(statement)
         session.flush()
         groupid=statement.groupid
         add_user_to_group(groupid,owner,'owner')
         session.commit()
+        return groupid
     except:
         session.rollback()
         print('Failed to add_group()',file=stderr)
         return -1
         
-    return
+# returns the global shifts for a group
+def get_group_shifts(groupid):
+    try:
+        shift_schedule = session.query(Groups.globalschedule).filter_by(groupid=groupid).first()
+        return shift_schedule[0]
+    except:
+        
+        print("Unable to get the group shift schedule for group:",groupid, file=stderr)
+        return -1
 
+
+
+# changes the recurring shifts for a group
+def change_group_shifts(groupid, shifts = None):
+    try:
+        session.query(Groups.groupid).filter_by(groupid=groupid).update({Groups.globalschedule : shifts})
+        return
+
+    except:
+        session.rollback()
+        print("Failed to change group shifts",file=stderr)
+        return -1
 
 
 # removes a group
@@ -258,11 +330,38 @@ def get_group_notifications(netid, groupid):
         print('Failed to get group notifications',file=stderr)
         return -1
 
+
+def get_user_schedule(netid,groupid):
+    userid = get_user_id(groupid,netid)
+    if userid == -1:
+        return -1
+    try:
+        sched = session.query(Group_members.userschedule).filter_by(inc=userid).first()
+        return sched
+    except:
+        print("failed to get user schedule",file=stderr)
+        return -1
+
+def update_user_schedule(netid,groupid, schedule = None):
+    userid = get_user_id(groupid,netid)
+    if userid == -1:
+        return -1
+    try:
+        session.query(Group_members).filter_by(inc=userid).update({Group_members.userschedule : schedule})
+        session.commit()
+        return
+
+    except:
+        session.rollback()
+        print("failed to update user schedule",file=stderr)
+        return -1
+
 # updates profile info
 # (name, email, phone)
-def update_profile_info(firstName, lastName, netid, email=None, phone=None, preferences=None):
+def update_profile_info(firstName, lastName, netid, email=None, phone=None, preferences=None, createGroup = True):
     try:
-        session.query(Users).filter_by(netid=netid).update({Users.firstname : firstName, Users.lastname: lastName, Users.email: email, Users.phone: phone, Users.globalpreferences: preferences})
+        session.query(Users).filter_by(netid=netid).update({Users.firstname : firstName, Users.lastname: lastName, 
+                            Users.email: email, Users.phone: phone,Users.can_create_group: createGroup, Users.globalpreferences: preferences})
         session.commit()
     except:
         session.rollback()
