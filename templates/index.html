@@ -39,11 +39,10 @@
                 </br>
                 <form action="" method="post">
                     {% for g in groups %}
-                    <input type="radio" id={{g}} name="groupname" value="{{g}}" {% if groupname == g %} checked
+                    <input type="radio" disabled name="groupname" value="{{g}}" {% if groupname == g %} checked
                         {% endif %}>
-                    <label for={{g}}>{{g}}</label><br>
+                    <input type="submit" name="groupname" value="{{g}}"> <br>
                     {% endfor %}
-                    <input type="submit" value="submit">
                 </form>
                 <hr>
                 {% endif %}
