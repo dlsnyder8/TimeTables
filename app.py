@@ -50,7 +50,9 @@ def getIsMgr(username, inGroup, request, groups=None):
         if groups == None:
             groups = get_user_groups(username)
         _, groupid = getCurrGroupnameAndId(request, groups)
+        print(groupid)
         role = get_user_role(username, groupid)
+        print(role)
         return (role in ['manager','owner'])
     else:
         return False
@@ -314,13 +316,18 @@ def cleanGroups():
 
 @app.route('/viewGroup', methods=['GET'])
 def viewGroup():
-    gName = request.cookies.get('groupname')
-    groupId = request.cookies.get('groupid')
+    username = get_username()
+    inGroup = in_group(username)
+    if not inGroup:
+        return redirect(url_for('index'))
+    groups = get_user_groups(username)
+    isMgr = getIsMgr(username, True, request, groups)
+    gName, groupId = getCurrGroupnameAndId(request, groups)
     members = get_group_users(groupId)
     print("this is the thing")
     print(members)
 
-    html = render_template('viewGroup.html', gName=gName, members=members)
+    html = render_template('viewGroup.html', gName=gName, members=members, inGroup=True, isMgr=isMgr)
     response = make_response(html)
 
     return response
