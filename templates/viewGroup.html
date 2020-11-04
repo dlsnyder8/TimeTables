@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang='en'>
+
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title> Create Group </title>
+
+
+    <!-- Bootstrap core CSS -->
+    <link href="../static/vendor/bootstrap/css/bootstrap.css" rel="stylesheet">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+</head>
+
+<body>
+    {% include 'header.html' %}
+    <div class="col-lg-12 text-center">
+        <h1>Group Info</h1>
+        <hr>
+        <h1>{{gName}}</h1>
+        <hr>
+        <h2>Group Members</h2>
+        {% for member in members: %}
+            {{member}} <br>
+        {% endfor %}
+
+    </div>
+</body>
+
+</html>

@@ -57,10 +57,10 @@ get_user_role(netid, groupid)
 
 
 #----------
-DATABASE_URL = os.environ['DATABASE_URL']
+# DATABASE_URL = os.environ['DATABASE_URL']
 
 # create engine (db object basically)
-engine = create_engine(DATABASE_URL)
+engine = create_engine("postgres://pheepicuurwuqg:fc272975e122789ac91401d8c19152c7ea716f2d935b3a28ad3d2e34e7131229@ec2-52-72-221-20.compute-1.amazonaws.com:5432/d7t82iju2c7ela")
 #start automap and create session with automap
 Base = automap_base()
 Base.prepare(engine, reflect=True)
@@ -416,6 +416,19 @@ def get_user_role(netid, groupid):
         return role.role
     except:
         print('get user role failed')
+        return -1
+
+# returns a list of user netids from a group
+def get_group_users(groupid):
+    try:
+        netids = session.query(Group_members.netid).filter_by(groupid=groupid)
+        id_array = []
+        for netid in netids:
+            id_array.append(netid[0])
+        return id_array
+    except Exception as e:
+        print("exception")
+        print(e)
         return -1
 
 def rollback():

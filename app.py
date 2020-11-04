@@ -29,6 +29,7 @@ def get_username():
     else:
         return 'batyas'
 
+
 # if user in group, gets groupname and id stored in cookie
 # if nothing stored, defaults to first group in list of user's groups
 def getCurrGroupnameAndId(request, groups, inGroup=True):
@@ -137,7 +138,7 @@ def index():
 
         html = render_template('index.html',groups=groups_by_name, groupname=groupname, numGroups=numGroups, inGroup=inGroup, isMgr=isMgr)
         response = make_response(html)
-        response.set_cookie('groupname',groupname)
+        response.set_cookie('groupname', groupname)
         response.set_cookie('groupid', str(groupid))
         return response
 
@@ -311,6 +312,19 @@ def cleanGroups():
     print("DELETED ALL GROUPS")
     return redirect(url_for('index'))
 
+@app.route('/viewGroup', methods=['GET'])
+def viewGroup():
+    gName = request.cookies.get('groupname')
+    groupId = request.cookies.get('groupid')
+    members = get_group_users(groupId)
+    print("this is the thing")
+    print(members)
+
+    html = render_template('viewGroup.html', gName=gName, members=members)
+    response = make_response(html)
+
+    return response
+
 
 @app.route('/createGroup', methods=['GET', 'POST'])
 def createGroup():
@@ -337,7 +351,9 @@ def createGroup():
         gName = request.form['gName']
         groupId = add_group(username, gName, None)
         for name in names:
-            add_user_to_group(groupId, name, 'member')
+            selected = request.form.get(name) is not None
+            if selected:
+                add_user_to_group(groupId, name, 'member')
 
         return redirect(url_for('index'))
 
