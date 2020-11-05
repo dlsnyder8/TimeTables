@@ -110,6 +110,7 @@ def blankSchedule():
         table_values.append(week)
     return table_values
 
+#------------------------------------------------------------------
 
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET','POST'])
@@ -178,6 +179,12 @@ def manage():
     numGroups = len(groups)
     inGroup = (numGroups != 0)
     isMgr = getIsMgr(username, inGroup, request, groups)
+
+    if len(groups) == 0:
+        return redirect(url_for('index'))
+    
+    if not isMgr:
+        return redirect(url_for('index'))
 
     groupname, groupid = getCurrGroupnameAndId(request, groups, inGroup)
 
