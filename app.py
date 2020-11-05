@@ -168,7 +168,40 @@ def profile():
 
     return response
 
+@app.route('/manage', methods=['GET','POST'])
+def manage():
+    username = get_username()
 
+    if not (user_exists(username)):
+        return redirect(url_for('createProfile'))
+
+    groups = get_user_groups(username)
+
+    numGroups = len(groups)
+    inGroup = (numGroups != 0)
+    isMgr = getIsMgr(username, inGroup, request, groups)
+
+    groupname, groupid = getCurrGroupnameAndId(request, groups, inGroup)
+    groups_by_name = [g[1] for g in groups]
+
+    shifts = get_group_shifts(groupid)
+
+    if request.method == 'GET':
+        html = render_template('manage.html', groupname=groupname, isMgr=isMgr, shifts = shifts)
+        response = make_response(html)
+        return response
+
+    else:
+        groupname = request.form['groupname']
+        groupid = get_group_id(groupname)
+
+        start = request.form['start']
+        shifts += start 
+        html = render_template('manage.html', groupname=groupname, isMgr=isMgr, shifts = shifts)
+        response = make_response(html)
+        response.set_cookie('groupname', groupname)
+        response.set_cookie('groupid', str(groupid))
+        return response
 
 @app.route('/schedule', methods=['GET'])
 def schedule():
@@ -365,6 +398,16 @@ def createGroup():
         return redirect(url_for('index'))
 
 
+@app.route('/newuser', methods=['GET', 'POST'])
+def newuser():
+    username = get_username()
+
+    if user_exists(username):
+        return redirect(url_for('profile'))
+
+    html = render_template('newuser.html')
+    response = make_response(html)
+    return response
 
 @app.route('/createProfile', methods=['GET', 'POST'])
 def createProfile():
