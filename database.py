@@ -235,7 +235,8 @@ def get_group_shifts(groupid):
 # changes the recurring shifts for a group
 def change_group_shifts(groupid, shifts = None):
     try:
-        session.query(Groups.groupid).filter_by(groupid=groupid).update({Groups.globalschedule : shifts})
+        session.query(Groups).filter_by(groupid=groupid).update({Groups.globalschedule : shifts})
+        session.commit()
         return
 
     except:
@@ -457,3 +458,4 @@ if __name__=="__main__":
     print(get_group_preferences(1, 'test2'))
     '''
     print(get_user_role('batyas',28))
+ 

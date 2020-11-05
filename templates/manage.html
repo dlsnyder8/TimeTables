@@ -38,34 +38,34 @@
                     <label for="day">Choose a day:</label>
 
                     <select name="day" id="day">
-                      <option value="Monday">Monday</option>
-                      <option value="Tuesday">Tuesday</option>
-                      <option value="Wednesday">Wednesday</option>
-                      <option value="Thursday">Thursday</option>
-                      <option value="Friday">Friday</option>
-                      <option value="Saturday">Saturday</option>
-                      <option value="Sunday">Sunday</option>
+                        <option value="Monday">Monday</option>
+                        <option value="Tuesday">Tuesday</option>
+                        <option value="Wednesday">Wednesday</option>
+                        <option value="Thursday">Thursday</option>
+                        <option value="Friday">Friday</option>
+                        <option value="Saturday">Saturday</option>
+                        <option value="Sunday">Sunday</option>
                     </select>
 
-                    
-                    <label for="start">Choose start:</label>
-                    <input type="time" id="start" name="start"
-                    required>
-                    <label for="end">Choose end:</label>
-                    <input type="time" id="end" name="end"
-                    required>
-                    <label for="npeople">Number of People</label>
-                    <input type="text" id="npeople" name="npeople"
-                    required>
-                    <input type="submit" value="Add">
-                    <hr>
 
-                    <h2> Current Shifts</h2><br>
-                    <p>The current shifts for <strong>{{groupname}}</strong>. <br>
-                        {{ shifts }}
-                    </form>
+                    <label for="start">Choose start:</label>
+                    <input type="time" id="start" name="start" required>
+                    <label for="end">Choose end:</label>
+                    <input type="time" id="end" name="end" required>
+                    <label for="npeople">Number of People</label>
+                    <input type="text" id="npeople" name="npeople" required>
+                    <input type="submit" value="Add">
+                </form>
 
                 <hr>
+
+                <h2> Current Shifts</h2><br>
+                <p>The current shifts for <strong>{{groupname}}</strong>. <br>
+                    {% for shift in shifts %}
+                    <strong>Day: </strong>{{shift[1]}} <strong>Start: </strong>{{shift[2]}}
+                    <strong>End: </strong>{{shift[3]}} <strong>Number of People: </strong>{{shift[4]}}<br>
+                    {% endfor %}
+                    <hr>
 
             </div>
         </div>

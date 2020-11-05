@@ -182,25 +182,53 @@ def manage():
     isMgr = getIsMgr(username, inGroup, request, groups)
 
     groupname, groupid = getCurrGroupnameAndId(request, groups, inGroup)
-    groups_by_name = [g[1] for g in groups]
 
+    # shifts stored in db as dictionary
     shifts = get_group_shifts(groupid)
+    # turn dict into double array
+    if shifts:
+        shifts = get_double_array(shifts)
+    else: shifts = []
+
+    def shifts_to_us_time(shifts):
+        def military_to_us_time(time):
+            if int(time.split(':')[0]) < 12:
+                time = time + " AM"
+            elif int(time.split(':')[0]) == 0:
+                time = "12:00 AM"
+            elif int(time.split(':')[0]) > 12:
+                time = str(int(time.split(":")[0]) - 12) + ":00 PM"
+            return time
+        
+        for shift in shifts:
+            shift[2] = military_to_us_time(shift[2])
+            shift[3] = military_to_us_time(shift[3])
+        return shifts
 
     if request.method == 'GET':
-        html = render_template('manage.html', groupname=groupname, isMgr=isMgr, shifts = shifts)
+        shifts = shifts_to_us_time(shifts)
+        html = render_template('manage.html', groupname=groupname, inGroup=inGroup, isMgr=isMgr, shifts = shifts)
         response = make_response(html)
         return response
 
     else:
-        groupname = request.form['groupname']
         groupid = get_group_id(groupname)
 
-        start = request.form['start']
-        shifts += start 
-        html = render_template('manage.html', groupname=groupname, isMgr=isMgr, shifts = shifts)
+        day = request.form["day"]
+        start = request.form["start"]
+        end = request.form["end"]
+        npeople = request.form["npeople"]
+        print(day, start, end, npeople)
+        
+        shift = [len(shifts), day, start, end, npeople]
+        shifts.append(shift)
+        print(shifts)
+        
+        # change double array of shifts to dict, update db
+        change_group_shifts(groupid, create_preferences(shifts))
+        shifts = shifts_to_us_time(shifts)
+        html = render_template('manage.html', groupname=groupname, inGroup=inGroup, isMgr=isMgr, shifts = shifts)
         response = make_response(html)
-        response.set_cookie('groupname', groupname)
-        response.set_cookie('groupid', str(groupid))
         return response
 
 @app.route('/schedule', methods=['GET'])
