@@ -73,6 +73,23 @@
                 <p> No current shifts for <strong>{{groupname}}</strong></p>
                 {% endif %}
                 <hr>
+                <h2>Edit Members</h2>
+                <form action='' method="post">
+                    <table style="margin-left: auto; margin-right: auto;">
+                    {% for user in users: %}
+                    <tr>
+                        <td>{{user}}</td>
+                        <td><input type="checkbox" name={{user}} {% if selected[user] %} checked {% endif %}></td>
+                    </tr>
+                    {% endfor %}
+                    </table>
+                    <input type="submit" name="submit" value="Save">
+                </form>>
+                <hr>
+                <h2>Delete Group</h2>
+                <form action='' method="post">
+                    <input type="submit" name="submit" value="DelGroup">
+                </form>
 
             </div>
         </div>
