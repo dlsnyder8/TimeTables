@@ -110,6 +110,22 @@ def blankSchedule():
         table_values.append(week)
     return table_values
 
+
+def shifts_to_us_time(shifts):
+    def military_to_us_time(time):
+        if int(time.split(':')[0]) < 12:
+            time = time + " AM"
+        elif int(time.split(':')[0]) == 0:
+            time = "12:00 AM"
+        elif int(time.split(':')[0]) > 12:
+            time = str(int(time.split(":")[0]) - 12) + ":00 PM"
+        return time
+
+    for i in shifts:
+        shifts[i][1] = military_to_us_time(shifts[i][1])
+        shifts[i][2] = military_to_us_time(shifts[i][2])
+    return shifts
+
 #------------------------------------------------------------------
 
 @app.route('/', methods=['GET', 'POST'])
@@ -203,21 +219,6 @@ def manage():
     if not shifts:
         shifts = {}
 
-    def shifts_to_us_time(shifts):
-        def military_to_us_time(time):
-            if int(time.split(':')[0]) < 12:
-                time = time + " AM"
-            elif int(time.split(':')[0]) == 0:
-                time = "12:00 AM"
-            elif int(time.split(':')[0]) > 12:
-                time = str(int(time.split(":")[0]) - 12) + ":00 PM"
-            return time
-        
-        for i in shifts:
-            shifts[i][1] = military_to_us_time(shifts[i][1])
-            shifts[i][2] = military_to_us_time(shifts[i][2])
-        return shifts
-
     if request.method == 'GET':
         shifts = shifts_to_us_time(shifts)
         html = render_template('manage.html', groupname=groupname, inGroup=inGroup, isMgr=isMgr, shifts=shifts, users=users, selected=selected)
@@ -241,20 +242,26 @@ def manage():
         elif request.form["submit"] == "Save":
             n_user_list = []
             curr_members.remove(username)
-            for user in users:
+            for user in users:  # adds users
                 if request.form.get(user) is not None:
+                    exists = False
                     n_user_list.append(user)
-                    add_user_to_group(groupid, user, 'member')
-                    # print("added user" + user)
-            for member in curr_members:
+                    for member in curr_members:
+                        if user == member:
+                            exists = True
+                    if not exists:
+                        add_user_to_group(groupid, user, 'member')
+                        print("added user" + user)
+            for member in curr_members:  # removes users
                 remains = False
                 for user in n_user_list:
                     if member == user:
                         remains = True
-                        # print("user remains" + user)
+                        print("user remains" + user)
                 if not remains:
                     remove_user(member, groupid)
-                    # print("removed" + member)
+                    print("removed" + member)
+
             selected = {}
             for user in users:
                 selected[user] = False
@@ -425,7 +432,12 @@ def viewGroup():
     gName, groupId = getCurrGroupnameAndId(request, groups)
     members = get_group_users(groupId)
 
-    html = render_template('viewGroup.html', gName=gName, members=members, inGroup=True, isMgr=isMgr)
+    shifts = get_group_shifts(groupId)
+    if not shifts:
+        shifts = {}
+    shifts = shifts_to_us_time(shifts)
+
+    html = render_template('viewGroup.html', gName=gName, members=members, inGroup=True, isMgr=isMgr, shifts=shifts)
     response = make_response(html)
 
     return response
