@@ -188,12 +188,9 @@ def manage():
 
     groupname, groupid = getCurrGroupnameAndId(request, groups, inGroup)
 
-    # shifts stored in db as dictionary
     shifts = get_group_shifts(groupid)
-    # turn dict into double array
-    if shifts:
-        shifts = get_double_array(shifts)
-    else: shifts = []
+    if not shifts:
+        shifts = {}
 
     def shifts_to_us_time(shifts):
         def military_to_us_time(time):
@@ -205,9 +202,9 @@ def manage():
                 time = str(int(time.split(":")[0]) - 12) + ":00 PM"
             return time
         
-        for shift in shifts:
-            shift[2] = military_to_us_time(shift[2])
-            shift[3] = military_to_us_time(shift[3])
+        for i in shifts:
+            shifts[i][1] = military_to_us_time(shifts[i][1])
+            shifts[i][2] = military_to_us_time(shifts[i][2])
         return shifts
 
     if request.method == 'GET':
@@ -219,16 +216,21 @@ def manage():
     else:
         groupid = get_group_id(groupname)
 
-        day = request.form["day"]
-        start = request.form["start"]
-        end = request.form["end"]
-        npeople = request.form["npeople"]
+        if request.form["submit"] == "Add":
+            day = request.form["day"]
+            start = request.form["start"]
+            end = request.form["end"]
+            npeople = request.form["npeople"]
+            
+            shift = [day, start, end, npeople]
+            shifts[len(shifts)]=shift
         
-        shift = [len(shifts), day, start, end, npeople]
-        shifts.append(shift)
-        
-        # change double array of shifts to dict, update db
-        change_group_shifts(groupid, create_preferences(shifts))
+            # change double array of shifts to dict, update db
+            change_group_shifts(groupid, shifts)
+        else:
+            shiftid = request.form["submit"]
+            del shifts[shiftid]
+            change_group_shifts(groupid, shifts)
         shifts = shifts_to_us_time(shifts)
         html = render_template('manage.html', groupname=groupname, inGroup=inGroup, isMgr=isMgr, shifts = shifts)
         response = make_response(html)
@@ -361,7 +363,6 @@ def populateUsers():
     add_user('Jen', 'Jill', 'jjill')
     print("Populated Users")
     return redirect(url_for('index'))
-
 
 @app.route('/cleanGroups', methods=['GET'])
 def cleanGroups():

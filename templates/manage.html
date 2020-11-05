@@ -54,21 +54,25 @@
                     <input type="time" id="end" name="end" required>
                     <label for="npeople">Number of People</label>
                     <input type="text" id="npeople" name="npeople" required>
-                    <input type="submit" value="Add">
+                    <input type="submit" name="submit" value="Add">
                 </form>
 
                 <hr>
 
                 <h2> Current Shifts</h2><br>
+                {% if shifts|length > 0 %}
                 <p>The current shifts for <strong>{{groupname}}</strong>. <br>
-                        <form action='' method="post">
-                            {% for shift in shifts %}
-                            <strong>Day: </strong>{{shift[1]}} <strong>Start: </strong>{{shift[2]}}
-                            <strong>End: </strong>{{shift[3]}} <strong>Number of People: </strong>{{shift[4]}}
-                            <input type="submit" value="remove"><br>
-                            {% endfor %}
-                        </form>
-                    <hr>
+                    {% for i in shifts %}
+                <form action='' method="post">
+                    <strong>Day: </strong>{{shifts[i][0]}} <strong>Start: </strong>{{shifts[i][1]}}
+                    <strong>End: </strong>{{shifts[i][2]}} <strong>Number of People: </strong>{{shifts[i][3]}}
+                    <button type="submit" name="submit" value="{{i}}">remove</button><br>
+                </form>
+                {% endfor %}
+                {% else %}
+                <p> No current shifts for <strong>{{groupname}}</strong></p>
+                {% endif %}
+                <hr>
 
             </div>
         </div>
