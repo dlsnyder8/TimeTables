@@ -122,7 +122,7 @@ def user_exists(netid):
     return session.query(Users).filter(Users.netid == netid).scalar() is not None
     
 # removes a user from a group
-def remove_user(netid, groupid):
+def remove_user_from_group(netid, groupid):
     try:
         userid = get_user_id(groupid,netid)
         session.execute(
@@ -137,6 +137,23 @@ def remove_user(netid, groupid):
         return -1
     return
 
+# removes user from db
+def remove_user(netid):
+    try:
+        if in_group(netid):
+            session.execute(
+                "DELETE FROM groupmembers WHERE netid=:param", {"param":netid}
+            )
+        session.execute(
+                "DELETE FROM users WHERE netid=:param", {"param":netid}
+        )
+        session.flush()
+        session.commit()
+    except:
+        session.rollback()
+        print('Remove User Failed',file=stderr)
+        return -1
+    return
 
 #replaces the personal preferences of a user, global
 def change_user_preferences_global(netid, preferences):
@@ -458,4 +475,6 @@ if __name__=="__main__":
     print(get_group_preferences(1, 'test2'))
     '''
     print(get_user_role('batyas',28))
- 
+    change_group_shifts(32)
+    change_group_shifts(33)
+    change_group_shifts(34)
