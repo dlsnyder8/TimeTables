@@ -24,6 +24,16 @@
         <hr>
         <h1>{{gName}}</h1>
         <hr>
+        <h2> Current Shifts</h2><br>
+            {% if shifts|length > 0 %}
+                {% for i in shifts %}
+                <strong>Day: </strong>{{shifts[i][0]}} <strong>Start: </strong>{{shifts[i][1]}}
+                <strong>End: </strong>{{shifts[i][2]}} <strong>Number of People: </strong>{{shifts[i][3]}}
+            {% endfor %}
+            {% else %}
+                <p> No current shifts for <strong>{{groupname}}</strong></p>
+            {% endif %}
+        <hr>
         <h2>Group Members</h2>
         {% for member in members: %}
         {{member}} <br>
