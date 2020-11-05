@@ -35,7 +35,7 @@ def get_username():
 def getCurrGroupnameAndId(request, groups, inGroup=True):
     groupname = request.cookies.get('groupname')
     if groupname == None and inGroup:
-        groupaname = groups[0][1]
+        groupname = groups[0][1]
 
     groupid = request.cookies.get('groupid')
     if groupid == None and inGroup:
@@ -50,9 +50,7 @@ def getIsMgr(username, inGroup, request, groups=None):
         if groups == None:
             groups = get_user_groups(username)
         _, groupid = getCurrGroupnameAndId(request, groups)
-        print(groupid)
         role = get_user_role(username, groupid)
-        print(role)
         return (role in ['manager','owner'])
     else:
         return False
@@ -218,11 +216,9 @@ def manage():
         start = request.form["start"]
         end = request.form["end"]
         npeople = request.form["npeople"]
-        print(day, start, end, npeople)
         
         shift = [len(shifts), day, start, end, npeople]
         shifts.append(shift)
-        print(shifts)
         
         # change double array of shifts to dict, update db
         change_group_shifts(groupid, create_preferences(shifts))
@@ -251,7 +247,6 @@ def schedule():
         # only an issue when users not created through createProfile page
         change_user_preferences_global(username, create_preferences(blankSchedule()))
         groupPreferences = get_global_preferences(username)
-    print(groupPreferences)
     groupPreferences = get_double_array(groupPreferences)
     edict = solve_shift_scheduling("", "", 10, 1, ['O', 'M', 'A', 'N'], [], create_requests(groupPreferences, 0))
     
@@ -385,8 +380,6 @@ def viewGroup():
     isMgr = getIsMgr(username, True, request, groups)
     gName, groupId = getCurrGroupnameAndId(request, groups)
     members = get_group_users(groupId)
-    print("this is the thing")
-    print(members)
 
     html = render_template('viewGroup.html', gName=gName, members=members, inGroup=True, isMgr=isMgr)
     response = make_response(html)
@@ -512,5 +505,4 @@ def editProfile():
         return redirect(url_for('profile'))
 
 if __name__ == '__main__':
-    print(create_preferences(blankSchedule()))
     app.run()
