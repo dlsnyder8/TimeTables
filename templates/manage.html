@@ -54,13 +54,15 @@
                     <label for="end">Choose end:</label>
                     <input type="time" id="end" name="end"
                     required>
-
+                    <label for="npeople">Number of People</label>
+                    <input type="text" id="npeople" name="npeople"
+                    required>
                     <input type="submit" value="Add">
                     <hr>
 
                     <h2> Current Shifts</h2><br>
                     <p>The current shifts for <strong>{{groupname}}</strong>. <br>
-                        {% get_group_shifts(groupid) %}
+                        {{ shifts }}
                     </form>
 
                 <hr>
