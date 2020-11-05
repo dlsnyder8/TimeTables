@@ -179,6 +179,8 @@ def manage():
     numGroups = len(groups)
     inGroup = (numGroups != 0)
     isMgr = getIsMgr(username, inGroup, request, groups)
+    users = get_all_users()
+    users.remove(username)
 
     if len(groups) == 0:
         return redirect(url_for('index'))
@@ -187,6 +189,15 @@ def manage():
         return redirect(url_for('index'))
 
     groupname, groupid = getCurrGroupnameAndId(request, groups, inGroup)
+    curr_members = get_group_users(groupid)
+
+    selected = {}
+    for user in users:
+        selected[user] = False
+    for member in curr_members:
+        selected[member] = True
+
+    print(selected)
 
     shifts = get_group_shifts(groupid)
     if not shifts:
@@ -209,7 +220,7 @@ def manage():
 
     if request.method == 'GET':
         shifts = shifts_to_us_time(shifts)
-        html = render_template('manage.html', groupname=groupname, inGroup=inGroup, isMgr=isMgr, shifts = shifts)
+        html = render_template('manage.html', groupname=groupname, inGroup=inGroup, isMgr=isMgr, shifts=shifts, users=users, selected=selected)
         response = make_response(html)
         return response
 
@@ -227,12 +238,35 @@ def manage():
         
             # change double array of shifts to dict, update db
             change_group_shifts(groupid, shifts)
+        elif request.form["submit"] == "Save":
+            n_user_list = []
+            curr_members.remove(username)
+            for user in users:
+                if request.form.get(user) is not None:
+                    n_user_list.append(user)
+                    add_user_to_group(groupid, user, 'member')
+                    print("added user" + user)
+            for member in curr_members:
+                remains = False
+                for user in n_user_list:
+                    if member == user:
+                        remains = True
+                        print("user remains" + user)
+                if not remains:
+                    remove_user(member, groupid)
+                    print("removed" + member)
+            selected = {}
+            for user in users:
+                selected[user] = False
+            for n_user in n_user_list:
+                selected[n_user] = True
+
         else:
             shiftid = request.form["submit"]
             del shifts[shiftid]
             change_group_shifts(groupid, shifts)
         shifts = shifts_to_us_time(shifts)
-        html = render_template('manage.html', groupname=groupname, inGroup=inGroup, isMgr=isMgr, shifts = shifts)
+        html = render_template('manage.html', groupname=groupname, inGroup=inGroup, isMgr=isMgr, shifts=shifts, users=users, selected=selected)
         response = make_response(html)
         return response
 
