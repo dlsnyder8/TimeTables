@@ -53,6 +53,8 @@ def getIsMgr(username, inGroup, request, groups=None):
             groups = get_user_groups(username)
         _, groupid = getCurrGroupnameAndId(request, groups)
         role = get_user_role(username, groupid)
+        if role == -1:
+            return role
         return (role in ['manager','owner'])
     else:
         return False
@@ -143,8 +145,8 @@ def index():
     numGroups = len(groups)
     inGroup = (numGroups != 0)
     isMgr = getIsMgr(username, inGroup, request, groups)
-
-    groupname, groupid = getCurrGroupnameAndId(request, groups, inGroup)
+    if isMgr == -1: groupname = groupid = None
+    else: groupname, groupid = getCurrGroupnameAndId(request, groups, inGroup)
     print(groupname, groupid, "at index")
     groups_by_name = [g[1] for g in groups]
 
@@ -240,7 +242,8 @@ def manage():
             npeople = request.form["npeople"]
             
             shift = [day, start, end, npeople]
-            shifts[len(shifts)]=shift
+            shiftid = "{}_{}_{}".format(day[0],start.split(":")[0],end.split(":")[0])
+            shifts[shiftid]=shift
         
             # change double array of shifts to dict, update db
             change_group_shifts(groupid, shifts)
