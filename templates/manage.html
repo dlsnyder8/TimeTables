@@ -61,10 +61,13 @@
 
                 <h2> Current Shifts</h2><br>
                 <p>The current shifts for <strong>{{groupname}}</strong>. <br>
-                    {% for shift in shifts %}
-                    <strong>Day: </strong>{{shift[1]}} <strong>Start: </strong>{{shift[2]}}
-                    <strong>End: </strong>{{shift[3]}} <strong>Number of People: </strong>{{shift[4]}}<br>
-                    {% endfor %}
+                        <form action='' method="post">
+                            {% for shift in shifts %}
+                            <strong>Day: </strong>{{shift[1]}} <strong>Start: </strong>{{shift[2]}}
+                            <strong>End: </strong>{{shift[3]}} <strong>Number of People: </strong>{{shift[4]}}
+                            <input type="submit" value="remove"><br>
+                            {% endfor %}
+                        </form>
                     <hr>
 
             </div>
