@@ -245,22 +245,24 @@ def manage():
                 if request.form.get(user) is not None:
                     n_user_list.append(user)
                     add_user_to_group(groupid, user, 'member')
-                    print("added user" + user)
+                    # print("added user" + user)
             for member in curr_members:
                 remains = False
                 for user in n_user_list:
                     if member == user:
                         remains = True
-                        print("user remains" + user)
+                        # print("user remains" + user)
                 if not remains:
                     remove_user(member, groupid)
-                    print("removed" + member)
+                    # print("removed" + member)
             selected = {}
             for user in users:
                 selected[user] = False
             for n_user in n_user_list:
                 selected[n_user] = True
-
+        elif request.form["submit"] == "DelGroup":
+            remove_group(groupid)
+            return redirect(url_for('index'))
         else:
             shiftid = request.form["submit"]
             del shifts[shiftid]
