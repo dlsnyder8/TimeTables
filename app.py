@@ -34,13 +34,15 @@ def get_username():
 # if nothing stored, defaults to first group in list of user's groups
 def getCurrGroupnameAndId(request, groups, inGroup=True):
     groupname = request.cookies.get('groupname')
+    print(groupname)
     if groupname == None and inGroup:
         groupname = groups[0][1]
 
     groupid = request.cookies.get('groupid')
+    print(groupid)
     if groupid == None and inGroup:
         groupid = groups[0][0]
-    else: groupid = int(groupid)
+    elif inGroup: groupid = int(groupid)
     return groupname, groupid
 
 # returns bool - is user owner or manager
@@ -131,6 +133,7 @@ def shifts_to_us_time(shifts):
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET','POST'])
 def index():
+    print('visiting index')
     username = get_username()
 
     if not (user_exists(username)):
@@ -142,6 +145,7 @@ def index():
     isMgr = getIsMgr(username, inGroup, request, groups)
 
     groupname, groupid = getCurrGroupnameAndId(request, groups, inGroup)
+    print(groupname, groupid, "at index")
     groups_by_name = [g[1] for g in groups]
 
     if request.method == 'GET':
@@ -152,6 +156,7 @@ def index():
     else:
         groupname = request.form['groupname']
         groupid = get_group_id(groupname)
+        isMgr = (get_user_role(username, groupid) in ["manager", "owner"])
 
         html = render_template('index.html',groups=groups_by_name, groupname=groupname, numGroups=numGroups, inGroup=inGroup, isMgr=isMgr)
         response = make_response(html)
@@ -267,9 +272,17 @@ def manage():
                 selected[user] = False
             for n_user in n_user_list:
                 selected[n_user] = True
-        elif request.form["submit"] == "DelGroup":
+        elif request.form["submit"] == "Delete":
             remove_group(groupid)
-            return redirect(url_for('index'))
+            groups = get_user_groups(username)
+            inGroup = (len(groups) > 0)
+            if inGroup:
+                groupid = groups[0][0]
+                groupname = groups[0][1]
+            response = make_response(redirect(url_for("index")))
+            response.set_cookie('groupname', groupname)
+            response.set_cookie('groupid', str(groupid))
+            return response
         else:
             shiftid = request.form["submit"]
             del shifts[shiftid]
