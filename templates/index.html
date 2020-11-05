@@ -45,24 +45,17 @@
                     {% endfor %}
                 </form>
                 <hr>
-                {% endif %}
-                Create Group:
-                <form action="/createGroup">
-                    <input type="submit" value="Create Group">
-                </form>
-                <hr>
-                {% if numGroups > 0 %}
-                View Group Info<br>
-                <form action="/viewGroup">
-                    <input type="submit" value="Group Information">
-                </form>
-                <hr>
                 Remember to input your weekly preferences:
                 <br>
                 <form action="/editGroup">
                     <input type="submit" value="weekly preferences">
                 </form>
+                <hr>
                 {% endif %}
+                Create New Group:
+                <form action="/createGroup">
+                    <input type="submit" value="Create Group">
+                </form>
             </div>
         </div>
     </div>

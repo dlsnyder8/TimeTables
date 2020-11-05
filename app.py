@@ -432,12 +432,7 @@ def viewGroup():
     gName, groupId = getCurrGroupnameAndId(request, groups)
     members = get_group_users(groupId)
 
-    shifts = get_group_shifts(groupId)
-    if not shifts:
-        shifts = {}
-    shifts = shifts_to_us_time(shifts)
-
-    html = render_template('viewGroup.html', gName=gName, members=members, inGroup=True, isMgr=isMgr, shifts=shifts)
+    html = render_template('viewGroup.html', gName=gName, members=members, inGroup=True, isMgr=isMgr)
     response = make_response(html)
 
     return response
