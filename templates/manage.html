@@ -58,7 +58,7 @@
 
                 <h2> Current Shifts</h2><br>
                 {% if shifts|length > 0 %}
-                <p>The current shifts for <strong>{{groupname}}</strong>. <br>
+                <p>Schedules for <strong>{{groupname}} will be generated using these shifts.</strong>. <br>
                     {% for i in shifts %}
                 <form action='' method="post">
                     <strong>Day: </strong>{{shifts[i][0]}} <strong>Start: </strong>{{shifts[i][1]}}
@@ -71,36 +71,13 @@
                 {% endif %}
                 <hr>
                 <h2>Current Schedule</h2>
-                <table class="table table-bordered">
-                    <thead class="thead-light">
-                        <tr>
-                            <th scope="col">#</th>
-                            <th scope="col">First</th>
-                            <th scope="col">Last</th>
-                            <th scope="col">Handle</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <th scope="row">1</th>
-                            <td>Mark</td>
-                            <td>Otto</td>
-                            <td>@mdo</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">2</th>
-                            <td>Jacob</td>
-                            <td>Thornton</td>
-                            <td>@fat</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">3</th>
-                            <td>Larry</td>
-                            <td>the Bird</td>
-                            <td>@twitter</td>
-                        </tr>
-                    </tbody>
-                </table>
+                {% for shift in currsched %}
+                <strong>{{shift}}</strong>:
+                {% for netid in currsched[shift] %}
+                {{netid}}{% if loop.index < currsched[shift]|length %},{% endif %}
+                {% endfor %}
+                <br>
+                {% endfor %}
                 <hr>
                 <h2>Edit Members</h2>
                 <form action='' method="post">

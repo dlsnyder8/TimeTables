@@ -41,6 +41,7 @@ get_group_shifts(groupid)
 change_group_shifts(groupid, shifts = None)
 
 // This is for the weekly schedule
+get_group_schedule(groupid)
 change_group_schedule(groupid, schedule)
 
 ----------------------------------------------
@@ -280,6 +281,14 @@ def remove_group(groupid):
         return -1
     return
 
+# returns the current schedule for a group
+def get_group_schedule(groupid):
+    try:
+        schedule = session.query(Groups.shiftSchedule).filter_by(groupid=groupid).first()
+        return schedule[0]
+    except:
+        print("Unable to get the current schedule for group:",groupid, file=stderr)
+        return -1
 
 # Replaces the schedule of the group specified by groupid
 def change_group_schedule(groupid, schedule):
@@ -475,6 +484,6 @@ if __name__=="__main__":
     print(get_group_preferences(1, 'test2'))
     '''
     print(get_user_role('batyas',28))
-    change_group_shifts(32)
-    change_group_shifts(33)
-    change_group_shifts(34)
+    print(get_user_groups('batyas'))
+    #change_group_schedule(52, {"0_1_2":["batyas","bates", "kevin"], "0_2_3":["hi1"],"1_4_5":["hi2"],"1_0_1":["hi3","b"]})
+    print(get_group_schedule(52))

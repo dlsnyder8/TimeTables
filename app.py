@@ -114,17 +114,16 @@ def blankSchedule():
         table_values.append(week)
     return table_values
 
+def military_to_us_time(time):
+    if int(time.split(':')[0]) == 0:
+        time = "12:00 AM"
+    elif int(time.split(':')[0]) < 12:
+        time = time + ":00 AM"
+    elif int(time.split(':')[0]) > 12:
+        time = str(int(time.split(":")[0]) - 12) + ":00 PM"
+    return time
 
 def shifts_to_us_time(shifts):
-    def military_to_us_time(time):
-        if int(time.split(':')[0]) < 12:
-            time = time + " AM"
-        elif int(time.split(':')[0]) == 0:
-            time = "12:00 AM"
-        elif int(time.split(':')[0]) > 12:
-            time = str(int(time.split(":")[0]) - 12) + ":00 PM"
-        return time
-
     for i in shifts:
         shifts[i][1] = military_to_us_time(shifts[i][1])
         shifts[i][2] = military_to_us_time(shifts[i][2])
@@ -199,14 +198,14 @@ def manage():
 
     groups = get_user_groups(username)
 
+    if len(groups) == 0:
+        return redirect(url_for('index'))
+
     numGroups = len(groups)
     inGroup = (numGroups != 0)
     isMgr = getIsMgr(username, inGroup, request, groups)
     users = get_all_users()
     users.remove(username)
-
-    if len(groups) == 0:
-        return redirect(url_for('index'))
     
     if not isMgr:
         return redirect(url_for('index'))
@@ -226,9 +225,22 @@ def manage():
     if not shifts:
         shifts = {}
 
+    days_to_nums = {'Sunday': 0, 'Monday': 1, 'Tuesday': 2, 'Wednesday': 3, 'Thursday': 4, 'Friday': 5, 'Saturday': 6}
+    nums_to_days = {0: 'Sunday', 1: 'Monday', 2: 'Tuesday', 3: 'Wednesday', 4: 'Thursday', 5: 'Friday', 6: 'Saturday'}
+
+    currsched = get_group_schedule(groupid)
+    if currsched: 
+        keys = sorted(currsched.keys())
+        schedStrings = {}
+        for key in keys:
+            split = key.split('_')
+            shiftString = "{} {} - {}".format(nums_to_days[int(split[0])],military_to_us_time(split[1]), military_to_us_time(split[2]))
+            schedStrings[shiftString] = currsched[key]
+        currsched = schedStrings
+    else: currsched = {}
     if request.method == 'GET':
         shifts = shifts_to_us_time(shifts)
-        html = render_template('manage.html', groupname=groupname, inGroup=inGroup, isMgr=isMgr, shifts=shifts, users=users, selected=selected)
+        html = render_template('manage.html', groupname=groupname, inGroup=inGroup, isMgr=isMgr, shifts=shifts, users=users, selected=selected, currsched=currsched)
         response = make_response(html)
         return response
 
@@ -242,7 +254,7 @@ def manage():
             npeople = request.form["npeople"]
             
             shift = [day, start, end, npeople]
-            shiftid = "{}_{}_{}".format(day[0],start.split(":")[0],end.split(":")[0])
+            shiftid = "{}_{}_{}".format(days_to_nums[day],start.split(":")[0],end.split(":")[0])
             shifts[shiftid]=shift
         
             # change double array of shifts to dict, update db
@@ -291,7 +303,7 @@ def manage():
             del shifts[shiftid]
             change_group_shifts(groupid, shifts)
         shifts = shifts_to_us_time(shifts)
-        html = render_template('manage.html', groupname=groupname, inGroup=inGroup, isMgr=isMgr, shifts=shifts, users=users, selected=selected)
+        html = render_template('manage.html', groupname=groupname, inGroup=inGroup, isMgr=isMgr, shifts=shifts, users=users, selected=selected, currsched=currsched)
         response = make_response(html)
         return response
 
