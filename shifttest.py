@@ -1,74 +1,115 @@
 from shift import solve_shift_scheduling
+from database import *
 
-def create_requests(prefArray, employeeNum):
-    offshifts = []
+def create_requests(pshifts, prefArray, employeeNum, currentPrefs):
+    shiftNum = 1
+    for key in pshifts:
+        items = key.split('_')
+        start = items[0]
+        end = items[1]
+        # check each day for any given shift
+        for i in range(len(pshifts[key])):
+            if pshifts[key][i] != 0:
+                for j in range(int(start), int(end)):
+                    if prefArray[j][i] == False:
+                        currentPrefs.append((employeeNum, shiftNum, i, 100))
+                        break
+        shiftNum += 1
+
+    return currentPrefs
+
+
+# parse shifts from get_group_shifts in database
+def parse_shifts(shifts):
+    output = {}
+    for key in shifts:
+        items = key.split('_')
+        day = items[0]
+        day = int(day)
+        start = items[1]
+        end = items[2]
+        shift = start + "_" + end
+        if not shift in output:
+            output[shift] = [0] * 7 
+        output[shift][day] = int(shifts[key][3])
+    return output
+
+# gets algorithm output ready for DB
+def format_schedule(edict, memberlist):
+    output = {}
+    for key in edict:
+        week = edict[key]
+        for i in range(len(week)):
+            if week[i] != 'O':
+                newshift = str(i) + "_" + week[i]
+                if newshift not in output:
+                    output[newshift] = []
+                output[newshift].append(memberlist[key])
+    return output
+
+def cover_demands(pshifts):
+    output  = []
+    i = 0
+    for key in pshifts:
+        for j in range(7):
+            if i == 0:
+                output.append([])
+            output[j].append(pshifts[key][j])
+        i += 1
+    return output
+
+# This generates a schedule based on groupID!
+# returns an empty dict {} if no solution found
+# otherwise, just call generate schedule to put it in database +
+# parse schedule for each netid
+def generate_schedule(groupid):
+    shifts = get_group_shifts(groupid)
+    pshifts  = parse_shifts(shifts)
+
+    fshifts = ['O']
+    fshifts += list(pshifts.keys())
+
+    weekly_cover_demands = cover_demands(pshifts)
+
+    memberlist = get_group_members(groupid)
+    prefs = []
+    i = 0
+    for member in memberlist:
+        prefs = create_requests(pshifts, get_double_array(get_group_preferences(groupid, member)), i, prefs)
+        i+= 1  
     
-    for i in range(len(prefArray)):
-        hourArray = prefArray[i]
-        for j in range(len(hourArray)):
-            shiftNum = 0
-            if hourArray[j] == False:
-                if i < 8:
-                    shiftNum = 0
-                elif i < 11:
-                    shiftNum = 1
-                elif i < 14:
-                    shiftNum = 2
-                elif i < 17:
-                    shiftNum = 3
-                if shiftNum != 0:
-                    addTuple = (employeeNum, shiftNum, j, 100)
-                    if addTuple not in offshifts:
-                        offshifts.append((employeeNum, shiftNum, j, 100))
-    return offshifts
-
-def create_schedule(edict, employeeNum):
-    outputlist = [[False] * 7] * 8
-    for i in range(3):
-        newlistrow = []
-        for j in range(7):
-            if (edict[employeeNum][j] == 'M'):
-                newlistrow.append(True)
-            else:
-                newlistrow.append(False)
-        outputlist.append(newlistrow)
-    for i in range(3):
-        newlistrow = []
-        for j in range(7):
-            if (edict[employeeNum][j] == 'A'):
-                newlistrow.append(True)
-            else:
-                newlistrow.append(False)
-        outputlist.append(newlistrow)
-    for i in range(3):
-        newlistrow = []
-        for j in range(7):
-            if (edict[employeeNum][j] == 'N'):
-                newlistrow.append(True)
-            else:
-                newlistrow.append(False)
-        outputlist.append(newlistrow)
-    for i in range(7):
-        outputlist.append([False] * 7)
-    return outputlist
-   
+    edict = solve_shift_scheduling("", "", len(memberlist), 1, fshifts, [], prefs, weekly_cover_demands)
+    
+    return format_schedule(edict, memberlist)
         
 def main():
-    prefArray = [[False, False, True, False, False, False, False], 
-    [False, False, True, False, False, False, False], 
-    [False, False, True, False, False, False, False], 
-    [False, False, True, False, False, False, False], 
-    [False, False, True, False, False, False, False], 
-    [False, False, False, False, False, False, False], 
-    [False, False, False, False, False, False, False], 
-    [False, False, False, False, False, False, False], 
-    [True, False, False, False, False, False, False],
-    [True, False, False, False, False, False, False], 
-    [True, False, False, False, False, False, False], 
-    [True, False, False, False, False, False, False], [False, False, False, False, False, False, False], [False, False, False, False, False, False, False], [False, False, False, False, False, False, False], [False, False, False, False, False, False, False], [False, False, False, False, False, False, False], [False, False, False, False, False, False, False], [False, False, False, False, False, False, False], [False, False, False, False, False, False, False], [False, False, False, False, False, False, False], [False, False, False, False, False, False, False], [False, False, False, False, False, False, False], [False, False, False, False, False, False, False]]
-    edict = solve_shift_scheduling("", "", 10, 1, ['O', 'M', 'A', 'N'], [], create_requests(prefArray, 0))
+    '''shifts = get_group_shifts(52)
+    pshifts  = parse_shifts(shifts)
+
+    fshifts = ['O']
+    fshifts += list(pshifts.keys())
+
+    weekly_cover_demands = cover_demands(pshifts)
+
+    memberlist = get_group_members(52)
+    prefs = []
+    i = 0
+    for member in memberlist:
+        prefs = create_requests(pshifts, get_double_array(get_group_preferences(52, member)), i, prefs)
+        i+= 1  
+
+    print(weekly_cover_demands)
     
-    print(create_schedule(edict, 0))
+    edict = solve_shift_scheduling("", "", len(memberlist), 1, fshifts, [], prefs, weekly_cover_demands)
+    
+    print(format_schedule(edict, memberlist))'''
+    schedule = generate_schedule(52)
+    if schedule is not None:
+        if schedule == {}:
+            print("No solution found. Try reducing number of people/number of shifts.")
+        else:
+            print("Success!")
+            print(parse_user_schedule('batyas', schedule))
     
 
 if __name__ == '__main__':

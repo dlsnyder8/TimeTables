@@ -517,6 +517,5 @@ if __name__=="__main__":
     #print(get_user_groups('batyas'))
     #change_group_schedule(52, {"6_5_2":["batyas","bates", "kevin"], "0_2_3":["hi1"],"1_4_5":["hi2"],"1_0_1":["hi3","b"]})
     #print(parse_user_schedule("batyas", get_group_schedule(52)))
-    memberlist = get_group_members(52)
-    for member in memberlist:
-        print(get_group_preferences(52, member))
+    
+    
