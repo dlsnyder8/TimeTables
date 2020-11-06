@@ -88,10 +88,28 @@ def get_double_array(preferences):
         output.append(preferences[str(i)])
     return output
 
-
-
-
-
+def parse_user_schedule(netid, groupschedule):
+    output = {}
+    # start with blank dict
+    for i in range(24):
+        output[str(i)] = [False] * 7
+    for key in groupschedule:
+        if netid in groupschedule[key]:
+            items = key.split('_')
+            day = items[0]
+            day = int(day)
+            start = items[1]
+            end = items[2]
+            # make sure shift is one day
+            if start < end:
+                for i in range(int(start), int(end)):
+                    output[str(i)][day] = True
+            else:
+                for i in range(int(start), 24):
+                    output[str(i)][day] = True
+                for i in range(int(end)):
+                    output[str(i)][(day + 1) % 7] = True
+    return output
 
 # adds a user to the database
 def add_user(firstName, lastName, netid, email=None, phone=None, preferences=None, createGroup = True):
@@ -483,7 +501,7 @@ if __name__=="__main__":
     change_user_preferences_group(1, 'test2')
     print(get_group_preferences(1, 'test2'))
     '''
-    print(get_user_role('batyas',28))
-    print(get_user_groups('batyas'))
+    #print(get_user_role('batyas',28))
+    #print(get_user_groups('batyas'))
     #change_group_schedule(52, {"0_1_2":["batyas","bates", "kevin"], "0_2_3":["hi1"],"1_4_5":["hi2"],"1_0_1":["hi3","b"]})
-    print(get_group_schedule(52))
+    #print(parse_user_schedule("batyas", get_group_schedule(52)))
