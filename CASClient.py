@@ -52,7 +52,7 @@ class CASClient:
         secondLine = r[1].decode('utf-8')
         if not firstLine.startswith('yes'):
             return None
-        return secondLine
+        return secondLine.strip()
         
     #-------------------------------------------------------------------
 
