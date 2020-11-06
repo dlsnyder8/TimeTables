@@ -50,7 +50,7 @@
                     <label for="end">Choose end:</label>
                     <input type="time" id="end" name="end" required>
                     <label for="npeople">Number of People</label>
-                    <input type="text" id="npeople" name="npeople" required>
+                    <input type="number" id="npeople" name="npeople" required>
                     <input type="submit" name="submit" value="Add">
                 </form>
 
@@ -58,7 +58,7 @@
 
                 <h2> Current Shifts</h2><br>
                 {% if shifts|length > 0 %}
-                <p>Schedules for <strong>{{groupname}} will be generated using these shifts.</strong>. <br>
+                <p>Schedules for <strong>{{groupname}}</strong> will be generated using these shifts. <br>
                     {% for i in shifts %}
                 <form action='' method="post">
                     <strong>Day: </strong>{{shifts[i][0]}} <strong>Start: </strong>{{shifts[i][1]}}
