@@ -298,6 +298,9 @@ def manage():
             response.set_cookie('groupname', groupname)
             response.set_cookie('groupid', str(groupid))
             return response
+        elif request.form["submit"] == "Generate Schedule":
+            pass
+            # add backend when or tools functions done
         else:
             shiftid = request.form["submit"]
             del shifts[shiftid]
