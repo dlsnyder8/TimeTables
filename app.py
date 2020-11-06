@@ -12,7 +12,7 @@ import urllib.parse as urlparse
 #-------------------
 # CAS Authentication cannot be run locally unfortunately
 # Set this variable to False if local, and change to True before pushing
-PROD_ENV = True
+PROD_ENV = False
 
 
 #----------
@@ -286,7 +286,7 @@ def manage():
                         remains = True
                         print("user remains" + user)
                 if not remains:
-                    remove_user(member, groupid)
+                    remove_user_from_group(member, groupid)
                     print("removed" + member)
 
             selected = {}
@@ -306,14 +306,20 @@ def manage():
             response.set_cookie('groupid', str(groupid))
             return response
         elif request.form["submit"] == "Generate Schedule":
-            currsched = generate_schedule(groupid)
-            change_group_schedule(groupid, currsched)
-            currsched = formatDisplaySched(currsched)
+            try:
+                currsched = generate_schedule(groupid)
+            except:
+                currsched = None
+            if (currsched == {}):
+                currsched = None
 
-            # reset weekly group prefs of all group members
-            groupmems = get_group_members(groupid)
-            for mem in groupmems:
-                change_user_preferences_group(groupid, mem)
+            if currsched is not None:
+                change_group_schedule(groupid, currsched)
+                currsched = formatDisplaySched(currsched)
+                # reset weekly group prefs of all group members
+                groupmems = get_group_members(groupid)
+                for mem in groupmems:
+                    change_user_preferences_group(groupid, mem)
         else:
             shiftid = request.form["submit"]
             del shifts[shiftid]
@@ -339,9 +345,20 @@ def schedule():
     isMgr = getIsMgr(username, True, request, groups)
     
     groupsched = get_group_schedule(groupid)
-    schedule = get_double_array(parse_user_schedule(username, groupsched))
+    if groupsched is not None:
+        schedule = get_double_array(parse_user_schedule(username, groupsched))
+    else:
+        schedule = groupsched
+    
+    shifts = get_group_shifts(groupid)
+    if not shifts:
+        shifts = {}
+    else:
+        shifts = shifts_to_us_time(shifts)
+       
 
-    html = render_template('schedule.html', schedule=schedule , groupname=groupname, inGroup=True, isMgr=isMgr, editable=False)
+    html = render_template('schedule.html', schedule=schedule , groupname=groupname, inGroup=True, isMgr=isMgr, editable=False,
+        shifts=shifts)
     response = make_response(html)
 
     return response

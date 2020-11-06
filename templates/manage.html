@@ -80,13 +80,18 @@
                 </form>
                 <hr>
                 <h2>Current Schedule</h2>
-                {% for shift in currsched %}
-                <strong>{{shift}}</strong>:
-                {% for netid in currsched[shift] %}
-                {{netid}}{% if loop.index < currsched[shift]|length %},{% endif %}
-                {% endfor %}
-                <br>
-                {% endfor %}
+                {% if currsched is not none %}
+                    {% for shift in currsched %}
+                    <strong>{{shift}}</strong>:
+                    {% for netid in currsched[shift] %}
+                    {{netid}}{% if loop.index < currsched[shift]|length %},{% endif %}
+                    {% endfor %}
+                    <br>
+                    {% endfor %}
+                {% else %}
+                <p>A new schedule could not be generated based on current shift demands and user preferences. <br>
+                    Make sure that you've included at least one shift, or try decreasing the number of people per shift.</p>
+                {% endif %}
                 <hr>
                 <h2>Edit Group Members</h2>
                 <form action='' method="post">
