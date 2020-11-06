@@ -136,7 +136,6 @@ def get_all_users():
         return -1
 
 
-
 def user_exists(netid):
     return session.query(Users).filter(Users.netid == netid).scalar() is not None
     
@@ -194,6 +193,19 @@ def get_global_preferences(netid):
     except:
         print('get_global_preferences() failed',file=stderr)
         return -1
+
+# get all users from a group based on netid
+def get_group_members(groupid):
+    try:
+        ids = session.query(Group_members.netid).filter_by(groupid=groupid).all()
+        id_array = []
+        for id in ids:
+            id_array.append(id[0])
+        return id_array
+    except:
+        print('get_group_members() failed',file=stderr)
+        return -1
+
 
 # get user's group preferences, gets global preferences if no group preferences set
 def get_group_preferences(groupid, netid):
@@ -503,5 +515,6 @@ if __name__=="__main__":
     '''
     #print(get_user_role('batyas',28))
     #print(get_user_groups('batyas'))
-    #change_group_schedule(52, {"0_1_2":["batyas","bates", "kevin"], "0_2_3":["hi1"],"1_4_5":["hi2"],"1_0_1":["hi3","b"]})
+    #change_group_schedule(52, {"6_5_2":["batyas","bates", "kevin"], "0_2_3":["hi1"],"1_4_5":["hi2"],"1_0_1":["hi3","b"]})
     #print(parse_user_schedule("batyas", get_group_schedule(52)))
+    print(get_group_members(52))
