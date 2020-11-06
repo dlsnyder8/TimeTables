@@ -25,7 +25,10 @@ app.secret_key = b'\x06)\x8e\xa3BW"\x9d\xcd\x1d5)\xd6\xd1b1'
 # obtains username
 def get_username():
     if PROD_ENV:
-        return CASClient().authenticate()
+        username = CASClient().authenticate()
+        print(username)
+        return username
+
     else:
         return 'batyas'
 
