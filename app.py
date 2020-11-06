@@ -521,8 +521,10 @@ def createGroup():
             selected = request.form.get(name) is not None
             if selected:
                 add_user_to_group(groupId, name, 'member')
-
-        return redirect(url_for('index'))
+        response = redirect(url_for('manage'))
+        response.set_cookie('groupname', gName)
+        response.set_cookie('groupid', str(groupId))
+        return response
 
 
 @app.route('/newuser', methods=['GET', 'POST'])
