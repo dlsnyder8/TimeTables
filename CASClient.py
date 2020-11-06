@@ -70,7 +70,8 @@ class CASClient:
         # validate it.
         ticket = request.args.get('ticket')
         if ticket is not None:
-            username = self.validate(ticket).strip()
+            username = self.validate(ticket).strip('\n')
+            username = username.strip()
             if username is not None: 
                 # The user is authenticated, so store the user's
                 # username in the session.               
