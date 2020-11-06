@@ -118,7 +118,7 @@ def military_to_us_time(time):
     if int(time.split(':')[0]) == 0:
         time = "12:00 AM"
     elif int(time.split(':')[0]) < 12:
-        time = time + ":00 AM"
+        time = str(int(time.split(":")[0])) + ":00 AM"
     elif int(time.split(':')[0]) > 12:
         time = str(int(time.split(":")[0]) - 12) + ":00 PM"
     return time

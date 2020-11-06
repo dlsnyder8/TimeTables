@@ -73,24 +73,27 @@
                 <h2>Create Schedule</h2>
                 Create schedule for shifts listed above, based on group members' weekly preferences. <br>
                 This will replace the current schedule below. <br>
-                Also, creating a new schedule resets each group member's weekly group preferences to their global
+                Once the new schedule is created, each group member's weekly group preferences will reset to their
+                global
                 preferences.
+                <br>
                 <form action="" method="post">
                     <input type="submit" name="submit" value="Generate Schedule">
                 </form>
                 <hr>
                 <h2>Current Schedule</h2>
                 {% if currsched is not none %}
-                    {% for shift in currsched %}
-                    <strong>{{shift}}</strong>:
-                    {% for netid in currsched[shift] %}
-                    {{netid}}{% if loop.index < currsched[shift]|length %},{% endif %}
-                    {% endfor %}
-                    <br>
-                    {% endfor %}
+                {% for shift in currsched %}
+                <strong>{{shift}}</strong>:
+                {% for netid in currsched[shift] %}
+                {{netid}}{% if loop.index < currsched[shift]|length %},{% endif %}
+                {% endfor %}
+                <br>
+                {% endfor %}
                 {% else %}
                 <p>A new schedule could not be generated based on current shift demands and user preferences. <br>
-                    Make sure that you've included at least one shift, or try decreasing the number of people per shift.</p>
+                    Make sure that you've included at least one shift, or try decreasing the number of people per shift.
+                </p>
                 {% endif %}
                 <hr>
                 <h2>Edit Group Members</h2>
