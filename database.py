@@ -212,7 +212,7 @@ def get_group_preferences(groupid, netid):
     try:
         userid = get_user_id(groupid, netid)
         pref = session.query(Group_members.grouppreferences).filter_by(inc=userid).first()
-        if pref == None:
+        if pref[0] is None:
             pref = session.query(Users.globalpreferences).filter_by(netid=netid).first()
             return pref._asdict()['globalpreferences']
         return pref._asdict()['grouppreferences']
@@ -517,4 +517,6 @@ if __name__=="__main__":
     #print(get_user_groups('batyas'))
     #change_group_schedule(52, {"6_5_2":["batyas","bates", "kevin"], "0_2_3":["hi1"],"1_4_5":["hi2"],"1_0_1":["hi3","b"]})
     #print(parse_user_schedule("batyas", get_group_schedule(52)))
-    print(get_group_members(52))
+    memberlist = get_group_members(52)
+    for member in memberlist:
+        print(get_group_preferences(52, member))
