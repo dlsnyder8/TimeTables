@@ -44,8 +44,11 @@
                     <input type="submit" name="groupname" value="{{g}}"> <br>
                     {% endfor %}
                 </form>
-                {% endif %}
                 <hr>
+                {% else %}]
+                You're not in any groups yet! Create a group or wait to be added to one in order
+                to be scheduled for shifts.
+                {% endif %}
                 Create New Group:
                 <form action="/createGroup">
                     <input type="submit" value="Create Group">
