@@ -41,6 +41,7 @@ get_group_shifts(groupid)
 change_group_shifts(groupid, shifts = None)
 
 // This is for the weekly schedule
+get_group_schedule(groupid)
 change_group_schedule(groupid, schedule)
 
 ----------------------------------------------
@@ -51,10 +52,11 @@ change_group_notifications(groupid, netid, emailnotif = False, textnotif = False
 get_group_notifications(netid, groupid)
 get_user_schedule(netid,groupid)
 update_user_schedule(netid,groupid, schedule = None)
+get_user_role(netid, groupid)
 """
 
 
-
+#temp url postgres://pheepicuurwuqg:fc272975e122789ac91401d8c19152c7ea716f2d935b3a28ad3d2e34e7131229@ec2-52-72-221-20.compute-1.amazonaws.com:5432/d7t82iju2c7ela
 #----------
 DATABASE_URL = os.environ['DATABASE_URL']
 
@@ -86,10 +88,28 @@ def get_double_array(preferences):
         output.append(preferences[str(i)])
     return output
 
-
-
-
-
+def parse_user_schedule(netid, groupschedule):
+    output = {}
+    # start with blank dict
+    for i in range(24):
+        output[str(i)] = [False] * 7
+    for key in groupschedule:
+        if netid in groupschedule[key]:
+            items = key.split('_')
+            day = items[0]
+            day = int(day)
+            start = items[1]
+            end = items[2]
+            # make sure shift is one day
+            if start < end:
+                for i in range(int(start), int(end)):
+                    output[str(i)][day] = True
+            else:
+                for i in range(int(start), 24):
+                    output[str(i)][day] = True
+                for i in range(int(end)):
+                    output[str(i)][(day + 1) % 7] = True
+    return output
 
 # adds a user to the database
 def add_user(firstName, lastName, netid, email=None, phone=None, preferences=None, createGroup = True):
@@ -116,12 +136,11 @@ def get_all_users():
         return -1
 
 
-
 def user_exists(netid):
     return session.query(Users).filter(Users.netid == netid).scalar() is not None
     
 # removes a user from a group
-def remove_user(netid, groupid):
+def remove_user_from_group(netid, groupid):
     try:
         userid = get_user_id(groupid,netid)
         session.execute(
@@ -136,11 +155,28 @@ def remove_user(netid, groupid):
         return -1
     return
 
+# removes user from db
+def remove_user(netid):
+    try:
+        if in_group(netid):
+            session.execute(
+                "DELETE FROM groupmembers WHERE netid=:param", {"param":netid}
+            )
+        session.execute(
+                "DELETE FROM users WHERE netid=:param", {"param":netid}
+        )
+        session.flush()
+        session.commit()
+    except:
+        session.rollback()
+        print('Remove User Failed',file=stderr)
+        return -1
+    return
 
 #replaces the personal preferences of a user, global
 def change_user_preferences_global(netid, preferences):
     try:
-        session.add(Users(netid=netid, globalpreferences=preferences))
+        session.query(Users).filter_by(netid=netid).update({Users.globalpreferences : preferences})
         session.commit()
     except:
         session.rollback()
@@ -158,12 +194,27 @@ def get_global_preferences(netid):
         print('get_global_preferences() failed',file=stderr)
         return -1
 
-# get user's group preferences 
+# get all users from a group based on netid
+def get_group_members(groupid):
+    try:
+        ids = session.query(Group_members.netid).filter_by(groupid=groupid).all()
+        id_array = []
+        for id in ids:
+            id_array.append(id[0])
+        return id_array
+    except:
+        print('get_group_members() failed',file=stderr)
+        return -1
+
+
+# get user's group preferences, gets global preferences if no group preferences set
 def get_group_preferences(groupid, netid):
     try:
         userid = get_user_id(groupid, netid)
         pref = session.query(Group_members.grouppreferences).filter_by(inc=userid).first()
-
+        if pref[0] is None:
+            pref = session.query(Users.globalpreferences).filter_by(netid=netid).first()
+            return pref._asdict()['globalpreferences']
         return pref._asdict()['grouppreferences']
     except:
         print('get_group_preferences() failed',file=stderr)
@@ -232,7 +283,8 @@ def get_group_shifts(groupid):
 # changes the recurring shifts for a group
 def change_group_shifts(groupid, shifts = None):
     try:
-        session.query(Groups.groupid).filter_by(groupid=groupid).update({Groups.globalschedule : shifts})
+        session.query(Groups).filter_by(groupid=groupid).update({Groups.globalschedule : shifts})
+        session.commit()
         return
 
     except:
@@ -259,11 +311,19 @@ def remove_group(groupid):
         return -1
     return
 
+# returns the current schedule for a group
+def get_group_schedule(groupid):
+    try:
+        schedule = session.query(Groups.shiftSchedule).filter_by(groupid=groupid).first()
+        return schedule[0]
+    except:
+        print("Unable to get the current schedule for group:",groupid, file=stderr)
+        return -1
 
 # Replaces the schedule of the group specified by groupid
 def change_group_schedule(groupid, schedule):
     try:
-        session.add(Groups(groupid=groupid, shiftSchedule=schedule))
+        session.query(Groups).filter_by(groupid=groupid).update({Groups.shiftSchedule : schedule})
         session.commit()
     except:
         session.rollback()
@@ -291,7 +351,7 @@ def change_group_role(groupid, netid, role):
         print('failed to change user role in group',file=stderr)
         return -1
     try:
-        session.add(Group_members(inc=userid,role=role))
+        session.query(Group_members).filter_by(inc=userid).update({Group_members.role : role})
         session.commit()
     except:
         session.rollback()
@@ -374,20 +434,17 @@ def update_profile_info(firstName, lastName, netid, email=None, phone=None, pref
     return
 
 # get all groupids of groups that user is part of 
-# (queries with netid instead of inc b/c each group that a user is in has different inc in groupmembers table)
-# returns list of groupids
+# returns list of tuples, (groupid, groupname)
 def get_user_groups(netid):
     try:
         groups = session.query(Group_members.groupid).filter_by(netid=netid).all()
         if len(groups) == 0:
             return groups
-        group_names = []
+        group_list = []
         for g in groups:
-            
             name = session.query(Groups.groupname).filter_by(groupid=g.groupid).first()
-            group_names.append(name[0])
-
-        return group_names
+            group_list.append((g.groupid,name[0]))
+        return group_list
     except:
         print('get user groups failed',file=stderr)
         return -1
@@ -407,6 +464,28 @@ def in_group(netid):
         return (ingroup != None)
     except:
         print('in group query failed', file=stderr)
+        return -1
+
+def get_user_role(netid, groupid):
+    try:
+        userid = get_user_id(groupid, netid)
+        role = session.query(Group_members.role).filter_by(inc=userid).first()
+        return role.role
+    except:
+        print('get user role failed')
+        return -1
+
+# returns a list of user netids from a group
+def get_group_users(groupid):
+    try:
+        netids = session.query(Group_members.netid).filter_by(groupid=groupid)
+        id_array = []
+        for netid in netids:
+            id_array.append(netid[0])
+        return id_array
+    except Exception as e:
+        print("exception")
+        print(e)
         return -1
 
 def rollback():
@@ -434,4 +513,9 @@ if __name__=="__main__":
     change_user_preferences_group(1, 'test2')
     print(get_group_preferences(1, 'test2'))
     '''
-    print(in_group('batyas'))
+    #print(get_user_role('batyas',28))
+    #print(get_user_groups('batyas'))
+    #change_group_schedule(52, {"6_5_2":["batyas","bates", "kevin"], "0_2_3":["hi1"],"1_4_5":["hi2"],"1_0_1":["hi3","b"]})
+    #print(parse_user_schedule("batyas", get_group_schedule(52)))
+    
+    

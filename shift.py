@@ -177,7 +177,8 @@ def add_soft_sum_constraint(model, works, hard_min, soft_min, min_cost,
     return cost_variables, cost_coefficients
 
 
-def solve_shift_scheduling(params, output_proto, num_employees, num_weeks, shifts, fixed_assignments, requests):
+def solve_shift_scheduling(params, output_proto, num_employees, num_weeks, shifts, fixed_assignments, requests,
+    weekly_cover_demands):
     """Solves the shift scheduling problem."""
     # Data
     #num_employees = 8
@@ -224,7 +225,7 @@ def solve_shift_scheduling(params, output_proto, num_employees, num_weeks, shift
         (0, 1, 1, 0, 7, 7, 0),
         # betweem 2 and 3 consecutive days of night shifts, 1 and 4 are
         # possible but penalized.
-        (3, 1, 2, 20, 3, 4, 5),
+        #(2, 1, 2, 20, 2, 4, 5),
     ]
 
     # Weekly sum constraints on shifts days:
@@ -234,32 +235,32 @@ def solve_shift_scheduling(params, output_proto, num_employees, num_weeks, shift
         # Constraints on rests per week.
         (0, 1, 2, 7, 7, 7, 0),
         # At least 1 night shift per week (penalized). At most 4 (hard).
-        (3, 0, 0, 3, 4, 4, 0),
+        #(2, 0, 0, 2, 4, 4, 0),
     ]
 
     # Penalized transitions:
     #     (previous_shift, next_shift, penalty (0 means forbidden))
     penalized_transitions = [
         # Afternoon to night has a penalty of 4.
-        (2, 3, 4),
+        #(1, 2, 4),
         # Night to morning is forbidden.
-        (3, 1, 0),
+        #(2, 1, 0),
     ]
 
     # daily demands for work shifts (morning, afternon, night) for each day
     # of the week starting on Monday.
-    weekly_cover_demands = [
-        (2, 3, 1),  # Monday
-        (2, 3, 1),  # Tuesday
-        (2, 2, 2),  # Wednesday
-        (2, 3, 1),  # Thursday
-        (2, 2, 2),  # Friday
-        (1, 2, 3),  # Saturday
-        (1, 3, 1),  # Sunday
-    ]
+    '''weekly_cover_demands = [
+        (1, 1),  # Monday
+        (1, 1),  # Tuesday
+        (1, 1),  # Wednesday
+        (1, 1),  # Thursday
+        (1, 1),  # Friday
+        (1, 1),  # Saturday
+        (1, 1),  # Sunday
+    ]'''
 
     # Penalty for exceeding the cover constraint per shift type.
-    excess_cover_penalties = (0, 0, 0)
+    excess_cover_penalties = tuple([0]*(len(shifts)-1))
 
     num_days = num_weeks * 7
     num_shifts = len(shifts)
@@ -408,7 +409,7 @@ def solve_shift_scheduling(params, output_proto, num_employees, num_weeks, shift
                 print('  %s violated by %i, linear penalty=%i' %
                       (var.Name(), solver.Value(var), obj_int_coeffs[i]))
 
-    print()
+    #print()
     print(solver.ResponseStats())
     return(employee_dict)
 

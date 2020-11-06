@@ -29,27 +29,11 @@
                 <h1 class="mt-5">Welcome to TimeTables!</h1>
                 <ul class="list-unstyled">
                 </ul>
-                
-                {% if numGroups > 0 %}
                 <hr>
-                <h3>Choose your group:</h3>
-                </br>The schedule and weekly preferences will display your information for this group.
-                </br>
-                You can come back here and switch groups at any time.
-                </br>
-                </br>
-                <form action="" method="post">
-                    {% for g in groups %}
-                    <input type="radio" disabled name="groupname" value="{{g}}" {% if groupname == g %} checked
-                        {% endif %}>
-                    <input type="submit" name="groupname" value="{{g}}"> <br>
-                    {% endfor %}
-                </form>
-                {% endif %}
+                It seems that you have not yet completed your profile yet, click here to do so! <br>
                 <hr>
-                Create New Group:
-                <form action="/createGroup">
-                    <input type="submit" value="Create Group">
+                <form action="/editProfile">
+                    <input type="submit" value="complete profile">
                 </form>
             </div>
         </div>

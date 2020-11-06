@@ -1,0 +1,127 @@
+<!--This is for people to put in their weekly preferences-->
+
+<!-- Main page after logging in, shows an employee's schedule for the week/month-->
+<!DOCTYPE html>
+<html lang='en'>
+
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title> Manage </title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="../static/vendor/bootstrap/css/bootstrap.css" rel="stylesheet">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+</head>
+
+<body>
+    {% include 'header.html' %}
+
+    <!-- Page Content -->
+    <div class="container">
+
+        <div class="row">
+            <div class="col-lg-12 text-center">
+                <h1>Manage {{groupname}}</h1>
+                <hr>
+                <h2> Set a new shift for {{groupname}}</h2><br>
+                <form action='' method="post">
+
+                    <label for="day">Choose a day:</label>
+
+                    <select name="day" id="day">
+                        <option value="Monday">Monday</option>
+                        <option value="Tuesday">Tuesday</option>
+                        <option value="Wednesday">Wednesday</option>
+                        <option value="Thursday">Thursday</option>
+                        <option value="Friday">Friday</option>
+                        <option value="Saturday">Saturday</option>
+                        <option value="Sunday">Sunday</option>
+                    </select>
+
+
+                    <label for="start">Choose start:</label>
+                    <input type="time" id="start" name="start" step=3600 required>
+                    <label for="end">Choose end:</label>
+                    <input type="time" id="end" name="end" step=3600 required>
+                    <label for="npeople">Number of People</label>
+                    <input type="number" id="npeople" name="npeople" required>
+                    <input type="submit" name="submit" value="Add">
+                </form>
+
+                <hr>
+
+                <h2> Current Shifts</h2><br>
+                {% if shifts|length > 0 %}
+                <p>Schedules for <strong>{{groupname}}</strong> will be generated using these shifts. <br>
+                    {% for i in shifts %}
+                <form action='' method="post">
+                    <strong>Day: </strong>{{shifts[i][0]}} <strong>Start: </strong>{{shifts[i][1]}}
+                    <strong>End: </strong>{{shifts[i][2]}} <strong>Number of People: </strong>{{shifts[i][3]}}
+                    <button type="submit" name="submit" value="{{i}}">Remove</button><br>
+                </form>
+                {% endfor %}
+                {% else %}
+                <p> No current shifts for <strong>{{groupname}}</strong></p>
+                {% endif %}
+                <hr>
+                <h2>Create Schedule</h2>
+                Create schedule for shifts listed above, based on group members' weekly preferences. <br>
+                This will replace the current schedule below. <br>
+                Once the new schedule is created, each group member's weekly group preferences will reset to their
+                global
+                preferences.
+                <br>
+                <form action="" method="post">
+                    <input type="submit" name="submit" value="Generate Schedule">
+                </form>
+                <hr>
+                <h2>Current Schedule</h2>
+                {% if currsched is not none %}
+                {% for shift in currsched %}
+                <strong>{{shift}}</strong>:
+                {% for netid in currsched[shift] %}
+                {{netid}}{% if loop.index < currsched[shift]|length %},{% endif %}
+                {% endfor %}
+                <br>
+                {% endfor %}
+                {% else %}
+                <p>A new schedule could not be generated based on current shift demands and user preferences. <br>
+                    Make sure that you've included at least one shift, or try decreasing the number of people per shift.
+                </p>
+                {% endif %}
+                <hr>
+                <h2>Edit Group Members</h2>
+                <form action='' method="post">
+                    <table style="margin-left: auto; margin-right: auto;">
+                        {% for user in users: %}
+                        <tr>
+                            <td>{{user}}</td>
+                            <td><input type="checkbox" name={{user}} {% if selected[user] %} checked {% endif %}></td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                    <input type="submit" name="submit" value="Save">
+                </form>
+                <hr>
+                <h2>Delete Group</h2>
+                <form action='' method="post">
+                    <input type="submit" name="submit" value="Delete">
+                </form>
+                <br>
+            </div>
+        </div>
+        {% include 'footer.html' %}
+
+        <!-- Bootstrap core JavaScript -->
+        <script src="../static/vendor/jquery/jquery.min.js"></script>
+        <script src="../static/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+</body>
+
+</html>

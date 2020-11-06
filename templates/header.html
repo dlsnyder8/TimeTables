@@ -20,11 +20,19 @@
                     </a>
                 </li>
                 {% if inGroup %}
-                <li class="nav-item">
-                    <a class="nav-link" href="./schedule">Schedule</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="./group">Group</a>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Group
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="./schedule">Schedule</a>
+                        <a class="dropdown-item" href="./group">Preferences</a>
+                        <a class="dropdown-item" href="./viewGroup">Info</a>
+                        {% if isMgr %} <a class="dropdown-item" href="./manage">Manage</a> {% endif %}
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="/createGroup">Create Group</a>
+                    </div>
                 </li>
                 {% endif %}
                 <li class="nav-item">
