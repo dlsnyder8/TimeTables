@@ -129,6 +129,21 @@ def shifts_to_us_time(shifts):
         shifts[i][2] = military_to_us_time(shifts[i][2])
     return shifts
 
+def formatDisplaySched(currsched):
+    days_to_nums = {'Sunday': 0, 'Monday': 1, 'Tuesday': 2, 'Wednesday': 3, 'Thursday': 4, 'Friday': 5, 'Saturday': 6}
+    nums_to_days = {0: 'Sunday', 1: 'Monday', 2: 'Tuesday', 3: 'Wednesday', 4: 'Thursday', 5: 'Friday', 6: 'Saturday'}
+
+    if currsched: 
+        keys = sorted(currsched.keys())
+        schedStrings = {}
+        for key in keys:
+            split = key.split('_')
+            shiftString = "{} {} - {}".format(nums_to_days[int(split[0])],military_to_us_time(split[1]), military_to_us_time(split[2]))
+            schedStrings[shiftString] = currsched[key]
+        currsched = schedStrings
+    else: currsched = {}
+    return currsched
+
 #------------------------------------------------------------------
 
 @app.route('/', methods=['GET', 'POST'])
@@ -224,20 +239,10 @@ def manage():
     shifts = get_group_shifts(groupid)
     if not shifts:
         shifts = {}
-
-    days_to_nums = {'Sunday': 0, 'Monday': 1, 'Tuesday': 2, 'Wednesday': 3, 'Thursday': 4, 'Friday': 5, 'Saturday': 6}
-    nums_to_days = {0: 'Sunday', 1: 'Monday', 2: 'Tuesday', 3: 'Wednesday', 4: 'Thursday', 5: 'Friday', 6: 'Saturday'}
-
+    
     currsched = get_group_schedule(groupid)
-    if currsched: 
-        keys = sorted(currsched.keys())
-        schedStrings = {}
-        for key in keys:
-            split = key.split('_')
-            shiftString = "{} {} - {}".format(nums_to_days[int(split[0])],military_to_us_time(split[1]), military_to_us_time(split[2]))
-            schedStrings[shiftString] = currsched[key]
-        currsched = schedStrings
-    else: currsched = {}
+    currsched = formatDisplaySched(currsched)
+    
     if request.method == 'GET':
         shifts = shifts_to_us_time(shifts)
         html = render_template('manage.html', groupname=groupname, inGroup=inGroup, isMgr=isMgr, shifts=shifts, users=users, selected=selected, currsched=currsched)
@@ -248,6 +253,8 @@ def manage():
         groupid = get_group_id(groupname)
 
         if request.form["submit"] == "Add":
+            days_to_nums = {'Sunday': 0, 'Monday': 1, 'Tuesday': 2, 'Wednesday': 3, 'Thursday': 4, 'Friday': 5, 'Saturday': 6}
+
             day = request.form["day"]
             start = request.form["start"]
             end = request.form["end"]
@@ -299,8 +306,14 @@ def manage():
             response.set_cookie('groupid', str(groupid))
             return response
         elif request.form["submit"] == "Generate Schedule":
-            pass
-            # add backend when or tools functions done
+            currsched = generate_schedule(groupid)
+            change_group_schedule(groupid, currsched)
+            currsched = formatDisplaySched(currsched)
+
+            # reset weekly group prefs of all group members
+            groupmems = get_group_members(groupid)
+            for mem in groupmems:
+                change_user_preferences_group(groupid, mem)
         else:
             shiftid = request.form["submit"]
             del shifts[shiftid]
