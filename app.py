@@ -325,16 +325,10 @@ def schedule():
     groupname, groupid = getCurrGroupnameAndId(request, groups)
     isMgr = getIsMgr(username, True, request, groups)
     
-    groupPreferences = get_group_preferences(groupid, username)
-    if groupPreferences == None:
-        # only an issue when users not created through createProfile page
-        change_user_preferences_global(username, create_preferences(blankSchedule()))
-        groupPreferences = get_global_preferences(username)
-    groupPreferences = get_double_array(groupPreferences)
-    edict = solve_shift_scheduling("", "", 10, 1, ['O', 'M', 'A', 'N'], [], create_requests(groupPreferences, 0))
-    
+    groupsched = get_group_schedule(groupid)
+    schedule = get_double_array(parse_user_schedule(username, groupsched))
 
-    html = render_template('schedule.html', schedule=create_schedule(edict, 0), groupname=groupname, inGroup=True, isMgr=isMgr, editable=False)
+    html = render_template('schedule.html', schedule=schedule , groupname=groupname, inGroup=True, isMgr=isMgr, editable=False)
     response = make_response(html)
 
     return response
