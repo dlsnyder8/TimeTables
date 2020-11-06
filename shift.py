@@ -250,17 +250,11 @@ def solve_shift_scheduling(params, output_proto, num_employees, num_weeks, shift
     # daily demands for work shifts (morning, afternon, night) for each day
     # of the week starting on Monday.
     '''weekly_cover_demands = [
-        (1, 1),  # Monday
-        (1, 1),  # Tuesday
-        (1, 1),  # Wednesday
-        (1, 1),  # Thursday
-        (1, 1),  # Friday
-        (1, 1),  # Saturday
-        (1, 1),  # Sunday
+        [0],[1],[0],[0],[0],[0],[0]
     ]'''
 
     # Penalty for exceeding the cover constraint per shift type.
-    excess_cover_penalties = tuple([0]*(len(shifts)-1))
+    excess_cover_penalties = tuple([1000]*(len(shifts)-1))
 
     num_days = num_weeks * 7
     num_shifts = len(shifts)
