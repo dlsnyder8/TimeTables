@@ -334,9 +334,9 @@ def change_group_schedule(groupid, schedule):
 # add a user (netid) to group (groupid), 
 # preferences is optional argument, but could default to global if None???
 # valid options for 'role' are: 'manager', 'owner', 'member'
-def add_user_to_group(groupid, netid, role, email=False,text=False,preferences = None):
+def add_user_to_group(groupid, netid, role, email=False,text=False,preferences = None,usersched = None):
     try:
-        session.add(Group_members(netid=netid,groupid=groupid,role=role,emailnotif=email,textnotif=text,grouppreferences=preferences))
+        session.add(Group_members(netid=netid,groupid=groupid,role=role,emailnotif=email,textnotif=text,grouppreferences=preferences,userschedule = usersched))
         session.commit()
     except:
         session.rollback()
