@@ -48,6 +48,7 @@ def getCurrGroupnameAndId(request, groups, inGroup=True):
     elif inGroup: groupid = int(groupid)
     return groupname, groupid
 
+
 # returns bool - is user owner or manager
 # (used to display manage group tab in navbar if relevant)
 def getIsMgr(username, inGroup, request, groups=None):
@@ -61,6 +62,15 @@ def getIsMgr(username, inGroup, request, groups=None):
         return (role in ['manager','owner'])
     else:
         return False
+
+
+# returns bool if administrator
+def getIsAdmin(username, groupid, inGroup):
+    if groupid is None: return False
+    if inGroup:
+        role = get_user_role(username, groupid)
+        return role == "owner"
+    return False
 
 # takes a request and returns the schedule values
 def parseSchedule():
@@ -147,6 +157,8 @@ def formatDisplaySched(currsched):
     else: currsched = {}
     return currsched
 
+
+
 #------------------------------------------------------------------
 
 @app.route('/', methods=['GET', 'POST'])
@@ -164,11 +176,12 @@ def index():
     isMgr = getIsMgr(username, inGroup, request, groups)
     if isMgr == -1: groupname = groupid = None
     else: groupname, groupid = getCurrGroupnameAndId(request, groups, inGroup)
+    isAdm = getIsAdmin(username, groupid, inGroup)
     print(groupname, groupid, "at index")
     groups_by_name = [g[1] for g in groups]
 
     if request.method == 'GET':
-        html = render_template('index.html', groups=groups_by_name, groupname=groupname, numGroups=numGroups, inGroup=inGroup, isMgr=isMgr)
+        html = render_template('index.html', groups=groups_by_name, groupname=groupname, numGroups=numGroups, inGroup=inGroup, isMgr=isMgr, isAdm=isAdm)
         response = make_response(html)
         return response
 
@@ -177,13 +190,68 @@ def index():
         groupid = get_group_id(groupname)
         isMgr = (get_user_role(username, groupid) in ["manager", "owner"])
 
-        html = render_template('index.html',groups=groups_by_name, groupname=groupname, numGroups=numGroups, inGroup=inGroup, isMgr=isMgr)
+        html = render_template('index.html',groups=groups_by_name, groupname=groupname, numGroups=numGroups, inGroup=inGroup, isMgr=isMgr, isAdm=isAdm)
         response = make_response(html)
         response.set_cookie('groupname', groupname)
         response.set_cookie('groupid', str(groupid))
         return response
 
-@app.route('/profile',methods=['GET'])
+
+@app.route('/admin', methods=['GET', 'POST'])
+def admin():
+    username = get_username()
+    if not (user_exists(username)):
+        return redirect(url_for('createProfile'))
+
+    groups = get_user_groups(username)
+    inGroup = (len(groups) != 0)
+    groupname, groupid = getCurrGroupnameAndId(request, groups, inGroup)
+    isAdm = getIsAdmin(username, groupid, inGroup)
+
+    users = get_group_users(groupid)
+    managers = []
+    roles = {}
+    isManager = {}
+    for user in users:
+        role = get_user_role(user, groupid)
+        roles[user] = role
+        if role == "manager":
+            isManager[user] = True
+            managers.append(user)
+        else:
+            isManager[user] = False
+
+    if request.method == "get":
+        html = render_template('admin.html', inGroup=inGroup, users=users, isManager=isManager, groupname=groupname, isAdm=isAdm)
+        response = make_response(html)
+        return response
+    else:
+        selectedManagers = []
+        newManagers = []
+        removedManagers = []
+        for user in users:
+            if request.form.get(user) is not None:
+                selectedManagers.append(user)
+        for user in selectedManagers:
+            if user not in managers:
+                newManagers.append(user)
+                isManager[user] = True
+        for user in managers:
+            if user not in selectedManagers:
+                removedManagers.append(user)
+                isManager[user] = False
+
+        for user in newManagers:
+            change_group_role(groupid, user, 'manager')
+        for user in removedManagers:
+            change_group_role(groupid, user, 'member')
+
+        html = render_template('admin.html', inGroup=inGroup, users=users, isManager=isManager, groupname=groupname)
+        response = make_response(html)
+        return response
+
+
+@app.route('/profile', methods=['GET'])
 def profile():
     username = get_username()
 
