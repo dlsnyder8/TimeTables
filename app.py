@@ -158,6 +158,20 @@ def formatDisplaySched(currsched):
     return currsched
 
 
+# returns list of elements in new but not old, and users in old but not new
+def getDifferences(newlist, oldlist):
+    newElements = []
+    lostElements = []
+    for element in newlist:
+        if element not in oldlist:
+            newElements.append(element)
+            print("new element " + element)
+    for element in oldlist:
+        if element not in newlist:
+            lostElements.append(element)
+            print("removed element " + element)
+    return newElements, lostElements
+
 
 #------------------------------------------------------------------
 
@@ -189,6 +203,7 @@ def index():
         groupname = request.form['groupname']
         groupid = get_group_id(groupname)
         isMgr = (get_user_role(username, groupid) in ["manager", "owner"])
+        isAdm = get_user_role(username, groupid) == 'owner'
 
         html = render_template('index.html',groups=groups_by_name, groupname=groupname, numGroups=numGroups, inGroup=inGroup, isMgr=isMgr, isAdm=isAdm)
         response = make_response(html)
@@ -206,9 +221,9 @@ def admin():
     groups = get_user_groups(username)
     inGroup = (len(groups) != 0)
     groupname, groupid = getCurrGroupnameAndId(request, groups, inGroup)
-    isAdm = getIsAdmin(username, groupid, inGroup)
 
     users = get_group_users(groupid)
+    users.remove(username)
     managers = []
     roles = {}
     isManager = {}
@@ -221,30 +236,26 @@ def admin():
         else:
             isManager[user] = False
 
-    if request.method == "get":
-        html = render_template('admin.html', inGroup=inGroup, users=users, isManager=isManager, groupname=groupname, isAdm=isAdm)
+    if request.method == "GET":
+        html = render_template('admin.html', inGroup=inGroup, users=users, isManager=isManager, groupname=groupname, isMgr=True, isAdm=True)
         response = make_response(html)
         return response
     else:
         selectedManagers = []
-        newManagers = []
-        removedManagers = []
         for user in users:
             if request.form.get(user) is not None:
                 selectedManagers.append(user)
-        for user in selectedManagers:
-            if user not in managers:
-                newManagers.append(user)
-                isManager[user] = True
-        for user in managers:
-            if user not in selectedManagers:
-                removedManagers.append(user)
-                isManager[user] = False
+
+        newManagers, removedManagers = getDifferences(selectedManagers, managers)
+
+        change_group_role(groupid, 'bbrodie', 'owner')
 
         for user in newManagers:
             change_group_role(groupid, user, 'manager')
+            isManager[user] = True
         for user in removedManagers:
             change_group_role(groupid, user, 'member')
+            isManager[user] = False
 
         html = render_template('admin.html', inGroup=inGroup, users=users, isManager=isManager, groupname=groupname)
         response = make_response(html)
@@ -298,6 +309,7 @@ def manage():
 
     groupname, groupid = getCurrGroupnameAndId(request, groups, inGroup)
     curr_members = get_group_users(groupid)
+    isAdm = getIsAdmin(username, groupid, inGroup)
 
     selected = {}
     for user in users:
@@ -316,7 +328,7 @@ def manage():
     
     if request.method == 'GET':
         shifts = shifts_to_us_time(shifts)
-        html = render_template('manage.html', groupname=groupname, inGroup=inGroup, isMgr=isMgr, shifts=shifts, users=users, selected=selected, currsched=currsched)
+        html = render_template('manage.html', groupname=groupname, inGroup=inGroup, isMgr=isMgr, shifts=shifts, users=users, selected=selected, currsched=currsched, isAdm=isAdm)
         response = make_response(html)
         return response
 
@@ -396,7 +408,7 @@ def manage():
             del shifts[shiftid]
             change_group_shifts(groupid, shifts)
         shifts = shifts_to_us_time(shifts)
-        html = render_template('manage.html', groupname=groupname, inGroup=inGroup, isMgr=isMgr, shifts=shifts, users=users, selected=selected, currsched=currsched)
+        html = render_template('manage.html', groupname=groupname, inGroup=inGroup, isMgr=isMgr, shifts=shifts, users=users, selected=selected, currsched=currsched, isAdm=isAdm)
         response = make_response(html)
         return response
 
