@@ -21,7 +21,7 @@ PROD_ENV = False
 
 app = Flask(__name__)
 app.secret_key = b'\x06)\x8e\xa3BW"\x9d\xcd\x1d5)\xd6\xd1b1'
-app.config.update(dict(
+"""app.config.update(dict(
     DEBUG = True,
     MAIL_SERVER = 'smtp.gmail.com',
     MAIL_PORT = 587,
@@ -30,7 +30,7 @@ app.config.update(dict(
     MAIL_USERNAME = os.environ['MAIL_USERNAME'],
     MAIL_PASSWORD = os.environ['MAIL_PW'],
 ))
-mail = Mail(app)
+mail = Mail(app)"""
 
 
 def filter_shifts(netid,shifts):
