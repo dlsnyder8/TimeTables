@@ -288,7 +288,7 @@ def admin():
         return redirect(url_for('createProfile'))
 
     # needs to be all groups, not just included ones
-    groups = get_user_groups(username)
+    groups = get_all_groups()
     groups_by_name = [g[1] for g in groups]
     users = get_all_users()
 
