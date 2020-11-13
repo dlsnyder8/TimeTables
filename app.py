@@ -62,7 +62,7 @@ def getIsMgr(username, inGroup, request, groups=None):
         return False
 
 
-# returns bool if administrator
+# returns bool if owner
 def getIsOwner(username, inGroup, groupid=None, request=None, groups=None):
     if not inGroup: 
         return False
@@ -193,6 +193,13 @@ def index():
     isOwner = getIsOwner(username, inGroup, request=request, groups=groups)
     groups_by_name = [g[1] for g in groups]
 
+    teststring = "user = " + username
+    if isMgr: teststring += "is manager "
+    else: teststring += "is not manager "
+    teststring += "of group " + groupname
+    print(teststring)
+
+
     if request.method == 'GET':
         html = render_template('index.html', groups=groups_by_name, groupname=groupname, numGroups=numGroups, inGroup=inGroup, isMgr=isMgr, isOwner=isOwner)
         response = make_response(html)
@@ -211,8 +218,8 @@ def index():
         return response
 
 
-@app.route('/admin', methods=['GET', 'POST'])
-def admin():
+@app.route('/owner', methods=['GET', 'POST'])
+def owner():
     username = get_username()
     if not (user_exists(username)):
         return redirect(url_for('createProfile'))
@@ -236,7 +243,7 @@ def admin():
             isManager[user] = False
 
     if request.method == "GET":
-        html = render_template('admin.html', inGroup=inGroup, users=users, isManager=isManager, groupname=groupname, isMgr=True, isOwner=True)
+        html = render_template('owner.html', inGroup=inGroup, users=users, isManager=isManager, groupname=groupname, isMgr=True, isOwner=True)
         response = make_response(html)
         return response
     else:
@@ -247,8 +254,6 @@ def admin():
 
         newManagers, removedManagers = getDifferences(selectedManagers, managers)
 
-        change_group_role(groupid, 'bbrodie', 'owner')
-
         for user in newManagers:
             change_group_role(groupid, user, 'manager')
             isManager[user] = True
@@ -256,7 +261,7 @@ def admin():
             change_group_role(groupid, user, 'member')
             isManager[user] = False
 
-        html = render_template('admin.html', inGroup=inGroup, users=users, isManager=isManager, groupname=groupname, isMgr=True, isOwner=True)
+        html = render_template('owner.html', inGroup=inGroup, users=users, isManager=isManager, groupname=groupname, isMgr=True, isOwner=True)
         response = make_response(html)
         return response
 
