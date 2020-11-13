@@ -61,18 +61,14 @@ def email_group(groupid, groupName):
             
             output = formatDisplaySched(sched)
             
-            html = "<strong>This week's shifts are:</strong><br>"
+            html = "<strong>Your shifts this week are:</strong><br>"
             
             for (key, value) in output.items():
                 print(key)
                 html += key + "<br>"
-            # html = "<strong>This week's shifts are:</strong><br>"
-            #for i in sched:
-            #   html += '<strong>Day: </strong>' + shifts[i][0] + '<strong>Start: </strong>' + \
-            #          shifts[i][1] + '<strong>End: </strong>' + shifts[i][2] + '<br>'
-            subject = "Your weekly schedule for: %s" % groupName
             
-            # print("html: \n",html)
+            subject = "Your weekly schedule for: %s" % groupName
+          
             
 
             msg = Message(subject=subject, 
