@@ -7,6 +7,7 @@ from database import *
 from shifttest import *
 
 import os
+import json
 from sys import stderr, exit
 import urllib.parse as urlparse
 
@@ -57,22 +58,22 @@ def email_group(groupid, groupName):
             mem_info = get_profile_info(netid) # get profile info
             sched = filter_shifts(netid,shifts) # get their weekly schedule
             # sched = shifts_to_us_time(shift)
-            print("sched: \n",sched)
-            
+            print("Before dump:",sched)
+            sched = json.dumps(sched)
+            print("After dump:",sched)
             # html = "<strong>This week's shifts are:</strong><br>"
             #for i in sched:
             #   html += '<strong>Day: </strong>' + shifts[i][0] + '<strong>Start: </strong>' + \
             #          shifts[i][1] + '<strong>End: </strong>' + shifts[i][2] + '<br>'
-
             subject = "Your weekly schedule for: %s" % groupName
             
             # print("html: \n",html)
-            return sched
+            
 
             msg = Message(subject=subject, 
                           body=sched,   
                           recipients=[mem_info.email],
-                          sender='coffeeclub@princeton.edu')
+                          sender='sdylan852@gmail.com')
             conn.send(msg)
     print("Group %s has been emailed" %groupName)
     return
@@ -239,7 +240,7 @@ def getDifferences(newlist, oldlist):
 @app.route('/index', methods=['GET','POST'])
 def index():
     username = get_username()
-
+    email_group(82, "Test Email Group")
     if not (user_exists(username)):
         return redirect(url_for('createProfile'))
 
@@ -255,7 +256,7 @@ def index():
     teststring = "user = " + username
     if isMgr: teststring += "is manager "
     else: teststring += "is not manager "
-    teststring += "of group " + groupname
+    #teststring += "of group " + groupname
     print(teststring)
 
 
