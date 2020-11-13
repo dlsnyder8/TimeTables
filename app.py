@@ -1,6 +1,7 @@
 from flask import Flask
 from flask import render_template, make_response, request, redirect, url_for
 from CASClient import CASClient
+from flask_mail import Mail, Message
 
 from database import *
 from shifttest import *
@@ -12,7 +13,7 @@ import urllib.parse as urlparse
 #-------------------
 # CAS Authentication cannot be run locally unfortunately
 # Set this variable to False if local, and change to True before pushing
-PROD_ENV = True
+PROD_ENV = False
 
 
 #----------
@@ -20,6 +21,64 @@ PROD_ENV = True
 
 app = Flask(__name__)
 app.secret_key = b'\x06)\x8e\xa3BW"\x9d\xcd\x1d5)\xd6\xd1b1'
+app.config.update(dict(
+    DEBUG = True,
+    MAIL_SERVER = 'smtp.gmail.com',
+    MAIL_PORT = 587,
+    MAIL_USE_TLS = True,
+    MAIL_USE_SSL = False,
+    MAIL_USERNAME = os.environ['MAIL_USERNAME'],
+    MAIL_PASSWORD = os.environ['MAIL_PW'],
+))
+mail = Mail(app)
+
+
+def filter_shifts(netid,shifts):
+    newdict = dict()
+    for (key, value) in shifts.items():
+        print(key,value)
+        for name in value:
+            print("name:",name)
+            if name == netid:
+                newdict[key] = name
+    print("dict:\n",newdict)
+    return newdict
+
+# This function will email every member in a group with their schedule for the next week.
+# It will assume that the schedule in groupmembers.userschedule is the one to use
+def email_group(groupid, groupName):
+    members = get_group_users(groupid) # get all group members
+    shifts = get_group_schedule(groupid) # group schedule
+    if not shifts:
+        shifts = {}
+    
+    with mail.connect() as conn:
+        for netid in members:
+            mem_info = get_profile_info(netid) # get profile info
+            sched = filter_shifts(netid,shifts) # get their weekly schedule
+            # sched = shifts_to_us_time(shift)
+            print("sched: \n",sched)
+            
+            # html = "<strong>This week's shifts are:</strong><br>"
+            #for i in sched:
+            #   html += '<strong>Day: </strong>' + shifts[i][0] + '<strong>Start: </strong>' + \
+            #          shifts[i][1] + '<strong>End: </strong>' + shifts[i][2] + '<br>'
+
+            subject = "Your weekly schedule for: %s" % groupName
+            
+            # print("html: \n",html)
+            return sched
+
+            msg = Message(subject=subject, 
+                          body=sched,   
+                          recipients=[mem_info.email],
+                          sender='coffeeclub@princeton.edu')
+            conn.send(msg)
+    print("Group %s has been emailed" %groupName)
+    return
+
+
+
 
 
 # obtains username
