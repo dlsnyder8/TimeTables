@@ -22,7 +22,7 @@ PROD_ENV = False
 
 app = Flask(__name__)
 app.secret_key = b'\x06)\x8e\xa3BW"\x9d\xcd\x1d5)\xd6\xd1b1'
-app.config.update(dict(
+"""app.config.update(dict(
     DEBUG = True,
     MAIL_SERVER = 'smtp.gmail.com',
     MAIL_PORT = 587,
@@ -31,7 +31,7 @@ app.config.update(dict(
     MAIL_USERNAME = os.environ['MAIL_USERNAME'],
     MAIL_PASSWORD = os.environ['MAIL_PW'],
 ))
-mail = Mail(app)
+mail = Mail(app)"""
 
 
 def filter_shifts(netid,shifts):
@@ -197,23 +197,25 @@ def military_to_us_time(time):
         time = str(int(time.split(":")[0]) - 12) + ":00 PM"
     return time
 
-def shifts_to_us_time(shifts):
+def shiftdict_to_us_time(shifts):
     for i in shifts:
         shifts[i][1] = military_to_us_time(shifts[i][1])
         shifts[i][2] = military_to_us_time(shifts[i][2])
     return shifts
 
-def formatDisplaySched(currsched):
+def shiftkey_to_str(shiftkey, full=False):
     days_to_nums = {'Sunday': 0, 'Monday': 1, 'Tuesday': 2, 'Wednesday': 3, 'Thursday': 4, 'Friday': 5, 'Saturday': 6}
     nums_to_days = {0: 'Sunday', 1: 'Monday', 2: 'Tuesday', 3: 'Wednesday', 4: 'Thursday', 5: 'Friday', 6: 'Saturday'}
+    split = shiftkey.split('_')
+    shiftString = "{} {} - {}".format(nums_to_days[int(split[0])],military_to_us_time(split[1]), military_to_us_time(split[2]))
+    return shiftString
 
+def formatDisplaySched(currsched):
     if currsched: 
         keys = sorted(currsched.keys())
         schedStrings = {}
         for key in keys:
-            split = key.split('_')
-            shiftString = "{} {} - {}".format(nums_to_days[int(split[0])],military_to_us_time(split[1]), military_to_us_time(split[2]))
-            schedStrings[shiftString] = currsched[key]
+            schedStrings[shiftkey_to_str(key)] = currsched[key]
         currsched = schedStrings
     else: currsched = {}
     return currsched
@@ -395,7 +397,7 @@ def manage():
     currsched = formatDisplaySched(currsched)
     
     if request.method == 'GET':
-        shifts = shifts_to_us_time(shifts)
+        shifts = shiftdict_to_us_time(shifts)
         html = render_template('manage.html', groupname=groupname, inGroup=True, isMgr=isMgr, shifts=shifts, users=users, mgrs=mgrs, selected=selected, currsched=currsched, username=username, isOwner=isOwner)
         response = make_response(html)
         return response
@@ -477,7 +479,7 @@ def manage():
             shiftid = request.form["submit"]
             del shifts[shiftid]
             change_group_shifts(groupid, shifts)
-        shifts = shifts_to_us_time(shifts)
+        shifts = shiftdict_to_us_time(shifts)
         html = render_template('manage.html', groupname=groupname, inGroup=True, isMgr=isMgr, shifts=shifts, users=users, mgrs=mgrs, selected=selected, currsched=currsched, schednotif=schednotif, isOwner=isOwner, username=username)
         response = make_response(html)
         return response
@@ -508,7 +510,7 @@ def schedule():
     if not shifts:
         shifts = {}
     else:
-        shifts = shifts_to_us_time(shifts)
+        shifts = shiftdict_to_us_time(shifts)
        
 
     html = render_template('schedule.html', schedule=schedule , groupname=groupname, inGroup=True, isMgr=isMgr, editable=False,
