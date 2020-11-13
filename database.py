@@ -449,6 +449,14 @@ def get_user_groups(netid):
         print('get user groups failed',file=stderr)
         return -1
 
+# returns groupname matching id
+def get_group_name(groupid):
+    try:
+        return (session.query(Groups.groupname).filter_by(groupid=groupid).first())[0]
+    except:
+        print('get groupid failed', file=stderr)
+        return -1
+
 def get_group_id(groupname):
     try:
         groupid = session.query(Groups.groupid).filter_by(groupname=groupname).first()

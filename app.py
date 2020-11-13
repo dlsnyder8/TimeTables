@@ -166,11 +166,9 @@ def getDifferences(newlist, oldlist):
     for element in newlist:
         if element not in oldlist:
             newElements.append(element)
-            print("new element " + element)
     for element in oldlist:
         if element not in newlist:
             lostElements.append(element)
-            print("removed element " + element)
     return newElements, lostElements
 
 
@@ -218,6 +216,96 @@ def index():
         return response
 
 
+# administrator page
+@app.route('/admin', methods=['GET', 'POST'])
+def admin():
+    username = get_username()
+    if not (user_exists(username)):
+        return redirect(url_for('createProfile'))
+
+    # needs to be all groups, not just included ones
+    groups = get_user_groups(username)
+    groups_by_name = [g[1] for g in groups]
+    users = get_all_users()
+
+    if request.method == "GET":
+        html = render_template('admin.html', groups=groups_by_name)
+        response = make_response(html)
+        return response
+    else:
+        groupname = request.form.get('groupname')
+        if groupname is None:
+            groupname = request.cookies.get('adminGroup')
+        groupid = get_group_id(groupname)
+        curr_members = get_group_users(groupid)
+        selected = {}
+        isManager = {}
+        managers = []
+        mgrs = {}
+
+        for user in users:
+            selected[user] = False
+            if user in curr_members:
+                user_role = get_user_role(user, groupid)
+                selected[user] = True
+            else:
+                user_role = "notGroup"
+
+            if user_role == "manager":
+                isManager[user] = True
+                managers.append(user)
+            else:
+                isManager[user] = False
+
+            mgrs[user] = (user_role, (user_role in ['owner', 'manager']))
+
+        # determines input
+        output = request.form.get("submit")
+        if output == "Save Users":
+            selectedUsers = []
+            for user in users:
+                if request.form.get(user) is not None:
+                    selectedUsers.append(user)
+            newUsers, oldUsers = getDifferences(selectedUsers, curr_members)
+
+            for user in newUsers:
+                add_user_to_group(groupid, user, 'member')
+                selected[user] = True
+            for user in oldUsers:
+                remove_user_from_group(user, groupid)
+                selected[user] = False
+                mgrs[user] = ("notGroup", False)
+
+            html = render_template('admin.html', groups=groups_by_name, groupname=get_group_name(groupid), users=users, selected=selected, mgrs=mgrs, members=selectedUsers, isManager=isManager)
+            response = make_response(html)
+            return response
+        elif output == "Save Managers":
+            selectedManagers = []
+            for member in curr_members:
+                if request.form.get(member) is not None:
+                    selectedManagers.append(member)
+
+            newManagers, oldManagers = getDifferences(selectedManagers, managers)
+
+            for user in newManagers:
+                change_group_role(groupid, user, 'manager')
+                isManager[user] = True
+            for user in oldManagers:
+                change_group_role(groupid, user, 'member')
+                isManager[user] = False
+
+            html = render_template('admin.html', groups=groups_by_name, groupname=get_group_name(groupid), users=users,
+                                   selected=selected, mgrs=mgrs, members=curr_members, isManager=isManager)
+            response = make_response(html)
+            return response
+        else:
+            html = render_template('admin.html', groups=groups_by_name, groupname=get_group_name(groupid), users=users, selected=selected, mgrs=mgrs, members=curr_members, isManager=isManager)
+            response = make_response(html)
+            response.set_cookie('adminGroup', groupname)
+            return response
+
+
+# page for group owners
 @app.route('/owner', methods=['GET', 'POST'])
 def owner():
     username = get_username()
