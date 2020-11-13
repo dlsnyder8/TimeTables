@@ -622,6 +622,8 @@ def group():
         return redirect(url_for('index'))
 
     groupname, groupid = getCurrGroupnameAndId(request, groups)
+    notGroupInTitle = (not groupname.split()[-1].lower() == 'group')
+
     isMgr = getIsMgr(username, True, request, groups)
     isOwner = getIsOwner(username, True, groupid)
     groupprefs = get_group_preferences(groupid, username)
@@ -640,7 +642,7 @@ def group():
         prevemailPref = False
 
     html = render_template('group.html', schedule=weeklyPref, groupname=groupname, prevemailPref=prevemailPref, 
-        inGroup=True, isMgr=isMgr, isOwner=isOwner, editable=False)
+        inGroup=True, isMgr=isMgr, notgroupintitle=notGroupInTitle, isOwner=isOwner, editable=False)
     response = make_response(html)
     return response
 
@@ -657,6 +659,7 @@ def editGroup():
         return redirect(url_for('index'))
 
     groupname, groupid = getCurrGroupnameAndId(request, groups)
+    notGroupInTitle = (not groupname.split()[-1].lower() == 'group')
     isMgr = getIsMgr(username, True, request, groups)
     isOwner = getIsOwner(username, True, groupid)
 
@@ -672,7 +675,7 @@ def editGroup():
 
     if request.method == 'GET':
         html = render_template('editGroup.html', schedule=weeklyPref, groupname=groupname, prevemailPref=prevemailPref,  
-            inGroup=True, isMgr=isMgr, isOwner=isOwner, editable=True)
+            inGroup=True, isMgr=isMgr, isOwner=isOwner, notgroupintitle=notGroupInTitle, editable=True)
         response = make_response(html)
         return response
     else:
@@ -723,11 +726,13 @@ def viewGroup():
     groups = get_user_groups(username)
     isMgr = getIsMgr(username, True, request, groups)
     gName, groupId = getCurrGroupnameAndId(request, groups)
+    notGroupInTitle = (not gName.split()[-1].lower() == 'group')
+
     isOwner = getIsOwner(username, True, groupId)
 
     members = get_group_users(groupId)
     members_w_roles = [(member, get_user_role(member, groupId)) for member in members]        
-    html = render_template('viewGroup.html', gName=gName, members=members_w_roles, inGroup=True, isMgr=isMgr, isOwner=isOwner)
+    html = render_template('viewGroup.html', gName=gName, notgroupintitle=notGroupInTitle, members=members_w_roles, inGroup=True, isMgr=isMgr, isOwner=isOwner)
     response = make_response(html)
 
     return response
