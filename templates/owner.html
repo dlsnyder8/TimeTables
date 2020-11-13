@@ -26,7 +26,8 @@
                 <table>
                     {% for user in users %}
                     <tr>
-                        <td>{{user}}<input type="checkbox" {% if isManager[user] %} checked {% endif %} name={{user}}>
+                        <td>{{user}}&nbsp;<input type="checkbox" {% if isManager[user] %} checked {% endif %}
+                                name={{user}}>
                         </td>
                     </tr>
                     {% endfor %}
