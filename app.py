@@ -1,6 +1,7 @@
 from flask import Flask
 from flask import render_template, make_response, request, redirect, url_for
 from CASClient import CASClient
+from flask_mail import Mail, Message
 
 from database import *
 from shifttest import *
@@ -20,6 +21,64 @@ PROD_ENV = False
 
 app = Flask(__name__)
 app.secret_key = b'\x06)\x8e\xa3BW"\x9d\xcd\x1d5)\xd6\xd1b1'
+"""app.config.update(dict(
+    DEBUG = True,
+    MAIL_SERVER = 'smtp.gmail.com',
+    MAIL_PORT = 587,
+    MAIL_USE_TLS = True,
+    MAIL_USE_SSL = False,
+    MAIL_USERNAME = os.environ['MAIL_USERNAME'],
+    MAIL_PASSWORD = os.environ['MAIL_PW'],
+))
+mail = Mail(app)"""
+
+
+def filter_shifts(netid,shifts):
+    newdict = dict()
+    for (key, value) in shifts.items():
+        print(key,value)
+        for name in value:
+            print("name:",name)
+            if name == netid:
+                newdict[key] = name
+    print("dict:\n",newdict)
+    return newdict
+
+# This function will email every member in a group with their schedule for the next week.
+# It will assume that the schedule in groupmembers.userschedule is the one to use
+def email_group(groupid, groupName):
+    members = get_group_users(groupid) # get all group members
+    shifts = get_group_schedule(groupid) # group schedule
+    if not shifts:
+        shifts = {}
+    
+    with mail.connect() as conn:
+        for netid in members:
+            mem_info = get_profile_info(netid) # get profile info
+            sched = filter_shifts(netid,shifts) # get their weekly schedule
+            # sched = shifts_to_us_time(shift)
+            print("sched: \n",sched)
+            
+            # html = "<strong>This week's shifts are:</strong><br>"
+            #for i in sched:
+            #   html += '<strong>Day: </strong>' + shifts[i][0] + '<strong>Start: </strong>' + \
+            #          shifts[i][1] + '<strong>End: </strong>' + shifts[i][2] + '<br>'
+
+            subject = "Your weekly schedule for: %s" % groupName
+            
+            # print("html: \n",html)
+            return sched
+
+            msg = Message(subject=subject, 
+                          body=sched,   
+                          recipients=[mem_info.email],
+                          sender='coffeeclub@princeton.edu')
+            conn.send(msg)
+    print("Group %s has been emailed" %groupName)
+    return
+
+
+
 
 
 # obtains username
@@ -62,7 +121,7 @@ def getIsMgr(username, inGroup, request, groups=None):
         return False
 
 
-# returns bool if administrator
+# returns bool if owner
 def getIsOwner(username, inGroup, groupid=None, request=None, groups=None):
     if not inGroup: 
         return False
@@ -195,6 +254,13 @@ def index():
     isOwner = getIsOwner(username, inGroup, request=request, groups=groups)
     groups_by_name = [g[1] for g in groups]
 
+    teststring = "user = " + username
+    if isMgr: teststring += "is manager "
+    else: teststring += "is not manager "
+    teststring += "of group " + groupname
+    print(teststring)
+
+
     if request.method == 'GET':
         html = render_template('index.html', groups=groups_by_name, groupname=groupname, numGroups=numGroups, inGroup=inGroup, isMgr=isMgr, isOwner=isOwner)
         response = make_response(html)
@@ -213,8 +279,8 @@ def index():
         return response
 
 
-@app.route('/admin', methods=['GET', 'POST'])
-def admin():
+@app.route('/owner', methods=['GET', 'POST'])
+def owner():
     username = get_username()
     if not (user_exists(username)):
         return redirect(url_for('createProfile'))
@@ -238,7 +304,7 @@ def admin():
             isManager[user] = False
 
     if request.method == "GET":
-        html = render_template('admin.html', inGroup=inGroup, users=users, isManager=isManager, groupname=groupname, isMgr=True, isOwner=True)
+        html = render_template('owner.html', inGroup=inGroup, users=users, isManager=isManager, groupname=groupname, isMgr=True, isOwner=True)
         response = make_response(html)
         return response
     else:
@@ -249,8 +315,6 @@ def admin():
 
         newManagers, removedManagers = getDifferences(selectedManagers, managers)
 
-        change_group_role(groupid, 'bbrodie', 'owner')
-
         for user in newManagers:
             change_group_role(groupid, user, 'manager')
             isManager[user] = True
@@ -258,7 +322,7 @@ def admin():
             change_group_role(groupid, user, 'member')
             isManager[user] = False
 
-        html = render_template('admin.html', inGroup=inGroup, users=users, isManager=isManager, groupname=groupname, isMgr=True, isOwner=True)
+        html = render_template('owner.html', inGroup=inGroup, users=users, isManager=isManager, groupname=groupname, isMgr=True, isOwner=True)
         response = make_response(html)
         return response
 
