@@ -53,6 +53,7 @@ get_group_notifications(netid, groupid)
 get_user_schedule(netid,groupid)
 update_user_schedule(netid,groupid, schedule = None)
 get_user_role(netid, groupid)
+get_group_users(groupid)
 """
 
 
@@ -110,19 +111,48 @@ def parse_user_schedule(netid, groupschedule):
                 for i in range(int(end)):
                     output[str(i)][(day + 1) % 7] = True
     return output
+def get_all_groups():
+    try:
+        return session.query(Groups.groupid,Groups.groupname).all()
+
+    except: 
+        print("Failed to get all groups")
+        session.rollback()
+        return
+
+
 
 # adds a user to the database
-def add_user(firstName, lastName, netid, email=None, phone=None, preferences=None, createGroup = True):
+def add_user(firstName, lastName, netid, email=None, phone=None, preferences=None, createGroup = True,admin=False):
     try:
         session.add(Users(firstname=firstName,lastname=lastName,netid=netid,
-                    email=email,phone=phone,globalpreferences=preferences, can_create_group = createGroup))
+                    email=email,phone=phone,globalpreferences=preferences, can_create_group = createGroup,
+                    is_admin=admin))
         session.commit()
         return
     except:
         session.rollback()
         print('Add User Failed',file=stderr)
         return -1
-        
+
+def change_admin(netid,admin = False):
+    try:
+        session.query(Users).filter_by(netid=netid).update({Users.is_admin : admin})
+        session.commit()
+        return
+    except: 
+        print("Failed to update admin role")
+        session.rollback()
+        return -1
+
+def is_admin(netid):
+    try:
+        return session.query(Users.is_admin).filter_by(netid=netid).first()
+    except:
+        print("Failed to determine if user is admin")
+        session.rollback()
+        return -1
+
 # returns the netid's of all users in the db
 def get_all_users():
     try: 
