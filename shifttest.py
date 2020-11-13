@@ -12,7 +12,7 @@ def create_requests(pshifts, prefArray, employeeNum, currentPrefs):
             if pshifts[key][i] != 0:
                 for j in range(int(start), int(end)):
                     if prefArray[j][i] == False:
-                        currentPrefs.append((employeeNum, shiftNum, i, 100))
+                        currentPrefs.append((employeeNum, shiftNum, i, 10000))
                         break
         shiftNum += 1
 
@@ -77,9 +77,7 @@ def generate_schedule(groupid):
     for member in memberlist:
         prefs = create_requests(pshifts, get_double_array(get_group_preferences(groupid, member)), i, prefs)
         i+= 1  
-    
     edict = solve_shift_scheduling("", "", len(memberlist), 1, fshifts, [], prefs, weekly_cover_demands)
-    
     return format_schedule(edict, memberlist)
         
 def main():
@@ -103,13 +101,14 @@ def main():
     edict = solve_shift_scheduling("", "", len(memberlist), 1, fshifts, [], prefs, weekly_cover_demands)
     
     print(format_schedule(edict, memberlist))'''
-    schedule = generate_schedule(52)
+    schedule = generate_schedule(69)
+    print(schedule)
     if schedule is not None:
         if schedule == {}:
             print("No solution found. Try reducing number of people/number of shifts.")
         else:
             print("Success!")
-            print(parse_user_schedule('batyas', schedule))
+            print(parse_user_schedule('alekk', schedule))
     
 
 if __name__ == '__main__':

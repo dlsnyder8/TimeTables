@@ -48,6 +48,7 @@ def getCurrGroupnameAndId(request, groups, inGroup=True):
     elif inGroup: groupid = int(groupid)
     return groupname, groupid
 
+
 # returns bool - is user owner or manager
 # (used to display manage group tab in navbar if relevant)
 def getIsMgr(username, inGroup, request, groups=None):
@@ -61,6 +62,15 @@ def getIsMgr(username, inGroup, request, groups=None):
         return (role in ['manager','owner'])
     else:
         return False
+
+
+# returns bool if administrator
+def getIsAdmin(username, groupid, inGroup):
+    if groupid is None: return False
+    if inGroup:
+        role = get_user_role(username, groupid)
+        return role == "owner"
+    return False
 
 # takes a request and returns the schedule values
 def parseSchedule():
@@ -147,6 +157,22 @@ def formatDisplaySched(currsched):
     else: currsched = {}
     return currsched
 
+
+# returns list of elements in new but not old, and users in old but not new
+def getDifferences(newlist, oldlist):
+    newElements = []
+    lostElements = []
+    for element in newlist:
+        if element not in oldlist:
+            newElements.append(element)
+            print("new element " + element)
+    for element in oldlist:
+        if element not in newlist:
+            lostElements.append(element)
+            print("removed element " + element)
+    return newElements, lostElements
+
+
 #------------------------------------------------------------------
 
 @app.route('/', methods=['GET', 'POST'])
@@ -164,11 +190,12 @@ def index():
     isMgr = getIsMgr(username, inGroup, request, groups)
     if isMgr == -1: groupname = groupid = None
     else: groupname, groupid = getCurrGroupnameAndId(request, groups, inGroup)
+    isAdm = getIsAdmin(username, groupid, inGroup)
     print(groupname, groupid, "at index")
     groups_by_name = [g[1] for g in groups]
 
     if request.method == 'GET':
-        html = render_template('index.html', groups=groups_by_name, groupname=groupname, numGroups=numGroups, inGroup=inGroup, isMgr=isMgr)
+        html = render_template('index.html', groups=groups_by_name, groupname=groupname, numGroups=numGroups, inGroup=inGroup, isMgr=isMgr, isAdm=isAdm)
         response = make_response(html)
         return response
 
@@ -176,14 +203,66 @@ def index():
         groupname = request.form['groupname']
         groupid = get_group_id(groupname)
         isMgr = (get_user_role(username, groupid) in ["manager", "owner"])
+        isAdm = get_user_role(username, groupid) == 'owner'
 
-        html = render_template('index.html',groups=groups_by_name, groupname=groupname, numGroups=numGroups, inGroup=inGroup, isMgr=isMgr)
+        html = render_template('index.html',groups=groups_by_name, groupname=groupname, numGroups=numGroups, inGroup=inGroup, isMgr=isMgr, isAdm=isAdm)
         response = make_response(html)
         response.set_cookie('groupname', groupname)
         response.set_cookie('groupid', str(groupid))
         return response
 
-@app.route('/profile',methods=['GET'])
+
+@app.route('/admin', methods=['GET', 'POST'])
+def admin():
+    username = get_username()
+    if not (user_exists(username)):
+        return redirect(url_for('createProfile'))
+
+    groups = get_user_groups(username)
+    inGroup = (len(groups) != 0)
+    groupname, groupid = getCurrGroupnameAndId(request, groups, inGroup)
+
+    users = get_group_users(groupid)
+    users.remove(username)
+    managers = []
+    roles = {}
+    isManager = {}
+    for user in users:
+        role = get_user_role(user, groupid)
+        roles[user] = role
+        if role == "manager":
+            isManager[user] = True
+            managers.append(user)
+        else:
+            isManager[user] = False
+
+    if request.method == "GET":
+        html = render_template('admin.html', inGroup=inGroup, users=users, isManager=isManager, groupname=groupname, isMgr=True, isAdm=True)
+        response = make_response(html)
+        return response
+    else:
+        selectedManagers = []
+        for user in users:
+            if request.form.get(user) is not None:
+                selectedManagers.append(user)
+
+        newManagers, removedManagers = getDifferences(selectedManagers, managers)
+
+        change_group_role(groupid, 'bbrodie', 'owner')
+
+        for user in newManagers:
+            change_group_role(groupid, user, 'manager')
+            isManager[user] = True
+        for user in removedManagers:
+            change_group_role(groupid, user, 'member')
+            isManager[user] = False
+
+        html = render_template('admin.html', inGroup=inGroup, users=users, isManager=isManager, groupname=groupname)
+        response = make_response(html)
+        return response
+
+
+@app.route('/profile', methods=['GET'])
 def profile():
     username = get_username()
 
@@ -230,6 +309,7 @@ def manage():
 
     groupname, groupid = getCurrGroupnameAndId(request, groups, inGroup)
     curr_members = get_group_users(groupid)
+    isAdm = getIsAdmin(username, groupid, inGroup)
 
     selected = {}
     for user in users:
@@ -248,7 +328,7 @@ def manage():
     
     if request.method == 'GET':
         shifts = shifts_to_us_time(shifts)
-        html = render_template('manage.html', groupname=groupname, inGroup=inGroup, isMgr=isMgr, shifts=shifts, users=users, selected=selected, currsched=currsched)
+        html = render_template('manage.html', groupname=groupname, inGroup=inGroup, isMgr=isMgr, shifts=shifts, users=users, selected=selected, currsched=currsched, isAdm=isAdm)
         response = make_response(html)
         return response
 
@@ -328,7 +408,7 @@ def manage():
             del shifts[shiftid]
             change_group_shifts(groupid, shifts)
         shifts = shifts_to_us_time(shifts)
-        html = render_template('manage.html', groupname=groupname, inGroup=inGroup, isMgr=isMgr, shifts=shifts, users=users, selected=selected, currsched=currsched)
+        html = render_template('manage.html', groupname=groupname, inGroup=inGroup, isMgr=isMgr, shifts=shifts, users=users, selected=selected, currsched=currsched, isAdm=isAdm)
         response = make_response(html)
         return response
 
