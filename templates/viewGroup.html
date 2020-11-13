@@ -17,18 +17,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 </head>
 
-<body>
+<body class="body">
     {% include 'header.html' %}
-    <div class="col-lg-12 text-center">
-        <h1>Group Info</h1>
-        <hr>
-        <h1>{{gName}}</h1>
-        <hr>
-        <h2>Group Members</h2>
-        {% for member in members: %}
-        {{member}} <br>
-        {% endfor %}
-
+    <div class=" p-md-3">
+        <div class="col-md-8 order-md-1 mx-auto">
+            <h1 class="display-4 font-weight-normal">{{gName}} Group Members</h1>
+            <hr>
+            {% for member in members: %}
+            {{member[0]}} {% if member[1] == 'owner' %} <span class="text-muted">(owner)</span>
+            {% elif member[1] == "manager" %}<span class="text-muted">(manager)</span> {% endif %}<br>
+            {% endfor %}
+        </div>
     </div>
 
     <!-- Bootstrap core JavaScript -->

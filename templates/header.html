@@ -2,45 +2,49 @@
 <!-- Project Title, the tabs for Group, profile, schedule -->
 
 
-
+<style>
+    .body {
+        padding-top: 3.5rem;
+    }
+</style>
 
 <!-- Navigation -->
-<nav class="navbar navbar-expand-lg navbar-light bg-light static-top">
-    <div class="container">
-        <a class="navbar-brand">TimeTables</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive"
-            aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarResponsive">
-            <ul class="navbar-nav ml-auto">
-                <li class="nav-item active">
-                    <a class="nav-link" href="./index">Home Page
-                        <!-- <span class="sr-only">(current)</span> -->
-                    </a>
-                </li>
-                {% if inGroup %}
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
-                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Group
-                    </a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="./schedule">Schedule</a>
-                        <a class="dropdown-item" href="./group">Preferences</a>
-                        <a class="dropdown-item" href="./viewGroup">Info</a>
-                        {% if isMgr %} <a class="dropdown-item" href="./manage">Manage</a> {% endif %}
-                        {% if isAdm %} <a class="dropdown-item" href="./admin">Select Managers</a> {% endif %}
-                        <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="/createGroup">Create Group</a>
-                    </div>
-                </li>
-                {% endif %}
-                <li class="nav-item">
-                    <a class="nav-link" href="./profile">Profile</a>
-                </li>
-            </ul>
-        </div>
+<nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
+    <a class="navbar-brand">TimeTables</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive"
+        aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarResponsive">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <a class="nav-link" href="./index">Home Page
+                    <!-- <span class="sr-only">(current)</span> -->
+                </a>
+            </li>
+            {% if inGroup %}
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
+                    aria-haspopup="true" aria-expanded="false">
+                    Group
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <a class="dropdown-item" href="./schedule">Schedule</a>
+                    <a class="dropdown-item" href="./group">Preferences</a>
+                    <a class="dropdown-item" href="./viewGroup">Info</a>
+                    {% if isMgr %} <a class="dropdown-item" href="./manage">Manage</a> {% endif %}
+                    {% if isOwner %} <a class="dropdown-item" href="./owner">Select Managers</a> {% endif %}
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="/createGroup">Create Group</a>
+                </div>
+            </li>
+            {% endif %}
+        </ul>
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item active">
+                <a class="nav-link" href="./profile">Profile</a>
+            </li>
+        </ul>
     </div>
 </nav>
 

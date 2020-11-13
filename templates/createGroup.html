@@ -17,39 +17,48 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 </head>
 
-<body>
+<body class="body">
     {% include 'header.html' %}
-    <div class="col-lg-12 text-center">
-        <h1>Create Group</h1>
-        <hr>
-        <form action='' method="post">
-            <h2>Group Info</h2>
+    <div class=" p-md-3 container">
+        <div class="col-md-8 order-md-1 mx-auto">
+            <h1 class="display-4 font-weight-normal">Create Group</h1>
             <hr>
-            <table style="margin-left: auto; margin-right: auto;">
-                <tr>
-                    <td>Group Name</td>
-                    <td><input type="text" name="gName" value='' required></td>
-                </tr>
-            </table>
-            <hr>
-            <h2>Group Members</h2>
-            <hr>
-            <table style="margin-left: auto; margin-right: auto;">
-                {% for name in names: %}
-                <tr>
-                    <td>{{name}}</td>
-                    <td><input type="checkbox" name={{name}}></td>
-                </tr>
-                {% endfor %}
-            </table>
-            <hr>
-            <input type="submit" value="Save">
-        </form>
+        </div>
+    </div>
+    <div class="container">
+        <div class="col-md-8 order-md-1 mx-auto">
+            <form action='' method="post">
+                <h2>Group Info</h2>
+                <hr>
+                <div class="mb-3">
+                    Group Name <br>
+                    <input type="text" id="gName" value="" required>
+                </div>
+                <hr>
+                <h2>Group Members</h2>
+                <hr>
+                <table>
+                    {% for name in names: %}
+                    <tr>
+                        <td>{{name}}</td>
+                        <td><input type="checkbox" name={{name}}></td>
+                    </tr>
+                    {% endfor %}
+                </table>
+                <hr>
+                <input type="submit" value="Save" class="btn btn-primary">
+            </form>
 
 
 
+        </div>
     </div>
     {% include 'footer.html' %}
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="../static/vendor/jquery/jquery.min.js"></script>
+    <script src="../static/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
 </body>
 
 </html>

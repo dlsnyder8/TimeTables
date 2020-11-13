@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang='en'>
+
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title> Admin </title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="../static/vendor/bootstrap/css/bootstrap.css" rel="stylesheet">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+</head>
+
+<body class="body">
+    {% include 'header.html' %}
+    <div class=" p-md-3">
+        <div class="col-md-8 order-md-1 mx-auto">
+            <h1 class="display-4 font-weight-normal">Set managers of {{groupname}}</h1>
+            <hr>
+            <form action='' method="post">
+                <table>
+                    {% for user in users %}
+                    <tr>
+                        <td>{{user}}<input type="checkbox" {% if isManager[user] %} checked {% endif %} name={{user}}>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </table>
+                <input type="submit" name="submit" value="Save" class="btn btn-primary">
+            </form>
+        </div>
+
+        <!-- Bootstrap core JavaScript -->
+        <script src="../static/vendor/jquery/jquery.min.js"></script>
+        <script src="../static/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+</body>
+
+</html>

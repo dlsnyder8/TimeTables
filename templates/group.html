@@ -19,47 +19,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 </head>
 
-<body>
+<body class="body">
     {% include 'header.html' %}
-
-    <!-- Page Content -->
+    <div class=" p-md-3 container">
+        <div class="col-md-8 order-md-1 mx-auto">
+            <h1 class="display-4 font-weight-normal">{{groupname}} Group Preferences</h1>
+            <form action="/editGroup">
+                <input class="btn btn-primary" type="submit" value="Edit Preferences" />
+            </form>
+        </div>
+    </div>
     <div class="container">
-
-        <div class="row">
-            <div class="col-lg-12 text-center">
-                <h1>{{groupname}} Preferences</h1>
-                <form action="/editGroup">
-                    <input type="submit" value="Edit Group Preferences" />
-                </form>
+        <div class="col-md-8 order-md-1 mx-auto">
+            <div class="mb-3">
                 <hr>
-                <h2> Notification Preferences</h2><br>
+                <h2> Notification Preferences</h2>
                 <p>Your notification preferences for <strong>{{groupname}}</strong>. <br> </p>
-                <form action='' method="post">
-                    <table style="
-                    margin-left: auto;
-                    margin-right: auto;">
-                        <tr>
-                            <td class="allR">Receive Text Notifications</td>
-                            <td><input type="checkbox" name="preftext" {% if prevphonePref %} checked {% endif %}
-                                    value="on" disabled>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="allR">Receive Email Notifications</td>
-                            <td><input type="checkbox" name="prefemail" {% if prevemailPref %} checked {% endif %}
-                                    value="on" disabled>
-                            </td>
-                        </tr>
-                    </table>
-                    <hr>
-                    <h2> Weekly Preferences</h2><br>
-                    <p>Your weekly preferences for <strong>{{groupname}}</strong>. <br>
-                        Resets to your global preferences every Sunday after a new
-                        schedule is released. <br>
-                        (Your weekly preferences for each group are independent of each other).<br>
-                    </p>
-                    {% include 'scheduleElement.html' %}
-                </form>
+                <table>
+                    <tr>
+                        <td>Receive Email Notifications</td>
+                        <td><input type="checkbox" name="prefemail" {% if prevemailPref %} checked {% endif %}
+                                value="on" disabled>
+                        </td>
+                    </tr>
+                </table>
+                <hr>
+                <h2> Weekly Preferences</h2>
+                <p>Your weekly preferences for <strong>{{groupname}}</strong>. <br>
+                    Resets to your global preferences every Sunday after a new
+                    schedule is released. <br>
+                    (Your weekly preferences for each group are independent of each other).<br>
+                </p>
+                {% include 'scheduleElement.html' %}
 
                 <hr>
 

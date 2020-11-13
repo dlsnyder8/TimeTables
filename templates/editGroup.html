@@ -19,55 +19,50 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 </head>
 
-<body>
+<body class="bg-light body">
     {% include 'header.html' %}
 
     <!-- Page Content -->
+    <div class=" p-md-3 container">
+        <div class="col-md-8 order-md-1 mx-auto">
+            <h1 class="display-4 font-weight-normal">Edit {{groupname}} Group Preferences</h1>
+            <hr>
+        </div>
+    </div>
     <div class="container">
 
-        <div class="row">
-            <div class="col-lg-12 text-center">
-                <h1>{{groupname}} Preferences</h1>
+        <div class="col-md-8 order-md-1 mx-auto">
+            <h4 class="mb-3"> Edit Notification Preferences</h4>
+            <p>Your notification preferences for <strong>{{groupname}}</strong>. <br> </p>
+            <form action='' method="post">
+                <table>
+                    <tr>
+                        <td>Receive Email Notifications</td>
+                        <td><input type="checkbox" name="prefemail" {% if prevemailPref %} checked {% endif %}
+                                value="on">
+                        </td>
+                    </tr>
+                </table>
                 <hr>
-                <h2> Edit Notification Preferences</h2><br>
-                <p>Your notification preferences for <strong>{{groupname}}</strong>. <br> </p>
-                <form action='' method="post">
-                    <table style="
-                    margin-left: auto;
-                    margin-right: auto;">
-                        <tr>
-                            <td class="allR">Receive Text Notifications</td>
-                            <td><input type="checkbox" name="preftext" {% if prevphonePref %} checked {% endif %}
-                                    value="on">
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="allR">Receive Email Notifications</td>
-                            <td><input type="checkbox" name="prefemail" {% if prevemailPref %} checked {% endif %}
-                                    value="on">
-                            </td>
-                        </tr>
-                    </table>
-                    <hr>
-                    <h2> Edit Weekly Preferences</h2><br>
-                    <p>Your weekly preferences for <strong>{{groupname}}</strong>. <br>
-                        Resets to your global preferences every Sunday after a new
-                        schedule is released.<br>
-                        (Your weekly preferences for each group are independent of each other.)<br>
-                    </p>
-                    {% include 'scheduleElement.html' %}
-                    <input type="submit" value="Save">
-                </form>
+                <h4 class="mb-3">Edit Weekly Preferences</h4>
+                <p>Your weekly preferences for <strong>{{groupname}}</strong>. <br>
+                    Resets to your global preferences every Sunday after a new
+                    schedule is released.<br>
+                    (Your weekly preferences for each group are independent of each other.)<br>
+                </p>
+                {% include 'scheduleElement.html' %}
+                <div class="mx-auto text-center"> <input type="submit" value="Save" class="btn btn-primary"></div>
+            </form>
 
-                <hr>
+            <hr>
 
-            </div>
         </div>
-        {% include 'footer.html' %}
+    </div>
+    {% include 'footer.html' %}
 
-        <!-- Bootstrap core JavaScript -->
-        <script src="../static/vendor/jquery/jquery.min.js"></script>
-        <script src="../static/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <!-- Bootstrap core JavaScript -->
+    <script src="../static/vendor/jquery/jquery.min.js"></script>
+    <script src="../static/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 
 </body>
 
