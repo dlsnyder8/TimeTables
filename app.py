@@ -844,18 +844,13 @@ def editProfile():
 
             update_profile_info(fname, lname, username, email, create_preferences(prevGlobalPreferences))
 
-            html = render_template('editProfile.html', prevfname=fname, prevlname=lname, \
-                prevemail=email, schedule=prevGlobalPreferences, inGroup=inGroup, isMgr=isMgr, isOwner=isOwner,editable=True)
+
         if request.form["submit"] == "Save Preferences":
             globalPreferences = parseSchedule()
            
             update_profile_info(prevfirstName, prevlastName, username, prevemail, create_preferences(globalPreferences))
 
-            html = render_template('editProfile.html', prevfname=prevfirstName, prevlname=prevlastName, \
-                prevemail=prevemail, schedule=globalPreferences, inGroup=inGroup, isMgr=isMgr, isOwner=isOwner,editable=True)
-        
-        response = make_response(html)
-        return response
+        return redirect(url_for('profile'))
 
 if __name__ == '__main__':
     app.run()
