@@ -14,7 +14,7 @@ import urllib.parse as urlparse
 #-------------------
 # CAS Authentication cannot be run locally unfortunately
 # Set this variable to False if local, and change to True before pushing
-PROD_ENV = False
+PROD_ENV = True
 
 
 #----------
@@ -22,7 +22,7 @@ PROD_ENV = False
 
 app = Flask(__name__)
 app.secret_key = b'\x06)\x8e\xa3BW"\x9d\xcd\x1d5)\xd6\xd1b1'
-"""app.config.update(dict(
+app.config.update(dict(
     DEBUG = True,
     MAIL_SERVER = 'smtp.gmail.com',
     MAIL_PORT = 587,
@@ -31,7 +31,7 @@ app.secret_key = b'\x06)\x8e\xa3BW"\x9d\xcd\x1d5)\xd6\xd1b1'
     MAIL_USERNAME = os.environ['MAIL_USERNAME'],
     MAIL_PASSWORD = os.environ['MAIL_PW'],
 ))
-mail = Mail(app)"""
+mail = Mail(app)
 
 
 def filter_shifts(netid,shifts):
@@ -58,9 +58,14 @@ def email_group(groupid, groupName):
             mem_info = get_profile_info(netid) # get profile info
             sched = filter_shifts(netid,shifts) # get their weekly schedule
             # sched = shifts_to_us_time(shift)
-            print("Before dump:",sched)
-            sched = json.dumps(sched)
-            print("After dump:",sched)
+            
+            output = formatDisplaySched(sched)
+            
+            html = "<strong>This week's shifts are:</strong><br>"
+            
+            for (key, value) in output.items():
+                print(key)
+                html += key + "<br>"
             # html = "<strong>This week's shifts are:</strong><br>"
             #for i in sched:
             #   html += '<strong>Day: </strong>' + shifts[i][0] + '<strong>Start: </strong>' + \
@@ -71,9 +76,10 @@ def email_group(groupid, groupName):
             
 
             msg = Message(subject=subject, 
-                          body=sched,   
+                          html=html,   
                           recipients=[mem_info.email],
                           sender='sdylan852@gmail.com')
+                        
             conn.send(msg)
     print("Group %s has been emailed" %groupName)
     return
@@ -242,7 +248,7 @@ def getDifferences(newlist, oldlist):
 @app.route('/index', methods=['GET','POST'])
 def index():
     username = get_username()
-    email_group(82, "Test Email Group")
+    
     if not (user_exists(username)):
         return redirect(url_for('createProfile'))
 
