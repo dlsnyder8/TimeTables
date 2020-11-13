@@ -16,21 +16,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 </head>
 
-<body>
+<body class="body">
     {% include 'header.html' %}
     <div class="container">
         <form action='' method="post">
             <h1>Set managers of {{groupname}}</h1>
             <table>
                 {% for user in users %}
-                    <tr>
-                        <td>{{user}}<input type="checkbox" {% if isManager[user] %} checked {% endif %} name={{user}}></td>
-                    </tr>
+                <tr>
+                    <td>{{user}}<input type="checkbox" {% if isManager[user] %} checked {% endif %} name={{user}}></td>
+                </tr>
                 {% endfor %}
             </table>
             <input type="submit" name="submit" value="Save">
         </form>
     </div>
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="../static/vendor/jquery/jquery.min.js"></script>
+    <script src="../static/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
 </body>
 
 </html>

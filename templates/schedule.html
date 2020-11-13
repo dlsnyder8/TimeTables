@@ -18,7 +18,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 </head>
 
-<body>
+<body class="body">
     {% include 'header.html' %}
 
     <!-- Page Content -->
@@ -27,17 +27,20 @@
         <div class="row">
             <div class="col-lg-12 text-center">
                 <br>
-                <h1>{{groupname}} Schedule</h1><br>
+                <h1>Your Schedule for {{groupname}}</h1><br>
                 <p>Your shifts are assigned based on your weekly availability in your weekly preferences page. <br>
-                    If you don't input any weekly prefences, they will default to the global preferences in your profile.<br>
+                    If you don't input any weekly prefences, they will default to the global preferences in your
+                    profile.<br>
                     To be scheduled, you must be available for the entirety of a shift.<br>
                     <br>
                     {% if shifts|length != 0: %}
+                    <hr class="mb-3 order-md-1 mx-auto">
+
                     <strong>This week's shifts are:</strong>
                     <br>
                     {% for i in shifts %}
-                        <strong>Day: </strong>{{shifts[i][0]}} <strong>Start: </strong>{{shifts[i][1]}}
-                            <strong>End: </strong>{{shifts[i][2]}} <br>
+                    <strong>Day: </strong>{{shifts[i][0]}} <strong>Start: </strong>{{shifts[i][1]}}
+                    <strong>End: </strong>{{shifts[i][2]}} <br>
                     {%endfor%}
                     </ul>
                     {% else  %}
@@ -48,9 +51,11 @@
             </div>
         </div>
         {% if schedule is not none %}
-        <div class="row">
-            <div class="col-lg-12 text-center">
-                <strong>Here is your schedule for the week:</strong>
+        <div class="col-md-8 order-md-1 mx-auto">
+            <div class="mb-3">
+                <hr>
+                <div class="text-center">
+                    <strong>Here is your schedule for the week:</strong></div>
                 <br>
                 {% include 'scheduleElement.html' %}
             </div>
@@ -60,11 +65,11 @@
             <div class="col-lg-12 text-center">
                 <p>This week's schedule has not been generated yet.</p>
                 <hr>
-                    You still have time to input your weekly preferences:
-                    <br>
-                    <form action="/editGroup">
-                        <input type="submit" value="Weekly Preferences">
-                    </form>
+                You still have time to input your weekly preferences:
+                <br>
+                <form action="/editGroup">
+                    <input type="submit" value="Weekly Preferences">
+                </form>
             </div>
         </div>
         {% endif %}

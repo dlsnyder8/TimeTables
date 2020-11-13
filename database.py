@@ -47,7 +47,7 @@ change_group_schedule(groupid, schedule)
 ----------------------------------------------
 
 ------------GROUP MEMBER FUNCTIONS------------
-change_group_notifications(groupid, netid, emailnotif = False, textnotif = False):
+change_group_notifications(groupid, netid, emailnotif = False):
 
 get_group_notifications(netid, groupid)
 get_user_schedule(netid,groupid)
@@ -334,9 +334,9 @@ def change_group_schedule(groupid, schedule):
 # add a user (netid) to group (groupid), 
 # preferences is optional argument, but could default to global if None???
 # valid options for 'role' are: 'manager', 'owner', 'member'
-def add_user_to_group(groupid, netid, role, email=False,text=False,preferences = None,usersched = None):
+def add_user_to_group(groupid, netid, role, email=False,preferences = None,usersched = None):
     try:
-        session.add(Group_members(netid=netid,groupid=groupid,role=role,emailnotif=email,textnotif=text,grouppreferences=preferences,userschedule = usersched))
+        session.add(Group_members(netid=netid,groupid=groupid,role=role,emailnotif=email,textnotif=False,grouppreferences=preferences,userschedule = usersched))
         session.commit()
     except:
         session.rollback()
@@ -361,13 +361,13 @@ def change_group_role(groupid, netid, role):
 
 # change the notifications of a person in a group
 # email and text should always be specified when calling this function
-def change_group_notifications(groupid, netid, emailnotif = False, textnotif = False):
+def change_group_notifications(groupid, netid, emailnotif = False):
     userid = get_user_id(groupid,netid)
     if userid == -1:
         print('failed to change group notifications',file=stderr)
         return -1
     try:
-        session.query(Group_members).filter_by(inc=userid).update({Group_members.emailnotif: emailnotif, Group_members.textnotif:textnotif})
+        session.query(Group_members).filter_by(inc=userid).update({Group_members.emailnotif: emailnotif})
         session.commit()
     except:
         session.rollback()
@@ -388,7 +388,7 @@ def get_profile_info(netid):
 def get_group_notifications(netid, groupid):
     try:
         userid = get_user_id(groupid, netid)
-        notifPrefs = session.query(Group_members.emailnotif, Group_members.textnotif).filter_by(inc=userid).first()
+        notifPrefs = session.query(Group_members.emailnotif).filter_by(inc=userid).first()
         return notifPrefs
     except:
         print('Failed to get group notifications',file=stderr)
@@ -422,10 +422,10 @@ def update_user_schedule(netid,groupid, schedule = None):
 
 # updates profile info
 # (name, email, phone)
-def update_profile_info(firstName, lastName, netid, email=None, phone=None, preferences=None, createGroup = True):
+def update_profile_info(firstName, lastName, netid, email=None, preferences=None, createGroup = True):
     try:
         session.query(Users).filter_by(netid=netid).update({Users.firstname : firstName, Users.lastname: lastName, 
-                            Users.email: email, Users.phone: phone,Users.can_create_group: createGroup, Users.globalpreferences: preferences})
+                            Users.email: email, Users.phone: None, Users.can_create_group: createGroup, Users.globalpreferences: preferences})
         session.commit()
     except:
         session.rollback()
@@ -517,5 +517,5 @@ if __name__=="__main__":
     #print(get_user_groups('batyas'))
     #change_group_schedule(52, {"6_5_2":["batyas","bates", "kevin"], "0_2_3":["hi1"],"1_4_5":["hi2"],"1_0_1":["hi3","b"]})
     #print(parse_user_schedule("batyas", get_group_schedule(52)))
-    
+    print(get_group_shifts(81))
     

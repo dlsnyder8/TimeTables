@@ -17,38 +17,41 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 </head>
 
-<body>
+<body class="body">
     {% include 'header.html' %}
 
     <!-- Page Content -->
+    <div class=" p-md-3 container">
+        <div class="col-md-8 order-md-1 mx-auto">
+            <h1 class="display-4 font-weight-normal">Profile</h1>
+            <form action="/editProfile">
+                <input class="btn btn-primary" type="submit" value="Edit Profile" />
+            </form>
+        </div>
+    </div>
     <div class="container">
-
-        <div class="row">
-            <div class="col-lg-12 text-center">
-                <h1>Profile</h1>
-                <form action="/editProfile">
-                    <input type="submit" value="Edit Profile" />
-                </form>
-                <hr>
-                Hi <strong>{{firstName}} {{lastName}}!</strong>
-                <br>
-                <br>
-                <strong>Netid:</strong> {{netid}}
-                <br>
-                <strong>Email:</strong> {{email}}
-                <br>
-                <strong>Phone number:</strong> {{phoneNum}}
-                <hr>
-                <h2>Global Schedule Preferences</h2>
-                Global preferences are your default availability times for the semester
-                (times you're free to work every week).
-                If you have a one-off change in availability, like a doctors appointment,
-                you can change your weekly availability by group in the group preferences page,
-                and it will not affect your global preferences.
-                <br>
-                <br>
-                {% include 'scheduleElement.html' %}
-                <hr>
+        <div class="col-md-8 order-md-1 mx-auto">
+            <div class="p">
+                <div class="mb-3">
+                    <hr>
+                    Hi <strong>{{firstName}} {{lastName}}!</strong>
+                    </br>
+                    </br>
+                    <strong>Netid:</strong> {{netid}}
+                    </br>
+                    <strong>Email:</strong> {{email}}
+                    <hr>
+                    <h4 class="mb-3">Global Schedule Preferences</h4>
+                    Global preferences are your default availability times for the semester
+                    (times you're free to work every week).
+                    If you have a one-off change in availability, like a doctors appointment,
+                    you can change your weekly availability by group in the group preferences page,
+                    and it will not affect your global preferences.
+                    </br>
+                    </br>
+                    {% include 'scheduleElement.html' %}
+                    <hr>
+                </div>
             </div>
         </div>
         {% include 'footer.html' %}

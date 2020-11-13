@@ -17,41 +17,33 @@
 
 </head>
 
-<body>
+<body class="body">
 
     {% include 'header.html' %}
 
     <!-- Page Content -->
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-12 text-center">
-                <h1 class="mt-5">Welcome to TimeTables!</h1>
-                <ul class="list-unstyled">
-                </ul>
-                <hr>
-
-                {% if numGroups > 0 %}
-                <h3>Choose your group:</h3>
-                </br>The schedule and weekly preferences will display your information for this group.
-                </br>
-                You can come back here and switch groups at any time.
-                </br>
-                </br>
-                <form action="" method="post">
-                    {% for g in groups %}
-                    <input type="radio" disabled name="groupname" value="{{g}}" {% if groupname == g %} checked
-                        {% endif %}>
-                    <input type="submit" name="groupname" value="{{g}}"> <br>
-                    {% endfor %}
-                </form>
-                <hr>
-                {% endif %}
-                Create New Group:
-                <form action="/createGroup">
-                    <input type="submit" value="Create Group">
-                </form>
-            </div>
+    <div class="jumbotron">
+        <div class="container">
+            <h1 class="display-3">Welcome to TimeTables!</h1>
         </div>
+    </div>
+
+    <div class="container">
+        {% if numGroups > 0 %}
+        <h2>Choose your group</h2>
+        <p>The schedule and weekly preferences will display your information for this group.
+            </br>
+            You can come back here and switch groups at any time.</p>
+        <form action="" method="post">
+            {% for g in groups %}
+            <input type="radio" disabled name="groupname" value="{{g}}" {% if groupname == g %} checked {% endif %}>
+            <input style="margin-bottom: 4px;" class="btn btn-primary btn-sm" type="submit" name="groupname"
+                value="{{g}}">
+            <br>
+            {% endfor %}
+        </form>
+        <hr>
+        {% endif %}
     </div>
 
     <!-- Bootstrap core JavaScript -->

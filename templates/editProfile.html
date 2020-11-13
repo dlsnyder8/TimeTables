@@ -15,64 +15,55 @@ global preferences and phone number-->
     <link href="../static/vendor/bootstrap/css/bootstrap.css" rel="stylesheet">
 
 </head>
-<style>
-    .allR {
-        text-align: right;
-    }
 
-    .allC {
-        text-align: center;
-    }
-</style>
-
-<body>
+<body class="bg-light body">
     {% include 'header.html' %}
 
     <!-- Page Content -->
+    <div class=" p-md-3 container">
+        <div class="col-md-8 order-md-1 mx-auto">
+            <h1 class="display-4 font-weight-normal">Edit Profile</h1>
+            <hr>
+        </div>
+    </div>
     <div class="container">
+        <div class="col-md-8 order-md-1 mx-auto">
+            <form action='' method="post">
+                <h4 class="mb-3">User Information</h4>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="firstName">First name</label>
+                        <input type="text" class="form-control" id="firstName" name="fname" required
+                            value={{prevfname}}> </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="lastName">Last name</label>
+                        <input type="text" class="form-control" id="lastName" name="lname" required value={{prevlname}}>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="email">Email <span class="text-muted">(Optional)</span></label>
+                    <input type="email" class="form-control" id="email" multiple name="email" {% if prevemail: %}
+                        value={{prevemail}} {% else %} value="" {% endif %}>
+                </div>
 
-        <div class="row">
-            <div class="col-lg-12 text-center">
-                <h1>Edit Profile</h1>
-                <hr>
-                <h2>Edit Information</h2>
-                <hr>
-                <form action='' method="post">
-                    <table style="
-                      margin-left: auto;
-                      margin-right: auto;">
-                        <tr>
-                            <td class="allR">Employee First Name</td>
-                            <td><input type="text" name="fname" required value={{prevfname}}></td>
-                        </tr>
-                        <tr>
-                            <td class="allR">Employee Last Name</td>
-                            <td><input type="text" name="lname" required value={{prevlname}}></td>
-                        </tr>
-                        <tr>
-                            <td class="allR">Employee Email</td>
-                            <td><input type="email" multiple name="email" {% if prevemail: %} value={{prevemail}}
-                                    {% else %} value="" {% endif %}></td>
-                        </tr>
-                        <tr>
-                            <td class="allR">Employee Phone Number</td>
-                            <td><input type="tel" name="pnumber" {% if prevemail: %} value={{prevphoneNum}} {% else %}
-                                    value="" {% endif %}></td>
-                        </tr>
-                    </table>
-                    <hr>
-                    <h2>Edit Time Preferences</h2>
-                    <hr>
-                    {% include 'scheduleElement.html' %}
-                    <hr>
-                    <input type="submit" value="Save">
-                </form>
-                <hr>
+                <input type="submit" name="submit" value="Save Information" class="btn btn-primary btn-sm">
+            </form>
+        </div>
+    </div>
 
-            </div>
+    <div class="container">
+        <div class="col-md-8 order-md-1 mx-auto">
+            <form action='' method="post">
+                <hr class="mb-4">
+                <h4 class="mb-3">Global Preferences</h4>
+                {% include 'scheduleElement.html' %}
+                <input type="submit" name="submit" value="Save Preferences" class="btn btn-primary btn-sm">
+                <hr>
+            </form>
         </div>
 
     </div>
+
     {% include 'footer.html' %}
 
     <!-- Bootstrap core JavaScript -->
