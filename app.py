@@ -462,6 +462,7 @@ def manage():
     users = get_all_users()
     users.remove(username)
     groupname, groupid = getCurrGroupnameAndId(request, groups, True)
+    notGroupInTitle = (not groupname.split()[-1].lower() == 'group')
 
     curr_members = get_group_users(groupid)
     isOwner = getIsOwner(username, True, groupid)
@@ -488,7 +489,7 @@ def manage():
     
     if request.method == 'GET':
         shifts = shiftdict_to_us_time(shifts)
-        html = render_template('manage.html', groupname=groupname, inGroup=True, isMgr=isMgr, shifts=shifts, users=users, mgrs=mgrs, selected=selected, currsched=currsched, username=username, isOwner=isOwner)
+        html = render_template('manage.html', groupname=groupname, notgroupintitle=notGroupInTitle, inGroup=True, isMgr=isMgr, shifts=shifts, users=users, mgrs=mgrs, selected=selected, currsched=currsched, username=username, isOwner=isOwner)
         response = make_response(html)
         return response
 
