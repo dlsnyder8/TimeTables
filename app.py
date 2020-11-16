@@ -28,8 +28,8 @@ app.config.update(dict(
     MAIL_PORT = 587,
     MAIL_USE_TLS = True,
     MAIL_USE_SSL = False,
-    MAIL_USERNAME = os.environ['MAIL_USERNAME'],
-    MAIL_PASSWORD = os.environ['MAIL_PW'],
+    #MAIL_USERNAME = os.environ['MAIL_USERNAME'],
+    #MAIL_PASSWORD = os.environ['MAIL_PW'],
 ))
 mail = Mail(app)
 
@@ -304,9 +304,10 @@ def admin():
         curr_members = get_group_users(groupid)
         selected = {}
         isManager = {}
+        isAdmin = {}
         managers = []
         mgrs = {}
-
+        admins = []
         for user in users:
             selected[user] = False
             if user in curr_members:
@@ -318,7 +319,12 @@ def admin():
             if user_role == "manager":
                 isManager[user] = True
                 managers.append(user)
+                isAdmin[user] = False
+            if user_role == "admin":
+                isAdmin[user] = True
+                admins.append(user)
             else:
+                isAdmin[user] = False
                 isManager[user] = False
 
             mgrs[user] = (user_role, (user_role in ['owner', 'manager']))
@@ -340,7 +346,26 @@ def admin():
                 selected[user] = False
                 mgrs[user] = ("notGroup", False)
 
-            html = render_template('admin.html', groups=groups_by_name, groupname=get_group_name(groupid), users=users, selected=selected, mgrs=mgrs, members=selectedUsers, isManager=isManager)
+            html = render_template('admin.html', groups=groups_by_name, groupname=get_group_name(groupid), users=users, selected=selected, mgrs=mgrs, members=selectedUsers, isManager=isManager, admins = admins)
+            response = make_response(html)
+            return response
+        elif output == "Change Roles":
+            selectedAdmins = []
+            for member in curr_members:
+                if request.form.get(member) is not None:
+                    selectedAdmins.append(member)
+
+            newAdmins, oldAdmins = getDifferences(selectedAdmins, admins)
+
+            for user in newAdmins:
+                change_group_role(groupid, user, 'admin')
+                isAdmin[user] = True
+            for user in oldAdmins:
+                change_group_role(groupid, user, 'member')
+                isAdmin[user] = False
+
+            html = render_template('admin.html', groups=groups_by_name, groupname=get_group_name(groupid), users=users,
+                                   selected=selected, mgrs=mgrs, members=curr_members, isManager=isManager, isAdmin= isAdmin, admins = admins)
             response = make_response(html)
             return response
         elif output == "Save Managers":
@@ -359,11 +384,12 @@ def admin():
                 isManager[user] = False
 
             html = render_template('admin.html', groups=groups_by_name, groupname=get_group_name(groupid), users=users,
-                                   selected=selected, mgrs=mgrs, members=curr_members, isManager=isManager)
+                selected=selected, mgrs=mgrs, members=curr_members, isManager=isManager, isAdmin= isAdmin, admins = admins)
             response = make_response(html)
             return response
         else:
-            html = render_template('admin.html', groups=groups_by_name, groupname=get_group_name(groupid), users=users, selected=selected, mgrs=mgrs, members=curr_members, isManager=isManager)
+            html = render_template('admin.html', groups=groups_by_name, groupname=get_group_name(groupid), users=users,
+                selected=selected, mgrs=mgrs, members=curr_members, isManager=isManager, isAdmin= isAdmin)
             response = make_response(html)
             response.set_cookie('adminGroup', groupname)
             return response
