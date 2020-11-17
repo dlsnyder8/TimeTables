@@ -360,10 +360,10 @@ def admin():
             newAdmins, oldAdmins = getDifferences(selectedAdmins, admins)
 
             for user in newAdmins:
-                change_admin(user, True)
+                change_admin(user, admin = True)
                 isAdmin[user] = True
             for user in oldAdmins:
-                change_admin(user, False)
+                change_admin(user, admin = False)
                 isAdmin[user] = False
 
             admins = selectedAdmins 
