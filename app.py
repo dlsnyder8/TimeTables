@@ -365,7 +365,6 @@ def admin():
             for user in oldAdmins:
                 change_admin(user, False)
                 isAdmin[user] = False
-            admins = newAdmins
             html = render_template('admin.html', groups=groups_by_name, groupname=get_group_name(groupid), users=users,
                                    selected=selected, mgrs=mgrs, members=curr_members, isManager=isManager, isAdmin= isAdmin, admins = admins)
             response = make_response(html)
