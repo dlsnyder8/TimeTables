@@ -291,9 +291,18 @@ def admin():
     groups = get_all_groups()
     groups_by_name = [g[1] for g in groups]
     users = get_all_users()
+    admins = []
+    isAdmin = {}
+    for user in users:
+        if is_admin(user):
+            isAdmin[user] = True
+            admins.append(user)
+        else:
+            isAdmin[user] = False
 
+    # gets admins
     if request.method == "GET":
-        html = render_template('admin.html', groups=groups_by_name)
+        html = render_template('admin.html', groups=groups_by_name, admins = admins)
         response = make_response(html)
         return response
     else:
@@ -304,10 +313,8 @@ def admin():
         curr_members = get_group_users(groupid)
         selected = {}
         isManager = {}
-        isAdmin = {}
         managers = []
         mgrs = {}
-        admins = []
         for user in users:
             selected[user] = False
             if user in curr_members:
@@ -319,12 +326,7 @@ def admin():
             if user_role == "manager":
                 isManager[user] = True
                 managers.append(user)
-                isAdmin[user] = False
-            if user_role == "admin":
-                isAdmin[user] = True
-                admins.append(user)
             else:
-                isAdmin[user] = False
                 isManager[user] = False
 
             mgrs[user] = (user_role, (user_role in ['owner', 'manager']))
@@ -346,24 +348,24 @@ def admin():
                 selected[user] = False
                 mgrs[user] = ("notGroup", False)
 
-            html = render_template('admin.html', groups=groups_by_name, groupname=get_group_name(groupid), users=users, selected=selected, mgrs=mgrs, members=selectedUsers, isManager=isManager, admins = admins)
+            html = render_template('admin.html', groups=groups_by_name, groupname=get_group_name(groupid), users=users, isAdmin= isAdmin, selected=selected, mgrs=mgrs, members=selectedUsers, isManager=isManager, admins = admins)
             response = make_response(html)
             return response
-        elif output == "Change Roles":
+        elif output == "Change Admins":
             selectedAdmins = []
-            for member in curr_members:
-                if request.form.get(member) is not None:
-                    selectedAdmins.append(member)
+            for user in users:
+                if request.form.get(user) is not None:
+                    selectedAdmins.append(user)
 
             newAdmins, oldAdmins = getDifferences(selectedAdmins, admins)
 
             for user in newAdmins:
-                change_group_role(groupid, user, 'admin')
+                change_admin(user, True)
                 isAdmin[user] = True
             for user in oldAdmins:
-                change_group_role(groupid, user, 'member')
+                change_admin(user, False)
                 isAdmin[user] = False
-
+            admins = newAdmins
             html = render_template('admin.html', groups=groups_by_name, groupname=get_group_name(groupid), users=users,
                                    selected=selected, mgrs=mgrs, members=curr_members, isManager=isManager, isAdmin= isAdmin, admins = admins)
             response = make_response(html)
@@ -389,7 +391,7 @@ def admin():
             return response
         else:
             html = render_template('admin.html', groups=groups_by_name, groupname=get_group_name(groupid), users=users,
-                selected=selected, mgrs=mgrs, members=curr_members, isManager=isManager, isAdmin= isAdmin)
+                selected=selected, mgrs=mgrs, members=curr_members, isManager=isManager, isAdmin= isAdmin, admins = admins)
             response = make_response(html)
             response.set_cookie('adminGroup', groupname)
             return response
