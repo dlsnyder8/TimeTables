@@ -358,12 +358,12 @@ def admin():
                     selectedAdmins.append(user)
 
             newAdmins, oldAdmins = getDifferences(selectedAdmins, admins)
-
             for user in newAdmins:
-                change_admin(user, admin = True)
+                change_admin(user, True)
                 isAdmin[user] = True
+                print("hit" + user)
             for user in oldAdmins:
-                change_admin(user, admin = False)
+                change_admin(user, False)
                 isAdmin[user] = False
 
             admins = selectedAdmins 
