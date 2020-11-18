@@ -147,7 +147,7 @@ def change_admin(netid,admin = False):
 
 def is_admin(netid):
     try:
-        return session.query(Users.is_admin).filter_by(netid=netid).first()
+        return session.query(Users.is_admin).filter_by(netid=netid).first()[0]
     except:
         print("Failed to determine if user is admin")
         session.rollback()
