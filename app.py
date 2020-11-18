@@ -245,7 +245,7 @@ def index():
     
     if not (user_exists(username)):
         return redirect(url_for('createProfile'))
-
+    isAd = is_admin(username)
     groups = get_user_groups(username)
     numGroups = len(groups)
     inGroup = (numGroups != 0)
@@ -263,7 +263,7 @@ def index():
 
 
     if request.method == 'GET':
-        html = render_template('index.html', groups=groups_by_name, groupname=groupname, numGroups=numGroups, inGroup=inGroup, isMgr=isMgr, isOwner=isOwner)
+        html = render_template('index.html', groups=groups_by_name, groupname=groupname, numGroups=numGroups, inGroup=inGroup, isMgr=isMgr, isOwner=isOwner, isAdmin = isAd)
         response = make_response(html)
         return response
 
@@ -273,7 +273,7 @@ def index():
         isMgr = (get_user_role(username, groupid) in ["manager", "owner"])
         isOwner = (get_user_role(username, groupid) == 'owner')
 
-        html = render_template('index.html',groups=groups_by_name, groupname=groupname, numGroups=numGroups, inGroup=inGroup, isMgr=isMgr, isOwner=isOwner)
+        html = render_template('index.html',groups=groups_by_name, groupname=groupname, numGroups=numGroups, inGroup=inGroup, isMgr=isMgr, isOwner=isOwner, isAdmin = isAd)
         response = make_response(html)
         response.set_cookie('groupname', groupname)
         response.set_cookie('groupid', str(groupid))
@@ -287,6 +287,7 @@ def admin():
     if not (user_exists(username)):
         return redirect(url_for('createProfile'))
 
+    isAd = is_admin(username)
     # needs to be all groups, not just included ones
     groups = get_all_groups()
     groups_by_name = [g[1] for g in groups]
@@ -405,6 +406,7 @@ def owner():
     if not (user_exists(username)):
         return redirect(url_for('createProfile'))
 
+    isAd = is_admin(username)
     groups = get_user_groups(username)
     inGroup = (len(groups) != 0)
     groupname, groupid = getCurrGroupnameAndId(request, groups, inGroup)
@@ -424,7 +426,7 @@ def owner():
             isManager[user] = False
 
     if request.method == "GET":
-        html = render_template('owner.html', inGroup=inGroup, users=users, isManager=isManager, groupname=groupname, isMgr=True, isOwner=True)
+        html = render_template('owner.html', inGroup=inGroup, users=users, isManager=isManager, groupname=groupname, isMgr=True, isOwner=True, isAdmin = isAd)
         response = make_response(html)
         return response
     else:
@@ -442,7 +444,7 @@ def owner():
             change_group_role(groupid, user, 'member')
             isManager[user] = False
 
-        html = render_template('owner.html', inGroup=inGroup, users=users, isManager=isManager, groupname=groupname, isMgr=True, isOwner=True)
+        html = render_template('owner.html', inGroup=inGroup, users=users, isManager=isManager, groupname=groupname, isMgr=True, isOwner=True, isAdmin = isAd)
         response = make_response(html)
         return response
 
@@ -454,6 +456,7 @@ def profile():
     if not (user_exists(username)):
         return redirect(url_for('createProfile'))
 
+    isAd = is_admin(username)
     userInfo = get_profile_info(username)
     inGroup = in_group(username)
     isMgr = getIsMgr(username, inGroup, request)
@@ -466,7 +469,7 @@ def profile():
         pass
 
     html = render_template('profile.html', firstName=userInfo.firstname, lastName=userInfo.lastname, netid=username, email=userInfo.email, 
-        schedule=globalPreferences, inGroup=inGroup, isMgr=isMgr, isOwner=isOwner, editable=False)
+        schedule=globalPreferences, inGroup=inGroup, isMgr=isMgr, isOwner=isOwner, editable=False, isAdmin = isAd)
 
     response = make_response(html)
 
@@ -479,6 +482,7 @@ def manage():
     if not (user_exists(username)):
         return redirect(url_for('createProfile'))
 
+    isAd = is_admin(username)
     groups = get_user_groups(username)
 
     if len(groups) == 0:
@@ -518,7 +522,8 @@ def manage():
     
     if request.method == 'GET':
         shifts = shiftdict_to_us_time(shifts)
-        html = render_template('manage.html', groupname=groupname, notgroupintitle=notGroupInTitle, inGroup=True, isMgr=isMgr, shifts=shifts, users=users, mgrs=mgrs, selected=selected, currsched=currsched, username=username, isOwner=isOwner)
+        html = render_template('manage.html', groupname=groupname, notgroupintitle=notGroupInTitle, inGroup=True, isMgr=isMgr, 
+            shifts=shifts, users=users, mgrs=mgrs, selected=selected, currsched=currsched, username=username, isOwner=isOwner, isAdmin = isAd)
         response = make_response(html)
         return response
 
@@ -600,7 +605,8 @@ def manage():
             del shifts[shiftid]
             change_group_shifts(groupid, shifts)
         shifts = shiftdict_to_us_time(shifts)
-        html = render_template('manage.html', groupname=groupname, inGroup=True, isMgr=isMgr, shifts=shifts, users=users, mgrs=mgrs, selected=selected, currsched=currsched, schednotif=schednotif, isOwner=isOwner, username=username)
+        html = render_template('manage.html', groupname=groupname, inGroup=True, isMgr=isMgr, shifts=shifts, users=users, mgrs=mgrs, selected=selected,
+         currsched=currsched, schednotif=schednotif, isOwner=isOwner, username=username, isAdmin = isAd)
         response = make_response(html)
         return response
 
@@ -611,6 +617,7 @@ def schedule():
     if not (user_exists(username)):
         return redirect(url_for('createProfile'))
     
+    isAd = is_admin(username)
     groups = get_user_groups(username)
 
     if len(groups) == 0:
@@ -634,7 +641,7 @@ def schedule():
        
 
     html = render_template('schedule.html', schedule=schedule , groupname=groupname, inGroup=True, isMgr=isMgr, editable=False,
-        shifts=shifts, isOwner=isOwner)
+        shifts=shifts, isOwner=isOwner, isAdmin = isAd)
     response = make_response(html)
 
     return response
@@ -646,6 +653,7 @@ def group():
     if not (user_exists(username)):
         return redirect(url_for('createProfile'))
 
+    isAd = is_admin(username)
     groups = get_user_groups(username)
 
     if len(groups) == 0:
@@ -672,7 +680,7 @@ def group():
         prevemailPref = False
 
     html = render_template('group.html', schedule=weeklyPref, groupname=groupname, prevemailPref=prevemailPref, 
-        inGroup=True, isMgr=isMgr, notgroupintitle=notGroupInTitle, isOwner=isOwner, editable=False)
+        inGroup=True, isMgr=isMgr, notgroupintitle=notGroupInTitle, isOwner=isOwner, editable=False, isAdmin = isAd)
     response = make_response(html)
     return response
 
@@ -683,6 +691,7 @@ def editGroup():
     if not (user_exists(username)):
         return redirect(url_for('createProfile'))
 
+    isAd = is_admin(username)
     groups = get_user_groups(username)
 
     if len(groups) == 0:
@@ -705,7 +714,7 @@ def editGroup():
 
     if request.method == 'GET':
         html = render_template('editGroup.html', schedule=weeklyPref, groupname=groupname, prevemailPref=prevemailPref,  
-            inGroup=True, isMgr=isMgr, isOwner=isOwner, notgroupintitle=notGroupInTitle, editable=True)
+            inGroup=True, isMgr=isMgr, isOwner=isOwner, notgroupintitle=notGroupInTitle, editable=True, isAdmin = isAd)
         response = make_response(html)
         return response
     else:
@@ -737,6 +746,7 @@ def populateUsers():
 def cleanGroups():
     username = get_username()
 
+    isAd = is_admin(username)
     groups = get_user_groups(username)
     if len(groups) == 0:
         return redirect(url_for('index'))
@@ -751,6 +761,7 @@ def cleanGroups():
 def viewGroup():
     username = get_username()
     inGroup = in_group(username)
+    isAd = is_admin(username)
     if not inGroup:
         return redirect(url_for('index'))
     groups = get_user_groups(username)
@@ -762,7 +773,7 @@ def viewGroup():
 
     members = get_group_users(groupId)
     members_w_roles = [(member, get_user_role(member, groupId)) for member in members]        
-    html = render_template('viewGroup.html', gName=gName, notgroupintitle=notGroupInTitle, members=members_w_roles, inGroup=True, isMgr=isMgr, isOwner=isOwner)
+    html = render_template('viewGroup.html', gName=gName, notgroupintitle=notGroupInTitle, members=members_w_roles, inGroup=True, isMgr=isMgr, isOwner=isOwner, isAdmin = isAd)
     response = make_response(html)
 
     return response
@@ -772,6 +783,7 @@ def viewGroup():
 def createGroup():
     username = get_username()
     
+    isAd = is_admin(username)
     inGroup = in_group(username)
     isMgr = getIsMgr(username, inGroup, request)
     isOwner = getIsOwner(username, inGroup, request=request)
@@ -785,7 +797,7 @@ def createGroup():
 
     if request.method == 'GET':
 
-        html = render_template('createGroup.html', names=names, inGroup=inGroup, isMgr=isMgr, isOwner=isOwner)
+        html = render_template('createGroup.html', names=names, inGroup=inGroup, isMgr=isMgr, isOwner=isOwner, isAdmin = isAd)
         response = make_response(html)
         return response
 
@@ -823,7 +835,7 @@ def createProfile():
     if request.method == 'GET':
         if (user_exists(username)):
             return redirect(url_for('profile'))
-        html = render_template('createProfile.html', schedule=blankSchedule(), inGroup=False, isMgr=False, isOwner=False, editable=True)
+        html = render_template('createProfile.html', schedule=blankSchedule(), inGroup=False, isMgr=False, isOwner=False, editable=True, isAdmin = False)
         response = make_response(html)
         return response
 
@@ -851,6 +863,7 @@ def createProfile():
 def editProfile():
     username = get_username()
 
+    isAd = is_admin(username)
     inGroup = in_group(username)
     isMgr = getIsMgr(username, inGroup, request)
     isOwner = getIsOwner(username, inGroup, request=request)
@@ -867,7 +880,7 @@ def editProfile():
 
     if request.method == 'GET':
         html = render_template('editProfile.html', prevfname=prevfirstName, prevlname=prevlastName, \
-            prevemail=prevemail, schedule=prevGlobalPreferences, inGroup=inGroup, isMgr=isMgr, isOwner=isOwner, editable=True)
+            prevemail=prevemail, schedule=prevGlobalPreferences, inGroup=inGroup, isMgr=isMgr, isOwner=isOwner, editable=True, isAdmin = isAd)
         response = make_response(html)
         return response
 
