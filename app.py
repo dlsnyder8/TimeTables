@@ -22,13 +22,13 @@ PROD_ENV = True
 app = Flask(__name__)
 app.secret_key = b'\x06)\x8e\xa3BW"\x9d\xcd\x1d5)\xd6\xd1b1'
 app.config.update(dict(
-    DEBUG = True,
-    MAIL_SERVER = 'smtp.gmail.com',
-    MAIL_PORT = 587,
-    MAIL_USE_TLS = True,
-    MAIL_USE_SSL = False,
-    #MAIL_USERNAME = os.environ['MAIL_USERNAME'],
-    #MAIL_PASSWORD = os.environ['MAIL_PW'],
+    DEBUG=True,
+    MAIL_SERVER='smtp.gmail.com',
+    MAIL_PORT=587,
+    MAIL_USE_TLS=True,
+    MAIL_USE_SSL=False,
+    #MAIL_USERNAME=os.environ['MAIL_USERNAME'],
+    #MAIL_PASSWORD=os.environ['MAIL_PW'],
 ))
 mail = Mail(app)
 
@@ -44,11 +44,12 @@ def filter_shifts(netid,shifts):
     print("dict:\n",newdict)
     return newdict
 
+
 # This function will email every member in a group with their schedule for the next week.
 # It will assume that the schedule in groupmembers.userschedule is the one to use
 def email_group(groupid, groupName):
-    members = get_group_users(groupid) # get all group members
-    shifts = get_group_schedule(groupid) # group schedule
+    members = get_group_users(groupid)  # get all group members
+    shifts = get_group_schedule(groupid)  # group schedule
     if not shifts:
         shifts = {}
     
@@ -70,8 +71,6 @@ def email_group(groupid, groupName):
                 html += key + "<br>"
             
             subject = "Your weekly schedule for: %s" % groupName
-          
-            
 
             msg = Message(subject=subject, 
                           html=html,   
@@ -81,9 +80,6 @@ def email_group(groupid, groupName):
             conn.send(msg)
     print("Group %s has been emailed" %groupName)
     return
-
-
-
 
 
 # obtains username
@@ -121,7 +117,7 @@ def getIsMgr(username, inGroup, request, groups=None):
         role = get_user_role(username, groupid)
         if role == -1:
             return role
-        return (role in ['manager','owner'])
+        return role in ['manager','owner']
     else:
         return False
 
@@ -136,6 +132,7 @@ def getIsOwner(username, inGroup, groupid=None, request=None, groups=None):
         _, groupid = getCurrGroupnameAndId(request, groups)
     role = get_user_role(username, groupid)
     return role == "owner"
+
 
 # takes a request and returns the schedule values
 def parseSchedule():
@@ -192,6 +189,7 @@ def blankSchedule():
         table_values.append(week)
     return table_values
 
+
 def military_to_us_time(time):
     if int(time.split(':')[0]) == 0:
         time = "12:00 AM"
@@ -201,11 +199,13 @@ def military_to_us_time(time):
         time = str(int(time.split(":")[0]) - 12) + ":00 PM"
     return time
 
+
 def shiftdict_to_us_time(shifts):
     for i in shifts:
         shifts[i][1] = military_to_us_time(shifts[i][1])
         shifts[i][2] = military_to_us_time(shifts[i][2])
     return shifts
+
 
 def shiftkey_to_str(shiftkey, full=False):
     days_to_nums = {'Sunday': 0, 'Monday': 1, 'Tuesday': 2, 'Wednesday': 3, 'Thursday': 4, 'Friday': 5, 'Saturday': 6}
@@ -214,6 +214,7 @@ def shiftkey_to_str(shiftkey, full=False):
     shiftString = "{} {} - {}".format(nums_to_days[int(split[0])],military_to_us_time(split[1]), military_to_us_time(split[2]))
     return shiftString
 
+
 def formatDisplaySched(currsched):
     if currsched: 
         keys = sorted(currsched.keys())
@@ -221,7 +222,8 @@ def formatDisplaySched(currsched):
         for key in keys:
             schedStrings[shiftkey_to_str(key)] = currsched[key]
         currsched = schedStrings
-    else: currsched = {}
+    else:
+        currsched = {}
     return currsched
 
 
@@ -252,17 +254,20 @@ def index():
     numGroups = len(groups)
     inGroup = (numGroups != 0)
     isMgr = getIsMgr(username, inGroup, request, groups)
-    if isMgr == -1: groupname = groupid = None
-    else: groupname, groupid = getCurrGroupnameAndId(request, groups, inGroup)
+    if isMgr == -1:
+        groupname = groupid = None
+    else:
+        groupname, groupid = getCurrGroupnameAndId(request, groups, inGroup)
     isOwner = getIsOwner(username, inGroup, request=request, groups=groups)
     groups_by_name = [g[1] for g in groups]
 
     teststring = "user = " + username
-    if isMgr: teststring += "is manager "
-    else: teststring += "is not manager "
-    #teststring += "of group " + groupname
+    if isMgr:
+        teststring += "is manager "
+    else:
+        teststring += "is not manager "
+    # teststring += "of group " + groupname
     print(teststring)
-
 
     if request.method == 'GET':
         html = render_template('index.html', groups=groups_by_name, groupname=groupname, numGroups=numGroups, inGroup=inGroup, isMgr=isMgr, isOwner=isOwner, isAdmin = isAd)
@@ -305,7 +310,8 @@ def admin():
 
     # gets admins
     if request.method == "GET":
-        html = render_template('admin.html', groups=groups_by_name, admins = admins)
+        html = render_template('admin.html', groups=groups_by_name, admins=admins, isAdmin=isAdmin, users=users)
+        print("hi")
         response = make_response(html)
         return response
     else:
@@ -351,8 +357,8 @@ def admin():
                 selected[user] = False
                 mgrs[user] = ("notGroup", False)
 
-            html = render_template('admin.html', groups=groups_by_name, groupname=get_group_name(groupid), users=users, isAdmin= isAdmin, 
-                selected=selected, mgrs=mgrs, members=selectedUsers, isManager=isManager, admins = admins, username = username)
+            html = render_template('admin.html', groups=groups_by_name, groupname=get_group_name(groupid), users=users, isAdmin=isAdmin,
+                selected=selected, mgrs=mgrs, members=selectedUsers, isManager=isManager, admins=admins, username=username)
             response = make_response(html)
             return response
         elif output == "Change Admins":
@@ -372,7 +378,7 @@ def admin():
 
             admins = selectedAdmins 
             html = render_template('admin.html', groups=groups_by_name, groupname=get_group_name(groupid), users=users,
-                                   selected=selected, mgrs=mgrs, members=curr_members, isManager=isManager, isAdmin= isAdmin, admins = admins, username = username)
+                                   selected=selected, mgrs=mgrs, members=curr_members, isManager=isManager, isAdmin=isAdmin, admins=admins, username=username)
             response = make_response(html)
             return response
         elif output == "Save Managers":
