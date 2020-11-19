@@ -292,7 +292,7 @@ def get_user_id(groupid,netid):
 # Adds a group, shiftSchedule is optional argument if known
 # should call add_user_to_group with owner role
 def add_group(owner, groupName, shiftSchedule = None, globalshifts=None):
-    statement = Groups(owner=owner, groupname=groupName,shiftSchedule=shiftSchedule, globalschedule=globalshifts)
+    statement = Groups(owner=owner, groupname=groupName,shiftSchedule=shiftSchedule, globalschedule=globalshifts,nextweekshift=None)
     try:
         session.add(statement)
         session.flush()
