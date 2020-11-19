@@ -514,8 +514,7 @@ def manage():
         mgrs[user] = (user_role, (user_role in ['owner','manager']))
     for member in curr_members:
         selected[member] = True
-
-    print(selected)
+    
     shifts = get_group_shifts(groupid)
     if not shifts:
         shifts = {}
@@ -589,7 +588,9 @@ def manage():
             return response
         elif request.form["submit"] == "Generate Schedule":
             try:
-                currsched = generate_schedule(groupid)
+                currsched, preferences, fshifts, memberlist = generate_schedule(groupid)
+                ## Generate dict of conflicts. Need to decide what to do with this
+                conflicts = parse_conflicts(currsched, preferences, fshifts, memberlist)
             except:
                 currsched = None
             if (currsched == {}):
