@@ -55,7 +55,10 @@ def email_group(groupid, groupName):
     
     with mail.connect() as conn:
         for netid in members:
+            
             mem_info = get_profile_info(netid) # get profile info
+            if not mem_info.email: # skips users who have email notifs off
+                continue
             sched = filter_shifts(netid,shifts) # get their weekly schedule
             # sched = shifts_to_us_time(shift)
             
