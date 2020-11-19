@@ -65,6 +65,38 @@
             </form>
     </div>
     {% endif %}
+<<<<<<< HEAD
+=======
+    <div class="p-md-3">
+        <strong>Change Admins</strong>
+        <form action='' method="post">
+            <table>
+                {% for user in users: %}
+                    {% if user != username %}
+                    <tr>
+                        <td><input type="checkbox" {% if isAdmin[user] %} checked {% endif %} name={{user}}></td>
+                        <td> &nbsp;{{user}}</td>
+                    </tr>
+                    {% endif %}
+                {% endfor %}
+                </table>
+                <input type="submit" name="submit" value="Change Admins" class="btn btn-primary btn-sm" style="margin-top: 4px;">
+            </form>
+    </div>
+    <div class="p-md-3">
+        <strong>Admins</strong>
+        <form action='' method="post">
+            <table>
+                {% for admin in admins: %}
+                    <tr>
+                        <td>{{admin}}</td>
+                    </tr>
+                {% endfor %}
+                </table>
+            </form>
+    </div>
+
+>>>>>>> 63e332468e7a87568015320ed335f136f0655505
 
     <!-- Bootstrap core JavaScript -->
     <script src="../static/vendor/jquery/jquery.min.js"></script>

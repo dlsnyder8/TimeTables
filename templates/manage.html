@@ -21,20 +21,12 @@
 
 <body class="body">
     {% include 'header.html' %}
-    {% if schednotif %}
-    <div class="container"
-        style="position: fixed; width: 25%; z-index: 1000; bottom: 0; left: 20px; margin-bottom: 10px">
-        <div class="alert alert-success alert-dismissible" role="alert">
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
-                    aria-hidden="true">&times;</span></button>
-            <b>New Schedule generated!</b> Your new schedule is now displayed in Current Schedule.
-        </div>
-    </div>
-    {% endif %}
+
     <!-- Page Content -->
     <div class=" p-md-3">
         <div class="col-md-8 order-md-1 mx-auto">
-            <h1 class="display-4 font-weight-normal">Manage {{groupname}} Group</h1>
+            <h1 class="display-4 font-weight-normal">Manage {{groupname}} {% if notgroupintitle %} Group {% endif %}
+            </h1>
             <hr>
         </div>
     </div>
@@ -45,12 +37,27 @@
             <h2 class="mb-3"> Current Shifts</h2>
             {% if shifts|length > 0 %}
             <p>Schedules for <strong>{{groupname}}</strong> will be generated using these shifts. <br>
+
                 {% for i in shifts %}
             <form action='' method="post">
-                <strong>Day: </strong>{{shifts[i][0]}} <strong>Start: </strong>{{shifts[i][1]}}
-                <strong>End: </strong>{{shifts[i][2]}} <strong>Number of People: </strong>{{shifts[i][3]}}
-                <button type="submit" name="submit" value="{{i}}" class="btn btn-danger btn-sm"
-                    style="margin-bottom: 4px;">Remove</button><br>
+                <div class="row">
+                    <div class="col">
+                        <strong>Day: </strong>{{shifts[i][0]}}
+                    </div>
+                    <div class="col">
+                        <strong>Start: </strong>{{shifts[i][1]}}
+                    </div>
+                    <div class="col">
+                        <strong>End: </strong>{{shifts[i][2]}}
+                    </div>
+                    <div class="col">
+                        <strong>Number of People: </strong>{{shifts[i][3]}}
+                    </div>
+                    <div class="col">
+                        <button type="submit" name="submit" value="{{i}}" class="btn btn-danger btn-sm"
+                            style="margin-bottom: 4px;">Remove</button><br>
+                    </div>
+                </div>
             </form>
             {% endfor %}
             {% else %}
@@ -92,7 +99,7 @@
                         </td>
                     </tr>
                     <tr>
-                        <td>
+                        <td style="padding-right: 5px;">
                             <label for="npeople">Number of People: </label>
                         </td>
                         <td>
@@ -118,6 +125,15 @@
                 <input type="submit" name="submit" value="Generate Schedule" class="btn btn-primary btn-sm"
                     style="margin-top: 4px;">
             </form>
+            {% if schednotif %}
+            <div class="container" style="position: fixed; bottom: 0; left: 20px; margin-bottom: 10px; width: 30%;">
+                <div class="alert alert-success alert-dismissible" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <strong>New Schedule Generated!</strong><br> Your new schedule is now displayed in Current Schedule.
+                </div>
+            </div>
+            {% endif %}
             <hr>
             <h2 class="mb-3">Current Schedule</h2>
             {% if currsched is not none %}

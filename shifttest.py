@@ -78,37 +78,26 @@ def generate_schedule(groupid):
         prefs = create_requests(pshifts, get_double_array(get_group_preferences(groupid, member)), i, prefs)
         i+= 1  
     edict = solve_shift_scheduling("", "", len(memberlist), 1, fshifts, [], prefs, weekly_cover_demands)
-    return format_schedule(edict, memberlist)
+    return format_schedule(edict, memberlist), prefs, fshifts, memberlist
+
+# Parses conflicts
+def parse_conflicts(schedule, prefs, fshifts, memberlist):
+    conflicts = {}
+    for preference in prefs:
+        keystring = str(preference[2]) + "_" + fshifts[preference[1]]
+        netid = memberlist[preference[0]]
+        if memberlist[preference[0]] in schedule[keystring]:
+            if keystring not in conflicts:
+                conflicts[keystring] = []
+            conflicts[keystring].append(netid)
+    return conflicts
+            
         
 def main():
-    '''shifts = get_group_shifts(52)
-    pshifts  = parse_shifts(shifts)
-
-    fshifts = ['O']
-    fshifts += list(pshifts.keys())
-
-    weekly_cover_demands = cover_demands(pshifts)
-
-    memberlist = get_group_members(52)
-    prefs = []
-    i = 0
-    for member in memberlist:
-        prefs = create_requests(pshifts, get_double_array(get_group_preferences(52, member)), i, prefs)
-        i+= 1  
-
-    print(weekly_cover_demands)
+    schedule, prefs, fshifts, memberlist = generate_schedule(81)
+    change_group_schedule(81, schedule)
+    print(parse_conflicts(schedule, prefs, fshifts, memberlist))
     
-    edict = solve_shift_scheduling("", "", len(memberlist), 1, fshifts, [], prefs, weekly_cover_demands)
-    
-    print(format_schedule(edict, memberlist))'''
-    schedule = generate_schedule(69)
-    print(schedule)
-    if schedule is not None:
-        if schedule == {}:
-            print("No solution found. Try reducing number of people/number of shifts.")
-        else:
-            print("Success!")
-            print(parse_user_schedule('alekk', schedule))
     
 
 if __name__ == '__main__':

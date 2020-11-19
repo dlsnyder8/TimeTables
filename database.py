@@ -44,6 +44,12 @@ change_group_shifts(groupid, shifts = None)
 get_group_schedule(groupid)
 change_group_schedule(groupid, schedule)
 
+
+def get_group_schedule_next(groupid)
+def change_group_schedule_next(groupid,schedule)
+
+store_group_sched(groupid, week_num,week_start, sched)
+ret_stored_group_sched(groupid)
 ----------------------------------------------
 
 ------------GROUP MEMBER FUNCTIONS------------
@@ -53,12 +59,13 @@ get_group_notifications(netid, groupid)
 get_user_schedule(netid,groupid)
 update_user_schedule(netid,groupid, schedule = None)
 get_user_role(netid, groupid)
+get_group_users(groupid)
 """
 
 
 #temp url postgres://pheepicuurwuqg:fc272975e122789ac91401d8c19152c7ea716f2d935b3a28ad3d2e34e7131229@ec2-52-72-221-20.compute-1.amazonaws.com:5432/d7t82iju2c7ela
 #----------
-DATABASE_URL = os.environ['DATABASE_URL']
+DATABASE_URL = "postgres://pheepicuurwuqg:fc272975e122789ac91401d8c19152c7ea716f2d935b3a28ad3d2e34e7131229@ec2-52-72-221-20.compute-1.amazonaws.com:5432/d7t82iju2c7ela"
 
 # create engine (db object basically)
 engine = create_engine(DATABASE_URL)
@@ -71,6 +78,7 @@ session = Session(engine)
 Users = Base.classes.users
 Groups = Base.classes.groups
 Group_members = Base.classes.groupmembers
+ShiftStore = Base.classes.shiftstore
 
 # call this function on the preferences array
 def create_preferences(hoursList):
@@ -110,19 +118,49 @@ def parse_user_schedule(netid, groupschedule):
                 for i in range(int(end)):
                     output[str(i)][(day + 1) % 7] = True
     return output
+def get_all_groups():
+    try:
+        return session.query(Groups.groupid,Groups.groupname).all()
+
+    except: 
+        print("Failed to get all groups")
+        session.rollback()
+        return
+
+
+
 
 # adds a user to the database
-def add_user(firstName, lastName, netid, email=None, phone=None, preferences=None, createGroup = True):
+def add_user(firstName, lastName, netid, email=None, phone=None, preferences=None, createGroup = True,admin=False):
     try:
         session.add(Users(firstname=firstName,lastname=lastName,netid=netid,
-                    email=email,phone=phone,globalpreferences=preferences, can_create_group = createGroup))
+                    email=email,phone=phone,globalpreferences=preferences, can_create_group = createGroup,
+                    is_admin=admin))
         session.commit()
         return
     except:
         session.rollback()
         print('Add User Failed',file=stderr)
         return -1
-        
+
+def change_admin(netid,admin = False):
+    try:
+        session.query(Users).filter_by(netid=netid).update({Users.is_admin : admin})
+        session.commit()
+        return
+    except: 
+        print("Failed to update admin role")
+        session.rollback()
+        return -1
+
+def is_admin(netid):
+    try:
+        return session.query(Users.is_admin).filter_by(netid=netid).first()[0]
+    except:
+        print("Failed to determine if user is admin")
+        session.rollback()
+        return -1
+
 # returns the netid's of all users in the db
 def get_all_users():
     try: 
@@ -220,6 +258,68 @@ def get_group_preferences(groupid, netid):
         print('get_group_preferences() failed',file=stderr)
         return -1
 
+# Change draft schedule
+def add_user_to_draft_schedule(groupid, shift, netid):
+    schedule = get_draft_schedule(groupid)
+    if schedule is None:
+        print('Empty Schedule', file=stderr)
+        return -1
+    if shift not in schedule:
+        print('Invalid Shift',file=stderr)
+        return -1
+    if netid in schedule[shift]:
+        print('Cannot add the same user twice', file = stderr)
+        return -1
+    schedule[shift].append(netid)
+    change_draft_schedule(groupid, schedule)
+
+def remove_user_from_draft_schedule(groupid, shift, netid):
+    schedule = get_draft_schedule(groupid)
+    if schedule is None:
+        print('Empty Schedule', file=stderr)
+        return -1
+    if shift not in schedule:
+        print('Invalid Shift',file=stderr)
+        return -1
+    try:
+        schedule[shift].remove(netid)
+        print(schedule)
+    except:
+        print('Invalid Shift/User', file=stderr)
+        return -1
+    change_draft_schedule(groupid, schedule)
+
+# Change final schedule
+def add_user_to_shift_schedule(groupid, shift, netid):
+    schedule = get_group_schedule(groupid)
+    if schedule is None:
+        print('Empty Schedule', file=stderr)
+        return -1
+    if shift not in schedule:
+        print('Invalid Shift',file=stderr)
+        return -1
+    if netid in schedule[shift]:
+        print('Cannot add the same user twice', file = stderr)
+        return -1
+    schedule[shift].append(netid)
+    change_group_schedule(groupid, schedule)
+
+def remove_user_from_shift_schedule(groupid, shift, netid):
+    schedule = get_group_schedule(groupid)
+    if schedule is None:
+        print('Empty Schedule', file=stderr)
+        return -1
+    if shift not in schedule:
+        print('Invalid Shift',file=stderr)
+        return -1
+    try:
+        schedule[shift].remove(netid)
+        print(schedule)
+    except:
+        print('Invalid Shift/User', file=stderr)
+        return -1
+    change_group_schedule(groupid, schedule)
+
 
 # replaces weekly preferences of user. If none specified, 
 # replaces it with global preferences
@@ -255,7 +355,7 @@ def get_user_id(groupid,netid):
 # Adds a group, shiftSchedule is optional argument if known
 # should call add_user_to_group with owner role
 def add_group(owner, groupName, shiftSchedule = None, globalshifts=None):
-    statement = Groups(owner=owner, groupname=groupName,shiftSchedule=shiftSchedule, globalschedule=globalshifts)
+    statement = Groups(owner=owner, groupname=groupName,shiftSchedule=shiftSchedule, globalschedule=globalshifts,nextweekshift=None,tempsched=None)
     try:
         session.add(statement)
         session.flush()
@@ -268,6 +368,27 @@ def add_group(owner, groupName, shiftSchedule = None, globalshifts=None):
         print('Failed to add_group()',file=stderr)
         return -1
         
+
+def get_draft_schedule(groupid):
+    try:
+        return session.query(Groups.tempsched).filter_by(groupid=groupid).first()[0]
+
+    except:
+        print("could not get draft sched")
+        session.rollback()
+        return -1
+
+def change_draft_schedule(groupid,schedule):
+    try:
+        session.query(Groups).filter_by(groupid=groupid).update({Groups.tempsched : schedule}) 
+        session.commit()
+        return
+    except:
+        print("could not update draft schedule")
+        session.rollback()
+        return -1 
+
+
 # returns the global shifts for a group
 def get_group_shifts(groupid):
     try:
@@ -311,6 +432,27 @@ def remove_group(groupid):
         return -1
     return
 
+# This func will store the schedule of a group for tracking purposes
+def store_group_sched(groupid, week_num,week_start, schedule):
+    try:
+        session.add(ShiftStore(groupid=groupid,week_num=week_num, week_start=week_start,schedule=schedule))
+        session.commit()
+        return
+    except:
+        print("could not store schedule")
+        session.rollback()
+        return -1
+    
+
+# This will return all stored schedules for a group
+def ret_stored_group_sched(groupid):
+    try:
+        retval=session.query(ShiftStore.schedule).filter_by(groupid=groupid).all()
+        return retval
+    except:
+        print("could not return stored schedules")
+        return -1
+
 # returns the current schedule for a group
 def get_group_schedule(groupid):
     try:
@@ -330,6 +472,49 @@ def change_group_schedule(groupid, schedule):
         print('change_group_schedule() failed',file=stderr)
         return -1
     return
+
+
+# returns the conflicts for a group
+def get_group_conflicts(groupid):
+    try:
+        conflicts = session.query(Groups.conflicts).filter_by(groupid=groupid).first()
+        return conflicts[0]
+    except:
+        print("Unable to get the conflicts for group:",groupid, file=stderr)
+        return -1
+
+# Replaces the schedule of the group specified by groupid
+def change_group_conflicts(groupid, conflictDict):
+    try:
+        session.query(Groups).filter_by(groupid=groupid).update({Groups.conflicts : conflictDict})
+        session.commit()
+    except:
+        session.rollback()
+        print('change_group_conflicts() failed',file=stderr)
+        return -1
+    return
+
+
+
+# Replaces the schedule of the group specified by groupid
+def change_group_schedule_next(groupid, schedule):
+    try:
+        session.query(Groups).filter_by(groupid=groupid).update({Groups.nextweekshift : schedule})
+        session.commit()
+    except:
+        session.rollback()
+        print('change_group_schedule() failed',file=stderr)
+        return -1
+    return
+
+# returns the current schedule for a group
+def get_group_schedule_next(groupid):
+    try:
+        schedule = session.query(Groups.nextweekshift).filter_by(groupid=groupid).first()
+        return schedule[0]
+    except:
+        print("Unable to get the current schedule for group:",groupid, file=stderr)
+        return -1
 
 # add a user (netid) to group (groupid), 
 # preferences is optional argument, but could default to global if None???
@@ -449,6 +634,14 @@ def get_user_groups(netid):
         print('get user groups failed',file=stderr)
         return -1
 
+# returns groupname matching id
+def get_group_name(groupid):
+    try:
+        return (session.query(Groups.groupname).filter_by(groupid=groupid).first())[0]
+    except:
+        print('get groupid failed', file=stderr)
+        return -1
+
 def get_group_id(groupname):
     try:
         groupid = session.query(Groups.groupid).filter_by(groupname=groupname).first()
@@ -517,5 +710,7 @@ if __name__=="__main__":
     #print(get_user_groups('batyas'))
     #change_group_schedule(52, {"6_5_2":["batyas","bates", "kevin"], "0_2_3":["hi1"],"1_4_5":["hi2"],"1_0_1":["hi3","b"]})
     #print(parse_user_schedule("batyas", get_group_schedule(52)))
-    print(get_group_shifts(81))
     
+    print(get_group_schedule(81))
+    #change_group_conflicts(81, {})
+    #print(get_group_conflicts(81))

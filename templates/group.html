@@ -23,7 +23,8 @@
     {% include 'header.html' %}
     <div class=" p-md-3 container">
         <div class="col-md-8 order-md-1 mx-auto">
-            <h1 class="display-4 font-weight-normal">{{groupname}} Group Preferences</h1>
+            <h1 class="display-4 font-weight-normal">{{groupname}} {% if notgroupintitle %} Group {% endif %}
+                Preferences</h1>
             <form action="/editGroup">
                 <input class="btn btn-primary" type="submit" value="Edit Preferences" />
             </form>
