@@ -588,13 +588,23 @@ def manage():
         elif request.form["submit"] == "Generate Schedule":
             try:
                 currsched, preferences, fshifts, memberlist = generate_schedule(groupid)
-                ## Generate dict of conflicts. Need to decide what to do with this
+        
                 conflicts = parse_conflicts(currsched, preferences, fshifts, memberlist)
             except:
                 currsched = None
             if (currsched == {}):
                 currsched = None
-
+            
+            # Store schedule, conflicts in DB
+            if currsched is not None:
+                change_draft_schedule(groupid, currsched)
+            if conflicts is not None:
+                change_group_conflicts(groupid, conflicts)
+            else:
+                change_group_conflicts(groupid, {})
+            ## Need to display draft schedule on Page
+            
+            ## This should be moved to a "PUBLISH section"
             if currsched is not None:
                 change_group_schedule(groupid, currsched)
                 currsched = formatDisplaySched(currsched)

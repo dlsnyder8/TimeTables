@@ -442,6 +442,29 @@ def change_group_schedule(groupid, schedule):
         return -1
     return
 
+
+# returns the conflicts for a group
+def get_group_conflicts(groupid):
+    try:
+        conflicts = session.query(Groups.conflicts).filter_by(groupid=groupid).first()
+        return conflicts[0]
+    except:
+        print("Unable to get the conflicts for group:",groupid, file=stderr)
+        return -1
+
+# Replaces the schedule of the group specified by groupid
+def change_group_conflicts(groupid, conflictDict):
+    try:
+        session.query(Groups).filter_by(groupid=groupid).update({Groups.conflicts : conflictDict})
+        session.commit()
+    except:
+        session.rollback()
+        print('change_group_conflicts() failed',file=stderr)
+        return -1
+    return
+
+
+
 # Replaces the schedule of the group specified by groupid
 def change_group_schedule_next(groupid, schedule):
     try:
@@ -658,5 +681,5 @@ if __name__=="__main__":
     #print(parse_user_schedule("batyas", get_group_schedule(52)))
     
     print(get_group_schedule(81))
-    add_user_to_shift_schedule(81, '2_14_15', 'bbrodie')
-    
+    #change_group_conflicts(81, {})
+    #print(get_group_conflicts(81))
