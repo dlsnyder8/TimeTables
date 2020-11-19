@@ -324,7 +324,7 @@ def get_user_id(groupid,netid):
 # Adds a group, shiftSchedule is optional argument if known
 # should call add_user_to_group with owner role
 def add_group(owner, groupName, shiftSchedule = None, globalshifts=None):
-    statement = Groups(owner=owner, groupname=groupName,shiftSchedule=shiftSchedule, globalschedule=globalshifts,nextweekshift=None)
+    statement = Groups(owner=owner, groupname=groupName,shiftSchedule=shiftSchedule, globalschedule=globalshifts,nextweekshift=None,tempsched=None)
     try:
         session.add(statement)
         session.flush()
@@ -337,6 +337,28 @@ def add_group(owner, groupName, shiftSchedule = None, globalshifts=None):
         print('Failed to add_group()',file=stderr)
         return -1
         
+
+def get_draft_schedule(groupid):
+    try:
+        return session.query(Groups.tempsched).filter_by(groupid=groupid).first()[0]
+
+    except:
+        print("could not get draft sched")
+        session.rollback()
+        return -1
+
+def change_draft_schedule(groupid,schedule):
+    try:
+        session.query(Groups).filter_by(groupid=groupid).update({Groups.tempsched : schedule}) 
+        session.commit()
+        return
+    except:
+        print("could not update draft schedule")
+        session.rollback()
+        return -1 
+
+
+
 # returns the global shifts for a group
 def get_group_shifts(groupid):
     try:
