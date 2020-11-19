@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang='en'>
+
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title> Admin </title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="../static/vendor/bootstrap/css/bootstrap.css" rel="stylesheet">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+</head>
+
+<body>
+    {% include 'header.html' %}
+    <br>
+    <br>
+    <div class="p-md-3">
+        <strong>Select Group</strong>
+        <form action="" method="post">
+            {% for g in groups %}
+            <input type="radio" disabled name="groupname" value="{{g}}" {% if groupname == g %} checked {% endif %}>
+            <input style="margin-bottom: 4px;" class="btn btn-primary btn-sm" type="submit" name="groupname"
+                value="{{g}}">
+            {% endfor %}
+        </form>
+    </div>
+    <hr>
+    {% if users %}
+    <div>
+        <strong>Change Users</strong>
+        <form action='' method="post">
+            <table>
+                {% for user in users: %}
+                    <tr>
+                        <td><input type="checkbox" name={{user}} {% if selected[user] %} checked {% endif %}></td>
+                        <td> &nbsp;{{user}} {% if mgrs[user][1] %} <span class="text-muted"> ({{mgrs[user][0]}})</span>
+                            {% endif %}</td>
+                    </tr>
+                {% endfor %}
+                </table>
+                <input type="submit" name="submit" value="Save Users" class="btn btn-primary btn-sm" style="margin-top: 4px;">
+            </form>
+    </div>
+    {% endif %}
+    <hr>
+    {% if members %}
+    <div>
+        <strong>Change Managers</strong>
+        <form action='' method="post">
+            <table>
+                {% for member in members: %}
+                    <tr>
+                        <td><input type="checkbox" name={{member}} {% if isManager[member] %} checked {% endif %} name={{member}}></td>
+                        <td>{{member}}</td>
+                    </tr>
+                {% endfor %}
+                </table>
+                <input type="submit" name="submit" value="Save Managers" class="btn btn-primary btn-sm" style="margin-top: 4px;">
+            </form>
+    </div>
+    {% endif %}
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="../static/vendor/jquery/jquery.min.js"></script>
+    <script src="../static/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
