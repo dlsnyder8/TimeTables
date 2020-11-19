@@ -351,7 +351,8 @@ def admin():
                 selected[user] = False
                 mgrs[user] = ("notGroup", False)
 
-            html = render_template('admin.html', groups=groups_by_name, groupname=get_group_name(groupid), users=users, isAdmin= isAdmin, selected=selected, mgrs=mgrs, members=selectedUsers, isManager=isManager, admins = admins)
+            html = render_template('admin.html', groups=groups_by_name, groupname=get_group_name(groupid), users=users, isAdmin= isAdmin, 
+                selected=selected, mgrs=mgrs, members=selectedUsers, isManager=isManager, admins = admins, username = username)
             response = make_response(html)
             return response
         elif output == "Change Admins":
@@ -359,7 +360,7 @@ def admin():
             for user in users:
                 if request.form.get(user) is not None:
                     selectedAdmins.append(user)
-
+            selectedAdmins.append(username)
             newAdmins, oldAdmins = getDifferences(selectedAdmins, admins)
             for user in newAdmins:
                 change_admin(user, True)
@@ -371,7 +372,7 @@ def admin():
 
             admins = selectedAdmins 
             html = render_template('admin.html', groups=groups_by_name, groupname=get_group_name(groupid), users=users,
-                                   selected=selected, mgrs=mgrs, members=curr_members, isManager=isManager, isAdmin= isAdmin, admins = admins)
+                                   selected=selected, mgrs=mgrs, members=curr_members, isManager=isManager, isAdmin= isAdmin, admins = admins, username = username)
             response = make_response(html)
             return response
         elif output == "Save Managers":
@@ -390,12 +391,12 @@ def admin():
                 isManager[user] = False
 
             html = render_template('admin.html', groups=groups_by_name, groupname=get_group_name(groupid), users=users,
-                selected=selected, mgrs=mgrs, members=curr_members, isManager=isManager, isAdmin= isAdmin, admins = admins)
+                selected=selected, mgrs=mgrs, members=curr_members, isManager=isManager, isAdmin= isAdmin, admins = admins, username = username)
             response = make_response(html)
             return response
         else:
             html = render_template('admin.html', groups=groups_by_name, groupname=get_group_name(groupid), users=users,
-                selected=selected, mgrs=mgrs, members=curr_members, isManager=isManager, isAdmin= isAdmin, admins = admins)
+                selected=selected, mgrs=mgrs, members=curr_members, isManager=isManager, isAdmin= isAdmin, admins = admins, username = username)
             response = make_response(html)
             response.set_cookie('adminGroup', groupname)
             return response
