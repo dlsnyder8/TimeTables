@@ -44,6 +44,12 @@ change_group_shifts(groupid, shifts = None)
 get_group_schedule(groupid)
 change_group_schedule(groupid, schedule)
 
+
+def get_group_schedule_next(groupid)
+def change_group_schedule_next(groupid,schedule)
+
+store_group_sched(groupid, week_num,week_start, sched)
+ret_stored_group_sched(groupid)
 ----------------------------------------------
 
 ------------GROUP MEMBER FUNCTIONS------------
@@ -72,6 +78,7 @@ session = Session(engine)
 Users = Base.classes.users
 Groups = Base.classes.groups
 Group_members = Base.classes.groupmembers
+ShiftStore = Base.classes.shiftstore
 
 # call this function on the preferences array
 def create_preferences(hoursList):
@@ -341,6 +348,27 @@ def remove_group(groupid):
         return -1
     return
 
+# This func will store the schedule of a group for tracking purposes
+def store_group_sched(groupid, week_num,week_start, schedule):
+    try:
+        session.add(ShiftStore(groupid=groupid,week_num=week_num, week_start=week_start,schedule=schedule))
+        session.commit()
+        return
+    except:
+        print("could not store schedule")
+        session.rollback()
+        return -1
+    
+
+# This will return all stored schedules for a group
+def ret_stored_group_sched(groupid):
+    try:
+        retval=session.query(ShiftStore.schedule).filter_by(groupid=groupid).all()
+        return retval
+    except:
+        print("could not return stored schedules")
+        return -1
+
 # returns the current schedule for a group
 def get_group_schedule(groupid):
     try:
@@ -360,6 +388,26 @@ def change_group_schedule(groupid, schedule):
         print('change_group_schedule() failed',file=stderr)
         return -1
     return
+
+# Replaces the schedule of the group specified by groupid
+def change_group_schedule_next(groupid, schedule):
+    try:
+        session.query(Groups).filter_by(groupid=groupid).update({Groups.nextweekshift : schedule})
+        session.commit()
+    except:
+        session.rollback()
+        print('change_group_schedule() failed',file=stderr)
+        return -1
+    return
+
+# returns the current schedule for a group
+def get_group_schedule_next(groupid):
+    try:
+        schedule = session.query(Groups.nextweekshift).filter_by(groupid=groupid).first()
+        return schedule[0]
+    except:
+        print("Unable to get the current schedule for group:",groupid, file=stderr)
+        return -1
 
 # add a user (netid) to group (groupid), 
 # preferences is optional argument, but could default to global if None???
