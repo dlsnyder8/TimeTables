@@ -258,8 +258,8 @@ def get_group_preferences(groupid, netid):
         print('get_group_preferences() failed',file=stderr)
         return -1
 
-# Change shift schedule
-def add_user_to_shift_schedule(groupid, shift, netid):
+# Change draft schedule
+def add_user_to_draft_schedule(groupid, shift, netid):
     schedule = get_draft_schedule(groupid)
     if schedule is None:
         print('Empty Schedule', file=stderr)
@@ -273,7 +273,7 @@ def add_user_to_shift_schedule(groupid, shift, netid):
     schedule[shift].append(netid)
     change_draft_schedule(groupid, schedule)
 
-def remove_user_from_shift_schedule(groupid, shift, netid):
+def remove_user_from_draft_schedule(groupid, shift, netid):
     schedule = get_draft_schedule(groupid)
     if schedule is None:
         print('Empty Schedule', file=stderr)
@@ -288,6 +288,37 @@ def remove_user_from_shift_schedule(groupid, shift, netid):
         print('Invalid Shift/User', file=stderr)
         return -1
     change_draft_schedule(groupid, schedule)
+
+# Change final schedule
+def add_user_to_shift_schedule(groupid, shift, netid):
+    schedule = get_group_schedule(groupid)
+    if schedule is None:
+        print('Empty Schedule', file=stderr)
+        return -1
+    if shift not in schedule:
+        print('Invalid Shift',file=stderr)
+        return -1
+    if netid in schedule[shift]:
+        print('Cannot add the same user twice', file = stderr)
+        return -1
+    schedule[shift].append(netid)
+    change_group_schedule(groupid, schedule)
+
+def remove_user_from_shift_schedule(groupid, shift, netid):
+    schedule = get_group_schedule(groupid)
+    if schedule is None:
+        print('Empty Schedule', file=stderr)
+        return -1
+    if shift not in schedule:
+        print('Invalid Shift',file=stderr)
+        return -1
+    try:
+        schedule[shift].remove(netid)
+        print(schedule)
+    except:
+        print('Invalid Shift/User', file=stderr)
+        return -1
+    change_group_schedule(groupid, schedule)
 
 
 # replaces weekly preferences of user. If none specified, 
