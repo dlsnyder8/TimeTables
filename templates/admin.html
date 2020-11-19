@@ -72,7 +72,7 @@
                 {% for user in users: %}
                     {% if user != username %}
                     <tr>
-                        <td><input type="checkbox" {% if isAdmin[member] %} checked {% endif %} name={{user}}></td>
+                        <td><input type="checkbox" {% if isAdmin[user] %} checked {% endif %} name={{user}}></td>
                         <td> &nbsp;{{user}}</td>
                     </tr>
                     {% endif %}
