@@ -260,7 +260,7 @@ def get_group_preferences(groupid, netid):
 
 # Change shift schedule
 def add_user_to_shift_schedule(groupid, shift, netid):
-    schedule = get_group_schedule(groupid)
+    schedule = get_draft_schedule(groupid)
     if schedule is None:
         print('Empty Schedule', file=stderr)
         return -1
@@ -271,10 +271,10 @@ def add_user_to_shift_schedule(groupid, shift, netid):
         print('Cannot add the same user twice', file = stderr)
         return -1
     schedule[shift].append(netid)
-    change_group_schedule(groupid, schedule)
+    change_draft_schedule(groupid, schedule)
 
 def remove_user_from_shift_schedule(groupid, shift, netid):
-    schedule = get_group_schedule(groupid)
+    schedule = get_draft_schedule(groupid)
     if schedule is None:
         print('Empty Schedule', file=stderr)
         return -1
@@ -287,7 +287,7 @@ def remove_user_from_shift_schedule(groupid, shift, netid):
     except:
         print('Invalid Shift/User', file=stderr)
         return -1
-    change_group_schedule(groupid, schedule)
+    change_draft_schedule(groupid, schedule)
 
 
 # replaces weekly preferences of user. If none specified, 
@@ -356,7 +356,6 @@ def change_draft_schedule(groupid,schedule):
         print("could not update draft schedule")
         session.rollback()
         return -1 
-
 
 
 # returns the global shifts for a group
