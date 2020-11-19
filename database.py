@@ -129,6 +129,7 @@ def get_all_groups():
 
 
 
+
 # adds a user to the database
 def add_user(firstName, lastName, netid, email=None, phone=None, preferences=None, createGroup = True,admin=False):
     try:
@@ -256,6 +257,37 @@ def get_group_preferences(groupid, netid):
     except:
         print('get_group_preferences() failed',file=stderr)
         return -1
+
+# Change shift schedule
+def add_user_to_shift_schedule(groupid, shift, netid):
+    schedule = get_group_schedule(groupid)
+    if schedule is None:
+        print('Empty Schedule', file=stderr)
+        return -1
+    if shift not in schedule:
+        print('Invalid Shift',file=stderr)
+        return -1
+    if netid in schedule[shift]:
+        print('Cannot add the same user twice', file = stderr)
+        return -1
+    schedule[shift].append(netid)
+    change_group_schedule(groupid, schedule)
+
+def remove_user_from_shift_schedule(groupid, shift, netid):
+    schedule = get_group_schedule(groupid)
+    if schedule is None:
+        print('Empty Schedule', file=stderr)
+        return -1
+    if shift not in schedule:
+        print('Invalid Shift',file=stderr)
+        return -1
+    try:
+        schedule[shift].remove(netid)
+        print(schedule)
+    except:
+        print('Invalid Shift/User', file=stderr)
+        return -1
+    change_group_schedule(groupid, schedule)
 
 
 # replaces weekly preferences of user. If none specified, 
@@ -603,5 +635,7 @@ if __name__=="__main__":
     #print(get_user_groups('batyas'))
     #change_group_schedule(52, {"6_5_2":["batyas","bates", "kevin"], "0_2_3":["hi1"],"1_4_5":["hi2"],"1_0_1":["hi3","b"]})
     #print(parse_user_schedule("batyas", get_group_schedule(52)))
-    print(get_group_shifts(81))
+    
+    print(get_group_schedule(81))
+    add_user_to_shift_schedule(81, '2_14_15', 'bbrodie')
     

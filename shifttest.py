@@ -95,6 +95,7 @@ def parse_conflicts(schedule, prefs, fshifts, memberlist):
         
 def main():
     schedule, prefs, fshifts, memberlist = generate_schedule(81)
+    change_group_schedule(81, schedule)
     print(parse_conflicts(schedule, prefs, fshifts, memberlist))
     
     

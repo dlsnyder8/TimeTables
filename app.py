@@ -16,7 +16,6 @@ import urllib.parse as urlparse
 # Set this variable to False if local, and change to True before pushing
 PROD_ENV = True
 
-
 #----------
 
 
