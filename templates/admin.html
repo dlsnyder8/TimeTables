@@ -70,10 +70,12 @@
         <form action='' method="post">
             <table>
                 {% for user in users: %}
+                    {% if user != username %}
                     <tr>
                         <td><input type="checkbox" {% if isAdmin[member] %} checked {% endif %} name={{user}}></td>
                         <td> &nbsp;{{user}}</td>
                     </tr>
+                    {% endif %}
                 {% endfor %}
                 </table>
                 <input type="submit" name="submit" value="Change Admins" class="btn btn-primary btn-sm" style="margin-top: 4px;">
