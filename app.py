@@ -740,6 +740,77 @@ def schedule():
 
     return response
 
+@app.route('/editdraft', methods=['GET', 'POST'])
+def editdraft():
+
+    username = get_username()
+
+    if not (user_exists(username)):
+        return redirect(url_for('createProfile'))
+
+    isAd = is_admin(username)
+    groups = get_user_groups(username)
+
+    if len(groups) == 0:
+        return redirect(url_for('index'))
+
+    isMgr = getIsMgr(username, True, request, groups)
+    if not isMgr:
+        return redirect(url_for('index'))
+    
+
+    
+    groupname, groupid = getCurrGroupnameAndId(request, groups, True)
+    notGroupInTitle = (not groupname.split()[-1].lower() == 'group')
+    isOwner = getIsOwner(username, True, groupid)
+
+    groupMembers = get_group_members(groupid)
+
+    raw_schedule = get_draft_schedule(groupid)
+    schedule = formatDisplaySched(raw_schedule)
+
+    conflicts = get_group_conflicts(groupid)
+    conflicts = formatDisplaySched(conflicts)
+
+    selected = {}
+    
+    if request.method == 'POST':
+        if request.form["submit"] == "Save":
+            rawShift = request.form.get("shift")
+            shift = rawShift.split()
+            
+            day = shift[0]
+            start = shift[1]
+            if shift[2] == 'PM':
+                start = start.split(":")
+                start = str(int(start[0]) + 12) + ":" + start[1]
+            end = shift[4]
+            if shift[5] == 'PM':
+                end = end.split(":")
+                end = str(int(end[0]) + 12) + ":" + end[1]
+            shift = shiftstr_to_key(day, start, end)
+            
+            selected["shift"] = rawShift
+            for member in groupMembers:
+                status = request.form.get(member)
+                if status is not None:
+                    selected[member] = True
+                    if member not in raw_schedule[shift]:
+                        add_user_to_draft_schedule(groupid, shift, member)
+                else:
+                    selected[member] = False
+                    if member in raw_schedule[shift]:
+                        remove_user_from_draft_schedule(groupid, shift, member)
+            
+            
+
+    html = render_template('editdraft.html', schedule=schedule, groupname=groupname, inGroup=True, isMgr=isMgr, groupMembers=groupMembers,
+                    conflicts=conflicts, shifts=get_group_shifts(groupid), isOwner=isOwner, isAdmin=isAd, notgroupintitle = notGroupInTitle,
+                    selected=selected)
+
+    response = make_response(html)
+    return response
+
 
 @app.route('/group', methods=['GET'])
 def group():

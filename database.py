@@ -314,7 +314,6 @@ def remove_user_from_shift_schedule(groupid, shift, netid):
         return -1
     try:
         schedule[shift].remove(netid)
-        print(schedule)
     except:
         print('Invalid Shift/User', file=stderr)
         return -1
