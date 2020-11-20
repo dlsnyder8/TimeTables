@@ -472,6 +472,26 @@ def change_group_schedule(groupid, schedule):
         return -1
     return
 
+# returns the next week schedule for a group
+def get_next_group_schedule(groupid):
+    try:
+        schedule = session.query(Groups.nextweekshift).filter_by(groupid=groupid).first()
+        return schedule[0]
+    except:
+        print("Unable to get the next week schedule for group:",groupid, file=stderr)
+        return -1
+
+# Replaces the next week schedule of the group specified by groupid
+def change_next_group_schedule(groupid, schedule):
+    try:
+        session.query(Groups).filter_by(groupid=groupid).update({Groups.nextweekshift : schedule})
+        session.commit()
+    except:
+        session.rollback()
+        print('change_next_group_schedule() failed',file=stderr)
+        return -1
+    return
+
 
 # returns the conflicts for a group
 def get_group_conflicts(groupid):
