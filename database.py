@@ -153,6 +153,13 @@ def change_admin(netid,admin = False):
         session.rollback()
         return -1
 
+def can_create_group(netid):
+    try:
+        return session.query(Users.can_create_group).filter_by(netid=netid).first()[0]
+    except:
+        print("Failed to determine if user can create group")
+        session.rollback()
+        return -1
 def is_admin(netid):
     try:
         return session.query(Users.is_admin).filter_by(netid=netid).first()[0]
