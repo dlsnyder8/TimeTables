@@ -125,30 +125,111 @@
                 <input type="submit" name="submit" value="Generate Schedule" class="btn btn-primary btn-sm"
                     style="margin-top: 4px;">
             </form>
-            {% if schednotif %}
+            {% if generatenotif %}
             <div class="container" style="position: fixed; bottom: 0; left: 20px; margin-bottom: 10px; width: 30%;">
                 <div class="alert alert-success alert-dismissible" role="alert">
                     <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
                             aria-hidden="true">&times;</span></button>
-                    <strong>New Schedule Generated!</strong><br> Your new schedule is now displayed in Current Schedule.
+                    <strong>New Schedule Generated!</strong><br> Your new schedule is now displayed in Draft Schedule.
+                    <br>
+                    You can make edits to the draft as wanted. <br> Publish your schedule it once it's finalized!
+                </div>
+            </div>
+            {% endif %}
+            {% if errormsg %}
+            <div class="container" style="position: fixed; bottom: 0; left: 20px; margin-bottom: 10px; width: 40%;">
+                <div class="alert alert-danger alert-dismissible" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <strong>Create New Schedule Failed!</strong><br> A new schedule could not be generated based on
+                    current shift demands and user
+                    preferences. <br>
+                    Make sure that you've included at least one shift, or try decreasing the number of people per shift.
                 </div>
             </div>
             {% endif %}
             <hr>
-            <h2 class="mb-3">Current Schedule</h2>
-            {% if currsched is not none %}
-            {% for shift in currsched %}
+            {% if draftsched %}
+            <h2 class="mb-3">Schedule Draft</h2>
+            <!-- display draft schedule, edit or publish -->
+            Current draft schedule: <br><br>
+            {% for shift in draftsched %}
             <strong>{{shift}}</strong>:
-            {% for netid in currsched[shift] %}
-            {{netid}}{% if loop.index < currsched[shift]|length %},{% endif %}
+            {% for netid in draftsched[shift] %}
+            {{netid}}{% if loop.index < draftsched[shift]|length %},{% endif %}
             {% endfor %}
             <br>
             {% endfor %}
-            {% else %}
-            <p>A new schedule could not be generated based on current shift demands and user preferences. <br>
-                Make sure that you've included at least one shift, or try decreasing the number of people per shift.
-            </p>
+            <br>
+            <form action="/editdraft">
+                <!--- draft schedule page-->
+                <input class="btn btn-primary btn-sm" type="submit" value="Edit draft" style="margin-top: 4px;">
+            </form>
+            <br>
+            <h5 class="mb-3">Publish Schedule</h5>
+            <input type="radio" name="week" value="next" checked> For next week <span
+                class="text-muted">(advised)</span> <br>
+            <input type="radio" name="week" value="this"> For this week
+
+            <form action='' method="post">
+                <input type="submit" name="submit" value="Publish draft" class="btn btn-primary btn-sm"
+                    style="margin-top: 4px;">
+            </form>
+            {% if publishnotif %}
+            <div class="container" style="position: fixed; bottom: 0; left: 20px; margin-bottom: 10px; width: 30%;">
+                <div class="alert alert-success alert-dismissible" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <strong>New Schedule Published!</strong><br> Your new schedule is now displayed in Current Schedule.
+                </div>
+            </div>
             {% endif %}
+            <hr>
+            {% endif %}
+            <h2 class="mb-3">Current Schedule</h2>
+            <div class="container">
+                <div class="card-deck mb-3">
+                    <div class="card">
+                        <div class="card-header text-center">
+                            <h4 class="my-0 font-weight-normal">This Week</h4>
+                        </div>
+                        <div class="card-body">
+                            {% if thisWeekSched %}
+                            {% for shift in thisWeekSched %}
+                            <strong>{{shift}}</strong>:
+                            {% for netid in thisWeekSched[shift] %}
+                            {{netid}}{% if loop.index < thisWeekSched[shift]|length %},{% endif %}
+                            {% endfor %}
+                            <br>
+                            {% endfor %}
+                            {% else %}
+                            <p>No schedule has been generated for this week yet - go to generate schedule to create one!
+                            </p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header text-center">
+                            <h4 class="my-0 font-weight-normal">Next Week</h4>
+                        </div>
+                        <div class="card-body">
+                            {% if nextWeekSched %}
+                            {% for shift in nextWeekSched %}
+                            <strong>{{shift}}</strong>:
+                            {% for netid in nextWeekSched[shift] %}
+                            {{netid}}{% if loop.index < nextWeekSched[shift]|length %},{% endif %}
+                            {% endfor %}
+                            <br>
+                            {% endfor %}
+                            {% else %}
+                            <p>No schedule has been generated for next week yet - go to generate schedule to create one!
+                            </p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
             <hr>
             <h2 class="mb-3">Edit Group Members</h2>
             <form action='' method="post">
@@ -163,7 +244,8 @@
                     <tr>
                         <td><input type="checkbox" name={{user}} {% if mgrs[user][1] %} disabled {% endif %}
                                 {% if selected[user] %} checked {% endif %}></td>
-                        <td> &nbsp;{{user}} {% if mgrs[user][1] %} <span class="text-muted"> ({{mgrs[user][0]}})</span>
+                        <td> &nbsp;{{user}} {% if mgrs[user][1] %} <span class="text-muted">
+                                ({{mgrs[user][0]}})</span>
                             {% endif %}</td>
                     </tr>
                     {% endfor %}

@@ -14,7 +14,7 @@ import urllib.parse as urlparse
 # -------------------
 # CAS Authentication cannot be run locally unfortunately
 # Set this variable to False if local, and change to True before pushing
-PROD_ENV = False
+PROD_ENV = True
 
 # ----------
 
@@ -230,7 +230,7 @@ def formatDisplaySched(currsched):
             schedStrings[shiftkey_to_str(key)] = currsched[key]
         currsched = schedStrings
     else:
-        currsched = {}
+        currsched = None
     return currsched
 
 
@@ -595,20 +595,26 @@ def manage():
     if not shifts:
         shifts = {}
 
-    currsched = get_group_schedule(groupid)
-    currsched = formatDisplaySched(currsched)
+    thisWeekSched = get_group_schedule(groupid)
+    thisWeekSched = formatDisplaySched(thisWeekSched)
+
+    nextWeekSched = get_next_group_schedule(groupid)
+    nextWeekSched = formatDisplaySched(thisWeekSched)
+
+    draftsched = get_draft_schedule(groupid)
+    draftsched = formatDisplaySched(draftsched)
 
     if request.method == 'GET':
         shifts = shiftdict_to_us_time(shifts)
-        html = render_template('manage.html', groupname=groupname, notgroupintitle=notGroupInTitle, inGroup=True,
-                               isMgr=isMgr,
-                               shifts=shifts, users=users, mgrs=mgrs, selected=selected, currsched=currsched,
+        html = render_template('manage.html', groupname=groupname, notgroupintitle=notGroupInTitle, inGroup=True, isMgr=isMgr,
+                               shifts=shifts, users=users, mgrs=mgrs, selected=selected, thisWeekSched=thisWeekSched, 
+                               nextWeekSched=nextWeekSched, draftsched = draftsched,
                                username=username, isOwner=isOwner, isAdmin=isAd)
         response = make_response(html)
         return response
 
     else:
-        schednotif = False
+        publishnotif = generatenotif = errormsg = False
         groupid = get_group_id(groupname)
 
         if request.form["submit"] == "Add":
@@ -665,41 +671,51 @@ def manage():
             return response
         elif request.form["submit"] == "Generate Schedule":
             try:
-                currsched, preferences, fshifts, memberlist = generate_schedule(groupid)
-
-                conflicts = parse_conflicts(currsched, preferences, fshifts, memberlist)
+                draftsched, preferences, fshifts, memberlist = generate_schedule(groupid)
+                conflicts = parse_conflicts(draftsched, preferences, fshifts, memberlist)
             except:
-                currsched = None
-            if (currsched == {}):
-                currsched = None
+                draftsched = None
+            if (draftsched == {}):
+                draftsched = None
+                errormsg = True
 
             # Store schedule, conflicts in DB
-            if currsched is not None:
-                change_draft_schedule(groupid, currsched)
+            if draftsched is not None:
+                change_draft_schedule(groupid, draftsched)
+                draftsched = formatDisplaySched(draftsched)
+                generatenotif = True
             if conflicts is not None:
                 change_group_conflicts(groupid, conflicts)
             else:
                 change_group_conflicts(groupid, {})
-            ## Need to display draft schedule on Page
 
-            ## This should be moved to a "PUBLISH section"
-            if currsched is not None:
-                change_group_schedule(groupid, currsched)
-                currsched = formatDisplaySched(currsched)
+        elif request.form["submit"] == "Publish draft":
+            week = request.form["week"]
+            if week == "this":
+                change_group_schedule(groupid, draftsched)
+                # change this week currsched
+                thisWeekSched = formatDisplaySched(draftsched)
+            if week == "next":
+                change_next_group_schedule(groupid, draftsched)
                 # reset weekly group prefs of all group members
                 groupmems = get_group_members(groupid)
                 for mem in groupmems:
                     change_user_preferences_group(groupid, mem)
-                schednotif = True
+                nextWeekSched = formatDisplaySched(draftsched)
+            # delete draft sched
+            change_draft_schedule(groupid, None)
+            publishnotif = True
+
         else:
             shiftid = request.form["submit"]
             del shifts[shiftid]
             change_group_shifts(groupid, shifts)
         shifts = shiftdict_to_us_time(shifts)
         html = render_template('manage.html', groupname=groupname, inGroup=True, isMgr=isMgr, shifts=shifts,
-                               users=users, mgrs=mgrs, selected=selected,
-                               currsched=currsched, schednotif=schednotif, isOwner=isOwner, username=username,
-                               isAdmin=isAd)
+                               users=users, mgrs=mgrs, selected=selected, thisWeekSched=thisWeekSched, 
+                               nextWeekSched=nextWeekSched,
+                               publishnotif=publishnotif, generatenotif=generatenotif, errormsg=errormsg, 
+                               isOwner=isOwner, username=username, isAdmin=isAd, draftsched=draftsched)
         response = make_response(html)
         return response
 
