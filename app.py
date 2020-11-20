@@ -11,12 +11,12 @@ import json
 from sys import stderr, exit
 import urllib.parse as urlparse
 
-#-------------------
+# -------------------
 # CAS Authentication cannot be run locally unfortunately
 # Set this variable to False if local, and change to True before pushing
 PROD_ENV = True
 
-#----------
+# ----------
 
 
 app = Flask(__name__)
@@ -27,21 +27,21 @@ app.config.update(dict(
     MAIL_PORT=587,
     MAIL_USE_TLS=True,
     MAIL_USE_SSL=False,
-    #MAIL_USERNAME=os.environ['MAIL_USERNAME'],
-    #MAIL_PASSWORD=os.environ['MAIL_PW'],
+    # MAIL_USERNAME = os.environ['MAIL_USERNAME'],
+    # MAIL_PASSWORD = os.environ['MAIL_PW'],
 ))
 mail = Mail(app)
 
 
-def filter_shifts(netid,shifts):
+def filter_shifts(netid, shifts):
     newdict = dict()
     for (key, value) in shifts.items():
-        print(key,value)
+        print(key, value)
         for name in value:
-            print("name:",name)
+            print("name:", name)
             if name == netid:
                 newdict[key] = name
-    print("dict:\n",newdict)
+    print("dict:\n", newdict)
     return newdict
 
 
@@ -52,33 +52,33 @@ def email_group(groupid, groupName):
     shifts = get_group_schedule(groupid)  # group schedule
     if not shifts:
         shifts = {}
-    
+
     with mail.connect() as conn:
         for netid in members:
-            
-            mem_info = get_profile_info(netid) # get profile info
-            if not mem_info.email: # skips users who have email notifs off
+
+            mem_info = get_profile_info(netid)  # get profile info
+            if not mem_info.email:  # skips users who have email notifs off
                 continue
-            sched = filter_shifts(netid,shifts) # get their weekly schedule
+            sched = filter_shifts(netid, shifts)  # get their weekly schedule
             # sched = shifts_to_us_time(shift)
-            
+
             output = formatDisplaySched(sched)
-            
+
             html = "<strong>Your shifts this week are:</strong><br>"
-            
+
             for (key, value) in output.items():
                 print(key)
                 html += key + "<br>"
-            
+
             subject = "Your weekly schedule for: %s" % groupName
 
-            msg = Message(subject=subject, 
-                          html=html,   
+            msg = Message(subject=subject,
+                          html=html,
                           recipients=[mem_info.email],
                           sender='sdylan852@gmail.com')
-                        
+
             conn.send(msg)
-    print("Group %s has been emailed" %groupName)
+    print("Group %s has been emailed" % groupName)
     return
 
 
@@ -103,7 +103,8 @@ def getCurrGroupnameAndId(request, groups, inGroup=True):
     groupid = request.cookies.get('groupid')
     if groupid == None and inGroup:
         groupid = groups[0][0]
-    elif inGroup: groupid = int(groupid)
+    elif inGroup:
+        groupid = int(groupid)
     return groupname, groupid
 
 
@@ -117,16 +118,16 @@ def getIsMgr(username, inGroup, request, groups=None):
         role = get_user_role(username, groupid)
         if role == -1:
             return role
-        return role in ['manager','owner']
+        return (role in ['manager', 'owner'])
     else:
         return False
 
 
 # returns bool if owner
 def getIsOwner(username, inGroup, groupid=None, request=None, groups=None):
-    if not inGroup: 
+    if not inGroup:
         return False
-    if inGroup and groupid==None:
+    if inGroup and groupid == None:
         if groups == None:
             groups = get_user_groups(username)
         _, groupid = getCurrGroupnameAndId(request, groups)
@@ -142,14 +143,14 @@ def parseSchedule():
         time = i
         week = []
         for day in range(7):  # iterates through days in a week
-            if i < (slot_num/2):
+            if i < (slot_num / 2):
                 split = "0"
             else:
                 split = "1"
             hour = time % 12
             if hour == 0:
                 hour = 12
-            str_call = str(hour) + "-" + str(1+((time) % 12)) + "-" + str(split) + "-" + str(day)
+            str_call = str(hour) + "-" + str(1 + ((time) % 12)) + "-" + str(split) + "-" + str(day)
             week.append(request.form.get(str_call))
         table_values.append(week)
 
@@ -211,12 +212,13 @@ def shiftkey_to_str(shiftkey, full=False):
     days_to_nums = {'Sunday': 0, 'Monday': 1, 'Tuesday': 2, 'Wednesday': 3, 'Thursday': 4, 'Friday': 5, 'Saturday': 6}
     nums_to_days = {0: 'Sunday', 1: 'Monday', 2: 'Tuesday', 3: 'Wednesday', 4: 'Thursday', 5: 'Friday', 6: 'Saturday'}
     split = shiftkey.split('_')
-    shiftString = "{} {} - {}".format(nums_to_days[int(split[0])],military_to_us_time(split[1]), military_to_us_time(split[2]))
+    shiftString = "{} {} - {}".format(nums_to_days[int(split[0])], military_to_us_time(split[1]),
+                                      military_to_us_time(split[2]))
     return shiftString
 
 
 def formatDisplaySched(currsched):
-    if currsched: 
+    if currsched:
         keys = sorted(currsched.keys())
         schedStrings = {}
         for key in keys:
@@ -240,13 +242,13 @@ def getDifferences(newlist, oldlist):
     return newElements, lostElements
 
 
-#------------------------------------------------------------------
+# ------------------------------------------------------------------
 
 @app.route('/', methods=['GET', 'POST'])
-@app.route('/index', methods=['GET','POST'])
+@app.route('/index', methods=['GET', 'POST'])
 def index():
     username = get_username()
-    
+
     if not (user_exists(username)):
         return redirect(url_for('createProfile'))
     isAd = is_admin(username)
@@ -270,7 +272,8 @@ def index():
     print(teststring)
 
     if request.method == 'GET':
-        html = render_template('index.html', groups=groups_by_name, groupname=groupname, numGroups=numGroups, inGroup=inGroup, isMgr=isMgr, isOwner=isOwner, isAdmin = isAd)
+        html = render_template('index.html', groups=groups_by_name, groupname=groupname, numGroups=numGroups,
+                               inGroup=inGroup, isMgr=isMgr, isOwner=isOwner, isAdmin=isAd)
         response = make_response(html)
         return response
 
@@ -280,7 +283,8 @@ def index():
         isMgr = (get_user_role(username, groupid) in ["manager", "owner"])
         isOwner = (get_user_role(username, groupid) == 'owner')
 
-        html = render_template('index.html',groups=groups_by_name, groupname=groupname, numGroups=numGroups, inGroup=inGroup, isMgr=isMgr, isOwner=isOwner, isAdmin = isAd)
+        html = render_template('index.html', groups=groups_by_name, groupname=groupname, numGroups=numGroups,
+                               inGroup=inGroup, isMgr=isMgr, isOwner=isOwner, isAdmin=isAd)
         response = make_response(html)
         response.set_cookie('groupname', groupname)
         response.set_cookie('groupid', str(groupid))
@@ -293,7 +297,6 @@ def admin():
     username = get_username()
     if not (user_exists(username)):
         return redirect(url_for('createProfile'))
-
 
     isAd = is_admin(username)
     # needs to be all groups, not just included ones
@@ -311,13 +314,7 @@ def admin():
 
     # gets admins
     if request.method == "GET":
-<<<<<<< HEAD
-        html = render_template('admin.html', groups=groups_by_name, admins=admins, isAdmin=isAdmin, users=users)
-        print("hi")
-=======
-        html = render_template('admin.html', groups=groups_by_name, admins = admins)
->>>>>>> 63e332468e7a87568015320ed335f136f0655505
->>>>>>> b34b2dc23a6be14166cbfc9c41f7e5eab6cd94b5
+        html = render_template('admin.html', groups=groups_by_name, admins=admins)
         response = make_response(html)
         return response
     else:
@@ -330,10 +327,6 @@ def admin():
         isManager = {}
         managers = []
         mgrs = {}
-<<<<<<< HEAD
-
-=======
->>>>>>> 63e332468e7a87568015320ed335f136f0655505
         for user in users:
             selected[user] = False
             if user in curr_members:
@@ -367,16 +360,10 @@ def admin():
                 selected[user] = False
                 mgrs[user] = ("notGroup", False)
 
-<<<<<<< HEAD
-            html = render_template('admin.html', groups=groups_by_name, groupname=get_group_name(groupid), users=users, isAdmin=isAdmin,
-                selected=selected, mgrs=mgrs, members=selectedUsers, isManager=isManager, admins=admins, username=username)
-=======
-<<<<<<< HEAD
-            html = render_template('admin.html', groups=groups_by_name, groupname=get_group_name(groupid), users=users, selected=selected, mgrs=mgrs, members=selectedUsers, isManager=isManager)
-=======
-            html = render_template('admin.html', groups=groups_by_name, groupname=get_group_name(groupid), users=users, isAdmin= isAdmin, 
-                selected=selected, mgrs=mgrs, members=selectedUsers, isManager=isManager, admins = admins, username = username)
->>>>>>> b34b2dc23a6be14166cbfc9c41f7e5eab6cd94b5
+            html = render_template('admin.html', groups=groups_by_name, groupname=get_group_name(groupid), users=users,
+                                   isAdmin=isAdmin,
+                                   selected=selected, mgrs=mgrs, members=selectedUsers, isManager=isManager,
+                                   admins=admins, username=username)
             response = make_response(html)
             return response
         elif output == "Change Admins":
@@ -394,14 +381,10 @@ def admin():
                 change_admin(user, False)
                 isAdmin[user] = False
 
-            admins = selectedAdmins 
+            admins = selectedAdmins
             html = render_template('admin.html', groups=groups_by_name, groupname=get_group_name(groupid), users=users,
-<<<<<<< HEAD
-                                   selected=selected, mgrs=mgrs, members=curr_members, isManager=isManager, isAdmin=isAdmin, admins=admins, username=username)
-=======
-                                   selected=selected, mgrs=mgrs, members=curr_members, isManager=isManager, isAdmin= isAdmin, admins = admins, username = username)
->>>>>>> 63e332468e7a87568015320ed335f136f0655505
->>>>>>> b34b2dc23a6be14166cbfc9c41f7e5eab6cd94b5
+                                   selected=selected, mgrs=mgrs, members=curr_members, isManager=isManager,
+                                   isAdmin=isAdmin, admins=admins, username=username)
             response = make_response(html)
             return response
         elif output == "Save Managers":
@@ -420,20 +403,14 @@ def admin():
                 isManager[user] = False
 
             html = render_template('admin.html', groups=groups_by_name, groupname=get_group_name(groupid), users=users,
-<<<<<<< HEAD
-                                   selected=selected, mgrs=mgrs, members=curr_members, isManager=isManager)
-            response = make_response(html)
-            return response
-        else:
-            html = render_template('admin.html', groups=groups_by_name, groupname=get_group_name(groupid), users=users, selected=selected, mgrs=mgrs, members=curr_members, isManager=isManager)
-=======
-                selected=selected, mgrs=mgrs, members=curr_members, isManager=isManager, isAdmin= isAdmin, admins = admins, username = username)
+                                   selected=selected, mgrs=mgrs, members=curr_members, isManager=isManager,
+                                   isAdmin=isAdmin, admins=admins, username=username)
             response = make_response(html)
             return response
         else:
             html = render_template('admin.html', groups=groups_by_name, groupname=get_group_name(groupid), users=users,
-                selected=selected, mgrs=mgrs, members=curr_members, isManager=isManager, isAdmin= isAdmin, admins = admins, username = username)
->>>>>>> 63e332468e7a87568015320ed335f136f0655505
+                                   selected=selected, mgrs=mgrs, members=curr_members, isManager=isManager,
+                                   isAdmin=isAdmin, admins=admins, username=username)
             response = make_response(html)
             response.set_cookie('adminGroup', groupname)
             return response
@@ -466,7 +443,8 @@ def owner():
             isManager[user] = False
 
     if request.method == "GET":
-        html = render_template('owner.html', inGroup=inGroup, users=users, isManager=isManager, groupname=groupname, isMgr=True, isOwner=True, isAdmin = isAd)
+        html = render_template('owner.html', inGroup=inGroup, users=users, isManager=isManager, groupname=groupname,
+                               isMgr=True, isOwner=True, isAdmin=isAd)
         response = make_response(html)
         return response
     else:
@@ -484,7 +462,8 @@ def owner():
             change_group_role(groupid, user, 'member')
             isManager[user] = False
 
-        html = render_template('owner.html', inGroup=inGroup, users=users, isManager=isManager, groupname=groupname, isMgr=True, isOwner=True, isAdmin = isAd)
+        html = render_template('owner.html', inGroup=inGroup, users=users, isManager=isManager, groupname=groupname,
+                               isMgr=True, isOwner=True, isAdmin=isAd)
         response = make_response(html)
         return response
 
@@ -508,14 +487,17 @@ def profile():
     except Exception:
         pass
 
-    html = render_template('profile.html', firstName=userInfo.firstname, lastName=userInfo.lastname, netid=username, email=userInfo.email, 
-        schedule=globalPreferences, inGroup=inGroup, isMgr=isMgr, isOwner=isOwner, editable=False, isAdmin = isAd)
+    html = render_template('profile.html', firstName=userInfo.firstname, lastName=userInfo.lastname, netid=username,
+                           email=userInfo.email,
+                           schedule=globalPreferences, inGroup=inGroup, isMgr=isMgr, isOwner=isOwner, editable=False,
+                           isAdmin=isAd)
 
     response = make_response(html)
 
     return response
 
-@app.route('/manage', methods=['GET','POST'])
+
+@app.route('/manage', methods=['GET', 'POST'])
 def manage():
     username = get_username()
 
@@ -544,25 +526,27 @@ def manage():
 
     for user in users:
         selected[user] = False
-        if user in curr_members: 
+        if user in curr_members:
             user_role = get_user_role(user, groupid)
         else:
             user_role = "notGroup"
-        mgrs[user] = (user_role, (user_role in ['owner','manager']))
+        mgrs[user] = (user_role, (user_role in ['owner', 'manager']))
     for member in curr_members:
         selected[member] = True
-    
+
     shifts = get_group_shifts(groupid)
     if not shifts:
         shifts = {}
-    
+
     currsched = get_group_schedule(groupid)
     currsched = formatDisplaySched(currsched)
-    
+
     if request.method == 'GET':
         shifts = shiftdict_to_us_time(shifts)
-        html = render_template('manage.html', groupname=groupname, notgroupintitle=notGroupInTitle, inGroup=True, isMgr=isMgr, 
-            shifts=shifts, users=users, mgrs=mgrs, selected=selected, currsched=currsched, username=username, isOwner=isOwner, isAdmin = isAd)
+        html = render_template('manage.html', groupname=groupname, notgroupintitle=notGroupInTitle, inGroup=True,
+                               isMgr=isMgr,
+                               shifts=shifts, users=users, mgrs=mgrs, selected=selected, currsched=currsched,
+                               username=username, isOwner=isOwner, isAdmin=isAd)
         response = make_response(html)
         return response
 
@@ -571,17 +555,18 @@ def manage():
         groupid = get_group_id(groupname)
 
         if request.form["submit"] == "Add":
-            days_to_nums = {'Sunday': 0, 'Monday': 1, 'Tuesday': 2, 'Wednesday': 3, 'Thursday': 4, 'Friday': 5, 'Saturday': 6}
+            days_to_nums = {'Sunday': 0, 'Monday': 1, 'Tuesday': 2, 'Wednesday': 3, 'Thursday': 4, 'Friday': 5,
+                            'Saturday': 6}
 
             day = request.form["day"]
             start = request.form["start"]
             end = request.form["end"]
             npeople = request.form["npeople"]
-            
+
             shift = [day, start, end, npeople]
-            shiftid = "{}_{}_{}".format(days_to_nums[day],start.split(":")[0],end.split(":")[0])
-            shifts[shiftid]=shift
-        
+            shiftid = "{}_{}_{}".format(days_to_nums[day], start.split(":")[0], end.split(":")[0])
+            shifts[shiftid] = shift
+
             # change double array of shifts to dict, update db
             change_group_shifts(groupid, shifts)
         elif request.form["submit"] == "Save":
@@ -626,13 +611,13 @@ def manage():
         elif request.form["submit"] == "Generate Schedule":
             try:
                 currsched, preferences, fshifts, memberlist = generate_schedule(groupid)
-        
+
                 conflicts = parse_conflicts(currsched, preferences, fshifts, memberlist)
             except:
                 currsched = None
             if (currsched == {}):
                 currsched = None
-            
+
             # Store schedule, conflicts in DB
             if currsched is not None:
                 change_draft_schedule(groupid, currsched)
@@ -641,7 +626,7 @@ def manage():
             else:
                 change_group_conflicts(groupid, {})
             ## Need to display draft schedule on Page
-            
+
             ## This should be moved to a "PUBLISH section"
             if currsched is not None:
                 change_group_schedule(groupid, currsched)
@@ -656,18 +641,21 @@ def manage():
             del shifts[shiftid]
             change_group_shifts(groupid, shifts)
         shifts = shiftdict_to_us_time(shifts)
-        html = render_template('manage.html', groupname=groupname, inGroup=True, isMgr=isMgr, shifts=shifts, users=users, mgrs=mgrs, selected=selected,
-         currsched=currsched, schednotif=schednotif, isOwner=isOwner, username=username, isAdmin = isAd)
+        html = render_template('manage.html', groupname=groupname, inGroup=True, isMgr=isMgr, shifts=shifts,
+                               users=users, mgrs=mgrs, selected=selected,
+                               currsched=currsched, schednotif=schednotif, isOwner=isOwner, username=username,
+                               isAdmin=isAd)
         response = make_response(html)
         return response
+
 
 @app.route('/schedule', methods=['GET'])
 def schedule():
     username = get_username()
-    
+
     if not (user_exists(username)):
         return redirect(url_for('createProfile'))
-    
+
     isAd = is_admin(username)
     groups = get_user_groups(username)
 
@@ -677,25 +665,26 @@ def schedule():
     groupname, groupid = getCurrGroupnameAndId(request, groups)
     isMgr = getIsMgr(username, True, request, groups)
     isOwner = getIsOwner(username, True, groupid)
-    
+
     groupsched = get_group_schedule(groupid)
     if groupsched is not None:
         schedule = get_double_array(parse_user_schedule(username, groupsched))
     else:
         schedule = groupsched
-    
+
     shifts = get_group_shifts(groupid)
     if not shifts:
         shifts = {}
     else:
         shifts = shiftdict_to_us_time(shifts)
-       
 
-    html = render_template('schedule.html', schedule=schedule , groupname=groupname, inGroup=True, isMgr=isMgr, editable=False,
-        shifts=shifts, isOwner=isOwner, isAdmin = isAd)
+    html = render_template('schedule.html', schedule=schedule, groupname=groupname, inGroup=True, isMgr=isMgr,
+                           editable=False,
+                           shifts=shifts, isOwner=isOwner, isAdmin=isAd)
     response = make_response(html)
 
     return response
+
 
 @app.route('/group', methods=['GET'])
 def group():
@@ -721,21 +710,23 @@ def group():
         change_user_preferences_global(username, create_preferences(blankSchedule()))
         groupprefs = get_global_preferences(username)
     weeklyPref = get_double_array(groupprefs)
-        
+
     # later add code to reset groupprefs to global prefs on sunday
 
     notifPrefs = get_group_notifications(username, groupid)
-    if notifPrefs != None and notifPrefs != -1: 
+    if notifPrefs != None and notifPrefs != -1:
         prevemailPref = notifPrefs.emailnotif
     else:
         prevemailPref = False
 
-    html = render_template('group.html', schedule=weeklyPref, groupname=groupname, prevemailPref=prevemailPref, 
-        inGroup=True, isMgr=isMgr, notgroupintitle=notGroupInTitle, isOwner=isOwner, editable=False, isAdmin = isAd)
+    html = render_template('group.html', schedule=weeklyPref, groupname=groupname, prevemailPref=prevemailPref,
+                           inGroup=True, isMgr=isMgr, notgroupintitle=notGroupInTitle, isOwner=isOwner, editable=False,
+                           isAdmin=isAd)
     response = make_response(html)
     return response
 
-@app.route('/editGroup',methods=['GET', 'POST'])
+
+@app.route('/editGroup', methods=['GET', 'POST'])
 def editGroup():
     username = get_username()
 
@@ -758,19 +749,20 @@ def editGroup():
         change_user_preferences_global(username, create_preferences(blankSchedule()))
         groupprefs = get_global_preferences(username)
     weeklyPref = get_double_array(groupprefs)
-        
+
     # later add code to reset groupprefs to global prefs on sunday
 
     prevemailPref = get_group_notifications(username, groupid).emailnotif
 
     if request.method == 'GET':
-        html = render_template('editGroup.html', schedule=weeklyPref, groupname=groupname, prevemailPref=prevemailPref,  
-            inGroup=True, isMgr=isMgr, isOwner=isOwner, notgroupintitle=notGroupInTitle, editable=True, isAdmin = isAd)
+        html = render_template('editGroup.html', schedule=weeklyPref, groupname=groupname, prevemailPref=prevemailPref,
+                               inGroup=True, isMgr=isMgr, isOwner=isOwner, notgroupintitle=notGroupInTitle,
+                               editable=True, isAdmin=isAd)
         response = make_response(html)
         return response
     else:
         prefemail = request.form.get('prefemail')
-        if prefemail == 'on': 
+        if prefemail == 'on':
             prefemail = True
         else:
             prefemail = False
@@ -778,7 +770,7 @@ def editGroup():
 
         prefs = create_preferences(parseSchedule())
         change_user_preferences_group(groupid, username, prefs)
-        
+
         return redirect(url_for('group'))
 
 
@@ -792,6 +784,7 @@ def populateUsers():
     add_user('Jen', 'Jill', 'jjill')
     print("Populated Users")
     return redirect(url_for('index'))
+
 
 @app.route('/cleanGroups', methods=['GET'])
 def cleanGroups():
@@ -808,6 +801,7 @@ def cleanGroups():
     print("DELETED ALL GROUPS")
     return redirect(url_for('index'))
 
+
 @app.route('/viewGroup', methods=['GET'])
 def viewGroup():
     username = get_username()
@@ -823,8 +817,9 @@ def viewGroup():
     isOwner = getIsOwner(username, True, groupId)
 
     members = get_group_users(groupId)
-    members_w_roles = [(member, get_user_role(member, groupId)) for member in members]        
-    html = render_template('viewGroup.html', gName=gName, notgroupintitle=notGroupInTitle, members=members_w_roles, inGroup=True, isMgr=isMgr, isOwner=isOwner, isAdmin = isAd)
+    members_w_roles = [(member, get_user_role(member, groupId)) for member in members]
+    html = render_template('viewGroup.html', gName=gName, notgroupintitle=notGroupInTitle, members=members_w_roles,
+                           inGroup=True, isMgr=isMgr, isOwner=isOwner, isAdmin=isAd)
     response = make_response(html)
 
     return response
@@ -833,7 +828,7 @@ def viewGroup():
 @app.route('/createGroup', methods=['GET', 'POST'])
 def createGroup():
     username = get_username()
-    
+
     isAd = is_admin(username)
     inGroup = in_group(username)
     isMgr = getIsMgr(username, inGroup, request)
@@ -848,7 +843,8 @@ def createGroup():
 
     if request.method == 'GET':
 
-        html = render_template('createGroup.html', names=names, inGroup=inGroup, isMgr=isMgr, isOwner=isOwner, isAdmin = isAd)
+        html = render_template('createGroup.html', names=names, inGroup=inGroup, isMgr=isMgr, isOwner=isOwner,
+                               isAdmin=isAd)
         response = make_response(html)
         return response
 
@@ -876,6 +872,7 @@ def newuser():
     response = make_response(html)
     return response
 
+
 @app.route('/createProfile', methods=['GET', 'POST'])
 def createProfile():
     username = get_username()
@@ -886,7 +883,8 @@ def createProfile():
     if request.method == 'GET':
         if (user_exists(username)):
             return redirect(url_for('profile'))
-        html = render_template('createProfile.html', schedule=blankSchedule(), inGroup=False, isMgr=False, isOwner=False, editable=True, isAdmin = False)
+        html = render_template('createProfile.html', schedule=blankSchedule(), inGroup=False, isMgr=False,
+                               isOwner=False, editable=True, isAdmin=False)
         response = make_response(html)
         return response
 
@@ -901,7 +899,7 @@ def createProfile():
 
         globalPreferences = parseSchedule()
 
-        groupid = 1 # for prototype - add user to group one
+        groupid = 1  # for prototype - add user to group one
         if not (user_exists(username)):
             add_user(fname, lname, username, email, create_preferences(globalPreferences))
             add_user_to_group(groupid, username, "member", prefemail, create_preferences(globalPreferences))
@@ -910,7 +908,8 @@ def createProfile():
 
         return redirect(url_for('profile'))
 
-@app.route('/editProfile',methods=['GET','POST'])
+
+@app.route('/editProfile', methods=['GET', 'POST'])
 def editProfile():
     username = get_username()
 
@@ -931,7 +930,8 @@ def editProfile():
 
     if request.method == 'GET':
         html = render_template('editProfile.html', prevfname=prevfirstName, prevlname=prevlastName, \
-            prevemail=prevemail, schedule=prevGlobalPreferences, inGroup=inGroup, isMgr=isMgr, isOwner=isOwner, editable=True, isAdmin = isAd)
+                               prevemail=prevemail, schedule=prevGlobalPreferences, inGroup=inGroup, isMgr=isMgr,
+                               isOwner=isOwner, editable=True, isAdmin=isAd)
         response = make_response(html)
         return response
 
@@ -943,13 +943,13 @@ def editProfile():
 
             update_profile_info(fname, lname, username, email, create_preferences(prevGlobalPreferences))
 
-
         if request.form["submit"] == "Save Preferences":
             globalPreferences = parseSchedule()
-           
+
             update_profile_info(prevfirstName, prevlastName, username, prevemail, create_preferences(globalPreferences))
 
         return redirect(url_for('profile'))
+
 
 if __name__ == '__main__':
     app.run()
