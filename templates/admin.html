@@ -56,7 +56,7 @@
             <table>
                 {% for member in members: %}
                     <tr>
-                        <td><input type="checkbox" name={{member}} {% if isManager[member] %} checked {% endif %} name={{member}}></td>
+                        <td><input type="checkbox" name={{member}} {% if isOwner[member] %} disabled {% endif %}{% if isManager[member] %} checked {% endif %} name={{member}}></td>
                         <td>{{member}}</td>
                     </tr>
                 {% endfor %}
