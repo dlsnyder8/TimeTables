@@ -1,0 +1,93 @@
+<!--This is for people to put in their weekly preferences-->
+
+<!-- Main page after logging in, shows an employee's schedule for the week/month-->
+<!DOCTYPE html>
+<html lang='en'>
+
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title> Edit Draft Schedule </title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="../static/vendor/bootstrap/css/bootstrap.css" rel="stylesheet">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+</head>
+
+<body class="body">
+    {% include 'header.html' %}
+
+    <!-- Page Content -->
+    <div class=" p-md-3">
+        <div class="col-md-8 order-md-1 mx-auto">
+            <h1 class="display-4 font-weight-normal">Edit Draft Schedule for {{groupname}} {% if notgroupintitle %} Group {% endif %}
+            </h1>
+            <hr>
+        </div>
+    </div>
+
+    <div class="col-md-8 order-md-1 mx-auto">
+        <div class="container">
+            <h2 class="mb-3">Draft Schedule</h2>
+
+            <p>Users displayed with an asterisk (*)
+            have indicated that they would prefer not to work that shift.</p>
+            {% if schedule is not none %}
+            {% for shift in schedule %}
+            
+            <strong>{{shift}}</strong>:
+            <form action='' method="post">
+                <span hidden><input type="text" name="shift" value="{{shift}}"></span>
+                <table>
+                    {% if selected["shift"] == shift %}
+                    {% for netid in groupMembers: %}
+                    <tr>
+                        <td><input type="checkbox" name={{netid}} {% if selected[netid] %} checked {% endif %}></td>
+                        <td> &nbsp;{{netid}}
+                            {% if netid in conflicts[shift] %}
+                            *
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% else %}
+                    {% for netid in groupMembers: %}
+                    <tr>
+                        <td><input type="checkbox" name={{netid}}
+                                {% if netid in schedule[shift] %} checked {% endif %}></td>
+                        <td> &nbsp;{{netid}}
+                            {% if netid in conflicts[shift] %}
+                            *
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% endif %}
+                </table>
+                <input type="submit" name="submit" value="Save" class="btn btn-primary btn-sm" style="margin-top: 4px;">
+            </form>
+            <br>
+            {% endfor %}
+            {% else %}
+            <p>You haven't generated a draft schedule yet.
+            </p>
+            {% endif %}
+            <hr>
+            
+            <br>
+        </div>
+    </div>
+    {% include 'footer.html' %}
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="../static/vendor/jquery/jquery.min.js"></script>
+    <script src="../static/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+</body>
+
+</html>
