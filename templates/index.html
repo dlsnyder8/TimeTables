@@ -47,6 +47,10 @@
             {% endfor %}
         </form>
         <hr>
+        {% else %}
+            <form action="/createGroup">
+                <input class="btn btn-primary" type="submit" value="Create Group" />
+            </form>
         {% endif %}
     </div>
 
