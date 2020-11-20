@@ -1108,10 +1108,14 @@ def createProfile():
 
         globalPreferences = parseSchedule()
 
-        groupid = 1  # for prototype - add user to group one
+        # groupid = 1  # for prototype - add user to group one
         if not (user_exists(username)):
             add_user(fname, lname, username, email, create_preferences(globalPreferences))
-            add_user_to_group(groupid, username, "member", prefemail, create_preferences(globalPreferences))
+            print(fname)
+            print(lname)
+            print(username)
+            print(email)
+            # add_user_to_group(groupid, username, "member", prefemail, create_preferences(globalPreferences))
         else:
             update_profile_info(fname, lname, username, email, create_preferences(globalPreferences))
 
