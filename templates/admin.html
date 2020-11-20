@@ -47,8 +47,8 @@
                 <input type="submit" name="submit" value="Save Users" class="btn btn-primary btn-sm" style="margin-top: 4px;">
             </form>
     </div>
-    {% endif %}
     <hr>
+    {% endif %}
     {% if members %}
     <div>
         <strong>Change Managers</strong>
@@ -64,6 +64,7 @@
                 <input type="submit" name="submit" value="Save Managers" class="btn btn-primary btn-sm" style="margin-top: 4px;">
             </form>
     </div>
+    <hr>
     {% endif %}
     {% if isOwner %}
     <div>
@@ -80,6 +81,15 @@
                 <input type="submit" name="submit" value="Save Owners" class="btn btn-primary btn-sm" style="margin-top: 4px;">
             </form>
     </div>
+    <hr>
+    {% endif %}
+    {% if selected %}
+    <div>
+        <form action="" method="post">
+            <input type="submit" name="submit" value="Delete Group" class="btn btn-primary btn-sm" style="margin-top: 4px;">
+        </form>
+    </div>
+    <hr>
     {% endif %}
     <div class="p-md-3">
         <strong>Change Admins</strong>
@@ -97,6 +107,7 @@
                 <input type="submit" name="submit" value="Change Admins" class="btn btn-primary btn-sm" style="margin-top: 4px;">
             </form>
     </div>
+    <hr>
     <div class="p-md-3">
         <strong>Admins</strong>
         <form action='' method="post">
@@ -109,7 +120,7 @@
                 </table>
             </form>
     </div>
-
+    <hr>
 
     <!-- Bootstrap core JavaScript -->
     <script src="../static/vendor/jquery/jquery.min.js"></script>

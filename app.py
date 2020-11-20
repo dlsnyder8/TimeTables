@@ -405,9 +405,11 @@ def admin():
             for user in newManagers:
                 change_group_role(groupid, user, 'manager')
                 isManager[user] = True
+                mgrs[user] = ('manager', True)
             for user in oldManagers:
                 change_group_role(groupid, user, 'member')
                 isManager[user] = False
+                mgrs[user] = ('member', False)
 
             html = render_template('admin.html', groups=groups_by_name, groupname=get_group_name(groupid), users=users,
                                    selected=selected, mgrs=mgrs, members=curr_members, isManager=isManager,
@@ -425,14 +427,30 @@ def admin():
             for user in newOwners:
                 change_group_role(groupid, user, 'owner')
                 isOwner[user] = True
+                mgrs[user] = ('owner', True)
             for user in oldOwners:
                 change_group_role(groupid, user, 'member')
                 isOwner[user] = False
+                mgrs[user] = ('member', False)
 
             html = render_template('admin.html', groups=groups_by_name, groupname=get_group_name(groupid), users=users,
                                    selected=selected, mgrs=mgrs, members=curr_members, isManager=isManager,
                                    isAdmin=isAdmin, admins=admins, username=username, isOwner=isOwner)
             response = make_response(html)
+            return response
+        elif output == "Delete Group":
+            remove_group(groupid)
+            groups = get_all_groups()
+            inGroup = (len(groups) > 0)
+            if inGroup:
+                groupid = groups[0][0]
+                groupname = groups[0][1]
+            groups_by_name = [g[1] for g in groups]
+            html = render_template('admin.html', groups=groups_by_name, admins=admins, isAdmin=isAdmin, users=users,
+                                   username=username)
+            response = make_response(html)
+            response.set_cookie('groupname', groupname)
+            response.set_cookie('groupid', str(groupid))
             return response
         else:
             html = render_template('admin.html', groups=groups_by_name, groupname=get_group_name(groupid), users=users,
