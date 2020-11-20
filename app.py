@@ -298,8 +298,6 @@ def admin():
     if not (user_exists(username)):
         return redirect(url_for('createProfile'))
 
-    isAd = is_admin(username)
-    # needs to be all groups, not just included ones
     groups = get_all_groups()
     groups_by_name = [g[1] for g in groups]
     users = get_all_users()
@@ -314,7 +312,8 @@ def admin():
 
     # gets admins
     if request.method == "GET":
-        html = render_template('admin.html', groups=groups_by_name, admins=admins)
+        html = render_template('admin.html', groups=groups_by_name, admins=admins, isAdmin=isAdmin, users=users,
+                               username=username)
         response = make_response(html)
         return response
     else:
@@ -929,7 +928,7 @@ def editProfile():
         pass
 
     if request.method == 'GET':
-        html = render_template('editProfile.html', prevfname=prevfirstName, prevlname=prevlastName, \
+        html = render_template('editProfile.html', prevfname=prevfirstName, prevlname=prevlastName,
                                prevemail=prevemail, schedule=prevGlobalPreferences, inGroup=inGroup, isMgr=isMgr,
                                isOwner=isOwner, editable=True, isAdmin=isAd)
         response = make_response(html)
