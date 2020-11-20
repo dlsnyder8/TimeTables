@@ -131,10 +131,10 @@ def get_all_groups():
 
 
 # adds a user to the database
-def add_user(firstName, lastName, netid, email=None, phone=None, preferences=None, createGroup = True,admin=False):
+def add_user(firstName, lastName, netid, email=None, preferences=None, createGroup = True, admin=False):
     try:
         session.add(Users(firstname=firstName,lastname=lastName,netid=netid,
-                    email=email,phone=phone,globalpreferences=preferences, can_create_group = createGroup,
+                    email=email,phone=None,globalpreferences=preferences, can_create_group = createGroup,
                     is_admin=admin))
         session.commit()
         return
@@ -760,9 +760,7 @@ if __name__=="__main__":
     #change_group_schedule(52, {"6_5_2":["batyas","bates", "kevin"], "0_2_3":["hi1"],"1_4_5":["hi2"],"1_0_1":["hi3","b"]})
     #print(parse_user_schedule("batyas", get_group_schedule(52)))
     
-    change_draft_schedule(81, None)
-    change_group_schedule(81, None)
-    change_group_schedule_next(81, None)
-    change_group_conflicts(81, None)
+    
     #change_group_conflicts(81, {})
     #print(get_group_conflicts(81))
+    add_user('batya','stein', 'batyas')
