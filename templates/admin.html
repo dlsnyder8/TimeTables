@@ -65,6 +65,22 @@
             </form>
     </div>
     {% endif %}
+    {% if isOwner %}
+    <div>
+        <strong>Change Owners</strong>
+        <form action='' method="post">
+            <table>
+                {% for member in members: %}
+                    <tr>
+                        <td><input type="checkbox" name={{member}} {% if isOwner[member] %} checked {% endif %} name={{member}}></td>
+                        <td>{{member}}</td>
+                    </tr>
+                {% endfor %}
+                </table>
+                <input type="submit" name="submit" value="Save Owners" class="btn btn-primary btn-sm" style="margin-top: 4px;">
+            </form>
+    </div>
+    {% endif %}
     <div class="p-md-3">
         <strong>Change Admins</strong>
         <form action='' method="post">

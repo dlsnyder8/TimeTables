@@ -325,6 +325,8 @@ def admin():
         selected = {}
         isManager = {}
         managers = []
+        isOwner = {}
+        owners = []
         mgrs = {}
         for user in users:
             selected[user] = False
@@ -337,8 +339,14 @@ def admin():
             if user_role == "manager":
                 isManager[user] = True
                 managers.append(user)
+                isOwner[user] = False
+            elif user_role == "owner":
+                isOwner[user] = True
+                owners.append(user)
+                isManager[user] = False
             else:
                 isManager[user] = False
+                isOwner[user] = False
 
             mgrs[user] = (user_role, (user_role in ['owner', 'manager']))
 
@@ -362,7 +370,7 @@ def admin():
             html = render_template('admin.html', groups=groups_by_name, groupname=get_group_name(groupid), users=users,
                                    isAdmin=isAdmin,
                                    selected=selected, mgrs=mgrs, members=selectedUsers, isManager=isManager,
-                                   admins=admins, username=username)
+                                   admins=admins, username=username, owners=owners, isOwner=isOwner)
             response = make_response(html)
             return response
         elif output == "Change Admins":
@@ -383,7 +391,7 @@ def admin():
             admins = selectedAdmins
             html = render_template('admin.html', groups=groups_by_name, groupname=get_group_name(groupid), users=users,
                                    selected=selected, mgrs=mgrs, members=curr_members, isManager=isManager,
-                                   isAdmin=isAdmin, admins=admins, username=username)
+                                   isAdmin=isAdmin, admins=admins, username=username, owners=owners, isOwner=isOwner)
             response = make_response(html)
             return response
         elif output == "Save Managers":
@@ -403,13 +411,13 @@ def admin():
 
             html = render_template('admin.html', groups=groups_by_name, groupname=get_group_name(groupid), users=users,
                                    selected=selected, mgrs=mgrs, members=curr_members, isManager=isManager,
-                                   isAdmin=isAdmin, admins=admins, username=username)
+                                   isAdmin=isAdmin, admins=admins, username=username, owners=owners, isOwner=isOwner)
             response = make_response(html)
             return response
         else:
             html = render_template('admin.html', groups=groups_by_name, groupname=get_group_name(groupid), users=users,
                                    selected=selected, mgrs=mgrs, members=curr_members, isManager=isManager,
-                                   isAdmin=isAdmin, admins=admins, username=username)
+                                   isAdmin=isAdmin, admins=admins, username=username, owners=owners, isOwner=isOwner)
             response = make_response(html)
             response.set_cookie('adminGroup', groupname)
             return response
