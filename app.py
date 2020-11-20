@@ -10,6 +10,7 @@ import os
 import json
 from sys import stderr, exit
 import urllib.parse as urlparse
+from itertools import chain
 
 # -------------------
 # CAS Authentication cannot be run locally unfortunately
@@ -607,7 +608,7 @@ def manage():
     if request.method == 'GET':
         shifts = shiftdict_to_us_time(shifts)
         html = render_template('manage.html', groupname=groupname, notgroupintitle=notGroupInTitle, inGroup=True, isMgr=isMgr,
-                               shifts=shifts, users=users, mgrs=mgrs, selected=selected, thisWeekSched=thisWeekSched, 
+                               shifts=shifts, users=users, mgrs=mgrs, selected=selected, schedule=schedule, 
                                nextWeekSched=nextWeekSched, draftsched = draftsched,
                                username=username, isOwner=isOwner, isAdmin=isAd)
         response = make_response(html)
@@ -741,21 +742,30 @@ def schedule():
     isMgr = getIsMgr(username, True, request, groups)
     isOwner = getIsOwner(username, True, groupid)
 
-    groupsched = get_group_schedule(groupid)
-    if groupsched is not None:
-        schedule = get_double_array(parse_user_schedule(username, groupsched))
-    else:
-        schedule = groupsched
+    schedule = get_group_schedule(groupid)
+    if schedule is not None:
+        schedule = get_double_array(parse_user_schedule(username, schedule))
+        if not any(chain(*schedule)):
+            schedule = -1
+    # check if sched exists but user not scheduled to work at all this week --
+    
+    
+    nextWeekSched = get_next_group_schedule(groupid)
+    if nextWeekSched is not None:
+        nextWeekSched = get_double_array(parse_user_schedule(username, nextWeekSched))
+        if not any(chain(*nextWeekSched)):
+            nextWeekSched = -1
 
+    # check if sched exists but user not scheduled to work at all this week --
+    
     shifts = get_group_shifts(groupid)
     if not shifts:
         shifts = {}
     else:
         shifts = shiftdict_to_us_time(shifts)
 
-    html = render_template('schedule.html', schedule=schedule, groupname=groupname, inGroup=True, isMgr=isMgr,
-                           editable=False,
-                           shifts=shifts, isOwner=isOwner, isAdmin=isAd)
+    html = render_template('schedule.html', schedule=schedule, nextWeekSched=nextWeekSched, groupname=groupname, 
+                            inGroup=True, isMgr=isMgr, editable=False, isOwner=isOwner, isAdmin=isAd)
     response = make_response(html)
 
     return response

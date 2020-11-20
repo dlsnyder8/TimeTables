@@ -15,6 +15,16 @@
     <!-- Bootstrap core CSS -->
     <link href="../static/vendor/bootstrap/css/bootstrap.css" rel="stylesheet">
 
+    <style>
+        .allR {
+            text-align: right;
+        }
+
+        .allC {
+            text-align: center;
+        }
+    </style>
+
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 </head>
 
@@ -33,6 +43,7 @@
                     profile.<br>
                     To be scheduled, you must be available for the entirety of a shift.<br>
                     <br>
+                    <!--
                     {% if shifts|length != 0: %}
                     <hr class="mb-3 order-md-1 mx-auto">
 
@@ -45,66 +56,496 @@
                     </ul>
                     {% else  %}
                     The manager has not added any shifts for this week.
-                    {% endif %}
+                    {% endif %} -->
+                    See your schedules for this week and next week below.
                 </p>
 
             </div>
         </div>
-        {% if schedule is not none %}
-        <div class="col-md-8 order-md-1 mx-auto">
-            <div class="mb-3">
-                <hr>
-                <div class="text-center">
-                    <strong>Here is your schedule for the week:</strong></div>
-                <br>
+        <div class="card">
+            <div class="card-header text-center">
+                <h4 class="my-0 font-weight-normal">This Week</h4>
+            </div>
+            <div class="card-body">
+                {% if schedule is not none %}
+                {% if schedule == -1 %}
+                You are not scheduled to work any shifts this week. <br>
+                Please contact your manager if you have any questions.
+                {% else %}
                 {% include 'scheduleElement.html' %}
+                {% endif %}
+                {% else %}
+                <div class="col-lg-12 text-center">
+                    <p>This week's schedule has not been generated yet.</p>
+                    <hr>
+                    You still have time to input your weekly preferences:
+                    <br> <br>
+                    <form action="/editGroup">
+                        <input type="submit" value="Weekly Preferences" class="btn btn-primary btn-sm">
+                    </form>
+                </div>
+                {% endif %}
             </div>
         </div>
-        {% else %}
-        <div>
-            <div class="col-lg-12 text-center">
-                <p>This week's schedule has not been generated yet.</p>
-                <hr>
-                You still have time to input your weekly preferences:
-                <br>
-                <form action="/editGroup">
-                    <input type="submit" value="Weekly Preferences">
-                </form>
-            </div>
-        </div>
-        {% endif %}
 
-        {% if schedule is not none %}
-        <div class="col-md-8 order-md-1 mx-auto">
-            <div class="mb-3">
-                <hr>
-                <div class="text-center">
-                    <strong>Here is your schedule for the next week:</strong></div>
-                <br>
-                {% include 'scheduleElement.html' %}
+        <br>
+        <div class="card">
+            <div class="card-header text-center">
+                <h4 class="my-0 font-weight-normal">Next Week</h4>
+            </div>
+            <div class="card-body">
+                {% if nextWeekSched is not none %}
+                {% if nextWeekSched == -1 %}
+                You are not scheduled to work any shifts next week. <br>
+                Please contact your manager if you have any questions.
+                {% else %}
+                <table style="
+                    margin-left: auto;
+                    margin-right: auto;" class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th scope="col">Sunday</th>
+                            <th scope="col">Monday</th>
+                            <th scope="col">Tuesday</th>
+                            <th scope="col">Wednesday</th>
+                            <th scope="col">Thursday</th>
+                            <th scope="col">Friday</th>
+                            <th scope="col">Saturday</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th scope="row" class="allR">12:00 AM - 1:00 AM</th>
+                            <td class="allC"><input {% if nextWeekSched[0][0] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="12-1-0-0"></td>
+                            <td class="allC"><input {% if nextWeekSched[0][1] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="12-1-0-1"></td>
+                            <td class="allC"><input {% if nextWeekSched[0][2] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="12-1-0-2"></td>
+                            <td class="allC"><input {% if nextWeekSched[0][3] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="12-1-0-3"></td>
+                            <td class="allC"><input {% if nextWeekSched[0][4] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="12-1-0-4"></td>
+                            <td class="allC"><input {% if nextWeekSched[0][5] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="12-1-0-5"></td>
+                            <td class="allC"><input {% if nextWeekSched[0][6] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="12-1-0-6"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row" class="allR">1:00 AM - 2:00 AM</th>
+                            <td class="allC"><input {% if nextWeekSched[1][0] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="1-2-0-0"></td>
+                            <td class="allC"><input {% if nextWeekSched[1][1] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="1-2-0-1"></td>
+                            <td class="allC"><input {% if nextWeekSched[1][2] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="1-2-0-2"></td>
+                            <td class="allC"><input {% if nextWeekSched[1][3] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="1-2-0-3"></td>
+                            <td class="allC"><input {% if nextWeekSched[1][4] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="1-2-0-4"></td>
+                            <td class="allC"><input {% if nextWeekSched[1][5] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="1-2-0-5"></td>
+                            <td class="allC"><input {% if nextWeekSched[1][6] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="1-2-0-6"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row" class="allR">2:00 AM - 3:00 AM</th>
+                            <td class="allC"><input {% if nextWeekSched[2][0] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="2-3-0-0"></td>
+                            <td class="allC"><input {% if nextWeekSched[2][1] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="2-3-0-1"></td>
+                            <td class="allC"><input {% if nextWeekSched[2][2] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="2-3-0-2"></td>
+                            <td class="allC"><input {% if nextWeekSched[2][3] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="2-3-0-3"></td>
+                            <td class="allC"><input {% if nextWeekSched[2][4] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="2-3-0-4"></td>
+                            <td class="allC"><input {% if nextWeekSched[2][5] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="2-3-0-5"></td>
+                            <td class="allC"><input {% if nextWeekSched[2][6] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="2-3-0-6"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row" class="allR">3:00 AM - 4:00 AM</th>
+                            <td class="allC"><input {% if nextWeekSched[3][0] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="3-4-0-0"></td>
+                            <td class="allC"><input {% if nextWeekSched[3][1] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="3-4-0-1"></td>
+                            <td class="allC"><input {% if nextWeekSched[3][2] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="3-4-0-2"></td>
+                            <td class="allC"><input {% if nextWeekSched[3][3] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="3-4-0-3"></td>
+                            <td class="allC"><input {% if nextWeekSched[3][4] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="3-4-0-4"></td>
+                            <td class="allC"><input {% if nextWeekSched[3][5] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="3-4-0-5"></td>
+                            <td class="allC"><input {% if nextWeekSched[3][6] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="3-4-0-6"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row" class="allR">4:00 AM - 5:00 AM</th>
+                            <td class="allC"><input {% if nextWeekSched[4][0] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="4-5-0-0"></td>
+                            <td class="allC"><input {% if nextWeekSched[4][1] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="4-5-0-1"></td>
+                            <td class="allC"><input {% if nextWeekSched[4][2] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="4-5-0-2"></td>
+                            <td class="allC"><input {% if nextWeekSched[4][3] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="4-5-0-3"></td>
+                            <td class="allC"><input {% if nextWeekSched[4][4] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="4-5-0-4"></td>
+                            <td class="allC"><input {% if nextWeekSched[4][5] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="4-5-0-5"></td>
+                            <td class="allC"><input {% if nextWeekSched[4][6] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="4-5-0-6"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row" class="allR">5:00 AM - 6:00 AM</th>
+                            <td class="allC"><input {% if nextWeekSched[5][0] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="5-6-0-0"></td>
+                            <td class="allC"><input {% if nextWeekSched[5][1] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="5-6-0-1"></td>
+                            <td class="allC"><input {% if nextWeekSched[5][2] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="5-6-0-2"></td>
+                            <td class="allC"><input {% if nextWeekSched[5][3] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="5-6-0-3"></td>
+                            <td class="allC"><input {% if nextWeekSched[5][4] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="5-6-0-4"></td>
+                            <td class="allC"><input {% if nextWeekSched[5][5] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="5-6-0-5"></td>
+                            <td class="allC"><input {% if nextWeekSched[5][6] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="5-6-0-6"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row" class="allR">6:00 AM - 7:00 AM</th>
+                            <td class="allC"><input {% if nextWeekSched[6][0] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="6-7-0-0"></td>
+                            <td class="allC"><input {% if nextWeekSched[6][1] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="6-7-0-1"></td>
+                            <td class="allC"><input {% if nextWeekSched[6][2] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="6-7-0-2"></td>
+                            <td class="allC"><input {% if nextWeekSched[6][3] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="6-7-0-3"></td>
+                            <td class="allC"><input {% if nextWeekSched[6][4] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="6-7-0-4"></td>
+                            <td class="allC"><input {% if nextWeekSched[6][5] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="6-7-0-5"></td>
+                            <td class="allC"><input {% if nextWeekSched[6][6] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="6-7-0-6"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row" class="allR">7:00 PM - 8:00 AM</th>
+                            <td class="allC"><input {% if nextWeekSched[7][0] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="7-8-0-0"></td>
+                            <td class="allC"><input {% if nextWeekSched[7][1] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="7-8-0-1"></td>
+                            <td class="allC"><input {% if nextWeekSched[7][2] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="7-8-0-2"></td>
+                            <td class="allC"><input {% if nextWeekSched[7][3] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="7-8-0-3"></td>
+                            <td class="allC"><input {% if nextWeekSched[7][4] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="7-8-0-4"></td>
+                            <td class="allC"><input {% if nextWeekSched[7][5] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="7-8-0-5"></td>
+                            <td class="allC"><input {% if nextWeekSched[7][6] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="7-8-0-6"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row" class="allR">8:00 AM - 9:00 AM</th>
+                            <td class="allC"><input {% if nextWeekSched[8][0] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="8-9-0-0"></td>
+                            <td class="allC"><input {% if nextWeekSched[8][1] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="8-9-0-1"></td>
+                            <td class="allC"><input {% if nextWeekSched[8][2] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="8-9-0-2"></td>
+                            <td class="allC"><input {% if nextWeekSched[8][3] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="8-9-0-3"></td>
+                            <td class="allC"><input {% if nextWeekSched[8][4] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="8-9-0-4"></td>
+                            <td class="allC"><input {% if nextWeekSched[8][5] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="8-9-0-5"></td>
+                            <td class="allC"><input {% if nextWeekSched[8][6] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="8-9-0-6"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row" class="allR">9:00 AM - 10:00 AM</th>
+                            <td class="allC"><input {% if nextWeekSched[9][0] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="9-10-0-0"></td>
+                            <td class="allC"><input {% if nextWeekSched[9][1] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="9-10-0-1"></td>
+                            <td class="allC"><input {% if nextWeekSched[9][2] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="9-10-0-2"></td>
+                            <td class="allC"><input {% if nextWeekSched[9][3] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="9-10-0-3"></td>
+                            <td class="allC"><input {% if nextWeekSched[9][4] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="9-10-0-4"></td>
+                            <td class="allC"><input {% if nextWeekSched[9][5] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="9-10-0-5"></td>
+                            <td class="allC"><input {% if nextWeekSched[9][6] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="9-10-0-6"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row" class="allR">10:00 AM - 11:00 AM</th>
+                            <td class="allC"><input {% if nextWeekSched[10][0] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="10-11-0-0"></td>
+                            <td class="allC"><input {% if nextWeekSched[10][1] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="10-11-0-1"></td>
+                            <td class="allC"><input {% if nextWeekSched[10][2] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="10-11-0-2"></td>
+                            <td class="allC"><input {% if nextWeekSched[10][3] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="10-11-0-3"></td>
+                            <td class="allC"><input {% if nextWeekSched[10][4] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="10-11-0-4"></td>
+                            <td class="allC"><input {% if nextWeekSched[10][5] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="10-11-0-5"></td>
+                            <td class="allC"><input {% if nextWeekSched[10][6] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="10-11-0-6"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row" class="allR">11:00 AM - 12:00 PM</th>
+                            <td class="allC"><input {% if nextWeekSched[11][0] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="11-12-0-0"></td>
+                            <td class="allC"><input {% if nextWeekSched[11][1] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="11-12-0-1"></td>
+                            <td class="allC"><input {% if nextWeekSched[11][2] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="11-12-0-2"></td>
+                            <td class="allC"><input {% if nextWeekSched[11][3] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="11-12-0-3"></td>
+                            <td class="allC"><input {% if nextWeekSched[11][4] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="11-12-0-4"></td>
+                            <td class="allC"><input {% if nextWeekSched[11][5] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="11-12-0-5"></td>
+                            <td class="allC"><input {% if nextWeekSched[11][6] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="11-12-0-6"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row" class="allR">12:00 PM - 1:00 PM</th>
+                            <td class="allC"><input {% if nextWeekSched[12][0] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="12-1-1-0"></td>
+                            <td class="allC"><input {% if nextWeekSched[12][1] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="12-1-1-1"></td>
+                            <td class="allC"><input {% if nextWeekSched[12][2] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="12-1-1-2"></td>
+                            <td class="allC"><input {% if nextWeekSched[12][3] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="12-1-1-3"></td>
+                            <td class="allC"><input {% if nextWeekSched[12][4] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="12-1-1-4"></td>
+                            <td class="allC"><input {% if nextWeekSched[12][5] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="12-1-1-5"></td>
+                            <td class="allC"><input {% if nextWeekSched[12][6] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="12-1-1-6"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row" class="allR">1:00 PM - 2:00 PM</th>
+                            <td class="allC"><input {% if nextWeekSched[13][0] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="1-2-1-0"></td>
+                            <td class="allC"><input {% if nextWeekSched[13][1] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="1-2-1-1"></td>
+                            <td class="allC"><input {% if nextWeekSched[13][2] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="1-2-1-2"></td>
+                            <td class="allC"><input {% if nextWeekSched[13][3] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="1-2-1-3"></td>
+                            <td class="allC"><input {% if nextWeekSched[13][4] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="1-2-1-4"></td>
+                            <td class="allC"><input {% if nextWeekSched[13][5] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="1-2-1-5"></td>
+                            <td class="allC"><input {% if nextWeekSched[13][6] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="1-2-1-6"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row" class="allR">2:00 PM - 3:00 PM</th>
+                            <td class="allC"><input {% if nextWeekSched[14][0] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="2-3-1-0"></td>
+                            <td class="allC"><input {% if nextWeekSched[14][1] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="2-3-1-1"></td>
+                            <td class="allC"><input {% if nextWeekSched[14][2] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="2-3-1-2"></td>
+                            <td class="allC"><input {% if nextWeekSched[14][3] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="2-3-1-3"></td>
+                            <td class="allC"><input {% if nextWeekSched[14][4] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="2-3-1-4"></td>
+                            <td class="allC"><input {% if nextWeekSched[14][5] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="2-3-1-5"></td>
+                            <td class="allC"><input {% if nextWeekSched[14][6] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="2-3-1-6"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row" class="allR">3:00 PM - 4:00 PM</th>
+                            <td class="allC"><input {% if nextWeekSched[15][0] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="3-4-1-0"></td>
+                            <td class="allC"><input {% if nextWeekSched[15][1] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="3-4-1-1"></td>
+                            <td class="allC"><input {% if nextWeekSched[15][2] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="3-4-1-2"></td>
+                            <td class="allC"><input {% if nextWeekSched[15][3] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="3-4-1-3"></td>
+                            <td class="allC"><input {% if nextWeekSched[15][4] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="3-4-1-4"></td>
+                            <td class="allC"><input {% if nextWeekSched[15][5] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="3-4-1-5"></td>
+                            <td class="allC"><input {% if nextWeekSched[15][6] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="3-4-1-6"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row" class="allR">4:00 PM - 5:00 PM</th>
+                            <td class="allC"><input {% if nextWeekSched[16][0] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="4-5-1-0"></td>
+                            <td class="allC"><input {% if nextWeekSched[16][1] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="4-5-1-1"></td>
+                            <td class="allC"><input {% if nextWeekSched[16][2] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="4-5-1-2"></td>
+                            <td class="allC"><input {% if nextWeekSched[16][3] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="4-5-1-3"></td>
+                            <td class="allC"><input {% if nextWeekSched[16][4] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="4-5-1-4"></td>
+                            <td class="allC"><input {% if nextWeekSched[16][5] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="4-5-1-5"></td>
+                            <td class="allC"><input {% if nextWeekSched[16][6] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="4-5-1-6"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row" class="allR">5:00 PM - 6:00 PM</th>
+                            <td class="allC"><input {% if nextWeekSched[17][0] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="5-6-1-0"></td>
+                            <td class="allC"><input {% if nextWeekSched[17][1] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="5-6-1-1"></td>
+                            <td class="allC"><input {% if nextWeekSched[17][2] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="5-6-1-2"></td>
+                            <td class="allC"><input {% if nextWeekSched[17][3] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="5-6-1-3"></td>
+                            <td class="allC"><input {% if nextWeekSched[17][4] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="5-6-1-4"></td>
+                            <td class="allC"><input {% if nextWeekSched[17][5] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="5-6-1-5"></td>
+                            <td class="allC"><input {% if nextWeekSched[17][6] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="5-6-1-6"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row" class="allR">6:00 PM - 7:00 PM</th>
+                            <td class="allC"><input {% if nextWeekSched[18][0] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="6-7-1-0"></td>
+                            <td class="allC"><input {% if nextWeekSched[18][1] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="6-7-1-1"></td>
+                            <td class="allC"><input {% if nextWeekSched[18][2] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="6-7-1-2"></td>
+                            <td class="allC"><input {% if nextWeekSched[18][3] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="6-7-1-3"></td>
+                            <td class="allC"><input {% if nextWeekSched[18][4] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="6-7-1-4"></td>
+                            <td class="allC"><input {% if nextWeekSched[18][5] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="6-7-1-5"></td>
+                            <td class="allC"><input {% if nextWeekSched[18][6] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="6-7-1-6"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row" class="allR">7:00 PM - 8:00 PM</th>
+                            <td class="allC"><input {% if nextWeekSched[19][0] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="7-8-1-0"></td>
+                            <td class="allC"><input {% if nextWeekSched[19][1] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="7-8-1-1"></td>
+                            <td class="allC"><input {% if nextWeekSched[19][2] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="7-8-1-2"></td>
+                            <td class="allC"><input {% if nextWeekSched[19][3] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="7-8-1-3"></td>
+                            <td class="allC"><input {% if nextWeekSched[19][4] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="7-8-1-4"></td>
+                            <td class="allC"><input {% if nextWeekSched[19][5] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="7-8-1-5"></td>
+                            <td class="allC"><input {% if nextWeekSched[19][6] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="7-8-1-6"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row" class="allR">8:00 PM - 9:00 PM</th>
+                            <td class="allC"><input {% if nextWeekSched[20][0] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="8-9-1-0"></td>
+                            <td class="allC"><input {% if nextWeekSched[20][1] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="8-9-1-1"></td>
+                            <td class="allC"><input {% if nextWeekSched[20][2] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="8-9-1-2"></td>
+                            <td class="allC"><input {% if nextWeekSched[20][3] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="8-9-1-3"></td>
+                            <td class="allC"><input {% if nextWeekSched[20][4] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="8-9-1-4"></td>
+                            <td class="allC"><input {% if nextWeekSched[20][5] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="8-9-1-5"></td>
+                            <td class="allC"><input {% if nextWeekSched[20][6] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="8-9-1-6"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row" class="allR">9:00 PM - 10:00 PM</th>
+                            <td class="allC"><input {% if nextWeekSched[21][0] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="9-10-1-0"></td>
+                            <td class="allC"><input {% if nextWeekSched[21][1] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="9-10-1-1"></td>
+                            <td class="allC"><input {% if nextWeekSched[21][2] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="9-10-1-2"></td>
+                            <td class="allC"><input {% if nextWeekSched[21][3] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="9-10-1-3"></td>
+                            <td class="allC"><input {% if nextWeekSched[21][4] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="9-10-1-4"></td>
+                            <td class="allC"><input {% if nextWeekSched[21][5] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="9-10-1-5"></td>
+                            <td class="allC"><input {% if nextWeekSched[21][6] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="9-10-1-6"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row" class="allR">10:00 PM - 11:00 PM</th>
+                            <td class="allC"><input {% if nextWeekSched[22][0] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="10-11-1-0"></td>
+                            <td class="allC"><input {% if nextWeekSched[22][1] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="10-11-1-1"></td>
+                            <td class="allC"><input {% if nextWeekSched[22][2] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="10-11-1-2"></td>
+                            <td class="allC"><input {% if nextWeekSched[22][3] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="10-11-1-3"></td>
+                            <td class="allC"><input {% if nextWeekSched[22][4] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="10-11-1-4"></td>
+                            <td class="allC"><input {% if nextWeekSched[22][5] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="10-11-1-5"></td>
+                            <td class="allC"><input {% if nextWeekSched[22][6] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="10-11-1-6"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row" class="allR">11:00 PM - 12:00 PM</th>
+                            <td class="allC"><input {% if nextWeekSched[23][0] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="11-12-1-0"></td>
+                            <td class="allC"><input {% if nextWeekSched[23][1] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="11-12-1-1"></td>
+                            <td class="allC"><input {% if nextWeekSched[23][2] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="11-12-1-2"></td>
+                            <td class="allC"><input {% if nextWeekSched[23][3] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="11-12-1-3"></td>
+                            <td class="allC"><input {% if nextWeekSched[23][4] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="11-12-1-4"></td>
+                            <td class="allC"><input {% if nextWeekSched[23][5] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="11-12-1-5"></td>
+                            <td class="allC"><input {% if nextWeekSched[23][6] %}checked{%endif%}
+                                    {%if not editable%}disabled{%endif%} type="checkbox" name="11-12-1-6"></td>
+                        </tr>
+                    </tbody>
+                </table>
+                {% endif %}
+                {% else %}
+                <div class="col-lg-12 text-center">
+                    <p>Next week's schedule has not been generated yet.</p>
+                    <hr>
+                    You still have time to input your weekly preferences:
+                    <br><br>
+                    <form action="/editGroup">
+                        <input type="submit" value="Weekly Preferences" class="btn btn-primary btn-sm">
+                    </form>
+                </div>
+                {% endif %}
             </div>
         </div>
-        {% else %}
-        <div>
-            <div class="col-lg-12 text-center">
-                <p>This week's schedule has not been generated yet.</p>
-                <hr>
-                You still have time to input your weekly preferences:
-                <br>
-                <form action="/editGroup">
-                    <input type="submit" value="Weekly Preferences">
-                </form>
-            </div>
-        </div>
-        {% endif %}
 
-    </div>
-    <hr>
-    {% include 'footer.html' %}
+        <hr>
+        {% include 'footer.html' %}
 
-    <!-- Bootstrap core JavaScript -->
-    <script src="../static/vendor/jquery/jquery.min.js"></script>
-    <script src="../static/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+        <!-- Bootstrap core JavaScript -->
+        <script src="../static/vendor/jquery/jquery.min.js"></script>
+        <script src="../static/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 
 </body>
 
