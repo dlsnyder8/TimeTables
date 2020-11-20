@@ -599,7 +599,7 @@ def manage():
     thisWeekSched = formatDisplaySched(thisWeekSched)
 
     nextWeekSched = get_next_group_schedule(groupid)
-    nextWeekSched = formatDisplaySched(thisWeekSched)
+    nextWeekSched = formatDisplaySched(nextWeekSched)
 
     draftsched = get_draft_schedule(groupid)
     draftsched = formatDisplaySched(draftsched)
@@ -615,6 +615,7 @@ def manage():
 
     else:
         publishnotif = generatenotif = errormsg = False
+        week = None
         groupid = get_group_id(groupname)
 
         if request.form["submit"] == "Add":
@@ -690,6 +691,7 @@ def manage():
                 change_group_conflicts(groupid, {})
 
         elif request.form["submit"] == "Publish draft":
+            draftsched = get_draft_schedule(groupid)
             week = request.form["week"]
             if week == "this":
                 change_group_schedule(groupid, draftsched)
@@ -704,16 +706,18 @@ def manage():
                 nextWeekSched = formatDisplaySched(draftsched)
             # delete draft sched
             change_draft_schedule(groupid, None)
+            draftsched = None
             publishnotif = True
 
         else:
             shiftid = request.form["submit"]
             del shifts[shiftid]
             change_group_shifts(groupid, shifts)
+        
         shifts = shiftdict_to_us_time(shifts)
         html = render_template('manage.html', groupname=groupname, inGroup=True, isMgr=isMgr, shifts=shifts,
                                users=users, mgrs=mgrs, selected=selected, thisWeekSched=thisWeekSched, 
-                               nextWeekSched=nextWeekSched,
+                               nextWeekSched=nextWeekSched, week=week,
                                publishnotif=publishnotif, generatenotif=generatenotif, errormsg=errormsg, 
                                isOwner=isOwner, username=username, isAdmin=isAd, draftsched=draftsched)
         response = make_response(html)

@@ -25,7 +25,8 @@
     <!-- Page Content -->
     <div class=" p-md-3">
         <div class="col-md-8 order-md-1 mx-auto">
-            <h1 class="display-4 font-weight-normal">Edit Draft Schedule for {{groupname}} {% if notgroupintitle %} Group {% endif %}
+            <h1 class="display-4 font-weight-normal">Edit Draft Schedule for {{groupname}} {% if notgroupintitle %}
+                Group {% endif %}
             </h1>
             <hr>
         </div>
@@ -36,10 +37,10 @@
             <h2 class="mb-3">Draft Schedule</h2>
 
             <p>Users displayed with an asterisk (*)
-            have indicated that they would prefer not to work that shift.</p>
+                have indicated that they would prefer not to work that shift.</p>
             {% if schedule is not none %}
             {% for shift in schedule %}
-            
+
             <strong>{{shift}}</strong>:
             <form action='' method="post">
                 <span hidden><input type="text" name="shift" value="{{shift}}"></span>
@@ -58,8 +59,8 @@
                     {% else %}
                     {% for netid in groupMembers: %}
                     <tr>
-                        <td><input type="checkbox" name={{netid}}
-                                {% if netid in schedule[shift] %} checked {% endif %}></td>
+                        <td><input type="checkbox" name={{netid}} {% if netid in schedule[shift] %} checked {% endif %}>
+                        </td>
                         <td> &nbsp;{{netid}}
                             {% if netid in conflicts[shift] %}
                             *
@@ -77,8 +78,11 @@
             <p>You haven't generated a draft schedule yet.
             </p>
             {% endif %}
+            <form action="/manage">
+                <input class="btn btn-primary" type="submit" value="Return to Manage page" style="margin-top: 4px;">
+            </form>
             <hr>
-            
+
             <br>
         </div>
     </div>

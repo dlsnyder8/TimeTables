@@ -64,7 +64,7 @@
             <p> No current shifts for <strong>{{groupname}}</strong></p>
             {% endif %}
             <hr>
-            <h2 class="mb-3"> Add a new shift for {{groupname}}</h2>
+            <h2 class="mb-3"> Add a new shift </h2>
             <form action='' method="post">
                 <table>
                     <tr>
@@ -116,28 +116,30 @@
             <hr>
             <span id="schedule"></span>
             <h2 class="mb-3">Create Schedule</h2>
-            Create schedule for shifts listed above, based on group members' weekly preferences. <br>
-            This will replace the current schedule below. <br>
-            Once the new schedule is created, each group member's weekly group preferences will reset to their
-            global preferences.
+            Generate schedule for shifts listed above, based on group members' weekly preferences. <br>
+            Once the schedule is generated, it will display in the "Schedule Draft" section, where you can make manual
+            edits to it. <br>
+            (Note that the schedule will not be sent to users until you publish it.)
             <br>
             <form action="" method="post">
                 <input type="submit" name="submit" value="Generate Schedule" class="btn btn-primary btn-sm"
-                    style="margin-top: 4px;">
+                    style="margin-top: 10px;">
             </form>
             {% if generatenotif %}
-            <div class="container" style="position: fixed; bottom: 0; left: 20px; margin-bottom: 10px; width: 30%;">
+            <div class="container"
+                style="position: fixed; bottom: 0; left: 20px; margin-bottom: 10px; width: 30%; z-index: 100;">
                 <div class="alert alert-success alert-dismissible" role="alert">
                     <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
                             aria-hidden="true">&times;</span></button>
-                    <strong>New Schedule Generated!</strong><br> Your new schedule is now displayed in Draft Schedule.
+                    <strong>New Schedule Generated!</strong><br> Your new schedule is now displayed in Schedule Draft.
                     <br>
                     You can make edits to the draft as wanted. <br> Publish your schedule it once it's finalized!
                 </div>
             </div>
             {% endif %}
             {% if errormsg %}
-            <div class="container" style="position: fixed; bottom: 0; left: 20px; margin-bottom: 10px; width: 40%;">
+            <div class="container"
+                style="position: fixed; bottom: 0; left: 20px; margin-bottom: 10px; width: 40%; z-index: 100;">
                 <div class="alert alert-danger alert-dismissible" role="alert">
                     <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
                             aria-hidden="true">&times;</span></button>
@@ -152,7 +154,7 @@
             {% if draftsched %}
             <h2 class="mb-3">Schedule Draft</h2>
             <!-- display draft schedule, edit or publish -->
-            Current draft schedule: <br><br>
+            Current schedule draft: <br><br>
             {% for shift in draftsched %}
             <strong>{{shift}}</strong>:
             {% for netid in draftsched[shift] %}
@@ -167,24 +169,30 @@
             </form>
             <br>
             <h5 class="mb-3">Publish Schedule</h5>
-            <input type="radio" name="week" value="next" checked> For next week <span
-                class="text-muted">(advised)</span> <br>
-            <input type="radio" name="week" value="this"> For this week
-
+            Once you publish your schedule it will display in "Current Schedule" below, and will be sent out to workers.
+            <br>
+            Note that all groupmembers' weekly preferences will reset to their global preferences once a schedule is
+            published. <br> <br>
             <form action='' method="post">
+                <input type="radio" name="week" value="next" checked> Publish schedule for <strong>next</strong> week
+                <span class="text-muted">(recommended)</span> <br>
+                <input type="radio" name="week" value="this"> Publish schedule for <strong>this</strong> week <br>
+
                 <input type="submit" name="submit" value="Publish draft" class="btn btn-primary btn-sm"
                     style="margin-top: 4px;">
             </form>
+            <hr>
+            {% endif %}
             {% if publishnotif %}
-            <div class="container" style="position: fixed; bottom: 0; left: 20px; margin-bottom: 10px; width: 30%;">
+            <div class="container"
+                style="position: fixed; bottom: 0; left: 20px; margin-bottom: 10px; width: 30%; z-index: 100;">
                 <div class="alert alert-success alert-dismissible" role="alert">
                     <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
                             aria-hidden="true">&times;</span></button>
-                    <strong>New Schedule Published!</strong><br> Your new schedule is now displayed in Current Schedule.
+                    <strong>New Schedule Published!</strong><br> Your new schedule for {{week}} week is now displayed in
+                    Current Schedule.
                 </div>
             </div>
-            {% endif %}
-            <hr>
             {% endif %}
             <h2 class="mb-3">Current Schedule</h2>
             <div class="container">
@@ -223,7 +231,7 @@
                             <br>
                             {% endfor %}
                             {% else %}
-                            <p>No schedule has been generated for next week yet - go to generate schedule to create one!
+                            <p>No schedule has been generated for next week yet. Go to generate schedule to create one!
                             </p>
                             {% endif %}
                         </div>
