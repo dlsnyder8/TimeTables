@@ -370,7 +370,7 @@ def admin():
             html = render_template('admin.html', groups=groups_by_name, groupname=get_group_name(groupid), users=users,
                                    isAdmin=isAdmin,
                                    selected=selected, mgrs=mgrs, members=selectedUsers, isManager=isManager,
-                                   admins=admins, username=username, owners=owners, isOwner=isOwner)
+                                   admins=admins, username=username, isOwner=isOwner)
             response = make_response(html)
             return response
         elif output == "Change Admins":
@@ -391,7 +391,7 @@ def admin():
             admins = selectedAdmins
             html = render_template('admin.html', groups=groups_by_name, groupname=get_group_name(groupid), users=users,
                                    selected=selected, mgrs=mgrs, members=curr_members, isManager=isManager,
-                                   isAdmin=isAdmin, admins=admins, username=username, owners=owners, isOwner=isOwner)
+                                   isAdmin=isAdmin, admins=admins, username=username, isOwner=isOwner)
             response = make_response(html)
             return response
         elif output == "Save Managers":
@@ -411,13 +411,33 @@ def admin():
 
             html = render_template('admin.html', groups=groups_by_name, groupname=get_group_name(groupid), users=users,
                                    selected=selected, mgrs=mgrs, members=curr_members, isManager=isManager,
-                                   isAdmin=isAdmin, admins=admins, username=username, owners=owners, isOwner=isOwner)
+                                   isAdmin=isAdmin, admins=admins, username=username, isOwner=isOwner)
+            response = make_response(html)
+            return response
+        elif output == "Save Owners":
+            selectedOwners = []
+            for member in curr_members:
+                if request.form.get(member) is not None:
+                    selectedOwners.append(member)
+
+            newOwners, oldOwners = getDifferences(selectedOwners, owners)
+
+            for user in newOwners:
+                change_group_role(groupid, user, 'owner')
+                isOwner[user] = True
+            for user in oldOwners:
+                change_group_role(groupid, user, 'member')
+                isOwner[user] = False
+
+            html = render_template('admin.html', groups=groups_by_name, groupname=get_group_name(groupid), users=users,
+                                   selected=selected, mgrs=mgrs, members=curr_members, isManager=isManager,
+                                   isAdmin=isAdmin, admins=admins, username=username, isOwner=isOwner)
             response = make_response(html)
             return response
         else:
             html = render_template('admin.html', groups=groups_by_name, groupname=get_group_name(groupid), users=users,
                                    selected=selected, mgrs=mgrs, members=curr_members, isManager=isManager,
-                                   isAdmin=isAdmin, admins=admins, username=username, owners=owners, isOwner=isOwner)
+                                   isAdmin=isAdmin, admins=admins, username=username, isOwner=isOwner)
             response = make_response(html)
             response.set_cookie('adminGroup', groupname)
             return response
