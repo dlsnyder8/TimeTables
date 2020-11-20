@@ -74,6 +74,30 @@
         </div>
         {% endif %}
 
+        {% if schedule is not none %}
+        <div class="col-md-8 order-md-1 mx-auto">
+            <div class="mb-3">
+                <hr>
+                <div class="text-center">
+                    <strong>Here is your schedule for the next week:</strong></div>
+                <br>
+                {% include 'scheduleElement.html' %}
+            </div>
+        </div>
+        {% else %}
+        <div>
+            <div class="col-lg-12 text-center">
+                <p>This week's schedule has not been generated yet.</p>
+                <hr>
+                You still have time to input your weekly preferences:
+                <br>
+                <form action="/editGroup">
+                    <input type="submit" value="Weekly Preferences">
+                </form>
+            </div>
+        </div>
+        {% endif %}
+
     </div>
     <hr>
     {% include 'footer.html' %}
