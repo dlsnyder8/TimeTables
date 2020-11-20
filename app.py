@@ -388,8 +388,14 @@ def admin():
                 change_admin(user, False)
                 isAdmin[user] = False
 
+            print(groupid)
+
             admins = selectedAdmins
-            html = render_template('admin.html', groups=groups_by_name, groupname=get_group_name(groupid), users=users,
+            if groupid == -1:
+                html = render_template('admin.html', groups=groups_by_name, admins=admins, isAdmin=isAdmin, inGroup=inGroup, users=users,
+                               username=username)
+            else:
+                html = render_template('admin.html', groups=groups_by_name, groupname=get_group_name(groupid), users=users,
                                    selected=selected, mgrs=mgrs, members=curr_members, isManager=isManager,
                                    isAdmin=isAdmin, admins=admins, inGroup=inGroup, username=username, isOwner=isOwner)
             response = make_response(html)
@@ -427,6 +433,7 @@ def admin():
             for user in newOwners:
                 change_group_role(groupid, user, 'owner')
                 isOwner[user] = True
+                isManager[user] = False
                 mgrs[user] = ('owner', True)
             for user in oldOwners:
                 change_group_role(groupid, user, 'member')
