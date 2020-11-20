@@ -20,8 +20,9 @@
     {% include 'header.html' %}
     <br>
     <br>
-    <div class="p-md-3">
+    <div class="p-md-3 text-center">
         <strong>Select Group</strong>
+        <br>
         <form action="" method="post">
             {% for g in groups %}
             <input type="radio" disabled name="groupname" value="{{g}}" {% if groupname == g %} checked {% endif %}>
@@ -31,67 +32,68 @@
         </form>
     </div>
     <hr>
+    <div class="container">
+        <div class= "row text-center">
+            {% if selected %}
+            <div class="col-sm ">
+                <strong>Change Users</strong>
+                <form action='' method="post">
+                    <table class="table" style="text-align: left; border: 1px solid black;">
+                        {% for user in users: %}
+                            <tr>
+                                <td><input type="checkbox" name={{user}} {% if selected[user] %} checked {% endif %}>
+                                &nbsp;{{user}} {% if mgrs[user][1] %} <span class="text-muted"> ({{mgrs[user][0]}})</span>
+                                    {% endif %}</td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                    <input type="submit" name="submit" value="Save Users" class="btn btn-primary btn-sm" style="margin-top: 4px;">
+                </form>
+            </div>
+            {% endif %}
+            {% if members %}
+            <div class="col-sm">
+                <strong>Change Managers</strong>
+                <form action='' method="post">
+                    <table class="table" style="text-align: left; border: 1px solid black;">
+                        {% for member in members: %}
+                            <tr>
+                                <td><input type="checkbox" name={{member}} {% if isOwner[member] %} disabled {% endif %}{% if isManager[member] %} checked {% endif %} name={{member}}>
+                                {{member}}</td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                    <input type="submit" name="submit" value="Save Managers" class="btn btn-primary btn-sm" style="margin-top: 4px;">
+                </form>
+            </div>
+            {% endif %}
+            {% if isOwner %}
+            <div class="col-sm">
+                <strong>Change Owners</strong>
+                <form action='' method="post">
+                    <table class="table" style="text-align: left; border: 1px solid black;">
+                        {% for member in members: %}
+                            <tr>
+                                <td><input type="checkbox" name={{member}} {% if isOwner[member] %} checked {% endif %} name={{member}}>
+                                {{member}}</td>
+                            </tr>
+                        {% endfor %}
+                        </table>
+                        <input type="submit" name="submit" value="Save Owners" class="btn btn-primary btn-sm" style="margin-top: 4px;">
+                    </form>
+            </div>
+        </div>
+    </div>
+    {% endif %}
     {% if selected %}
-    <div>
-        <strong>Change Users</strong>
-        <form action='' method="post">
-            <table>
-                {% for user in users: %}
-                    <tr>
-                        <td><input type="checkbox" name={{user}} {% if selected[user] %} checked {% endif %}></td>
-                        <td> &nbsp;{{user}} {% if mgrs[user][1] %} <span class="text-muted"> ({{mgrs[user][0]}})</span>
-                            {% endif %}</td>
-                    </tr>
-                {% endfor %}
-                </table>
-                <input type="submit" name="submit" value="Save Users" class="btn btn-primary btn-sm" style="margin-top: 4px;">
-            </form>
-    </div>
-    <hr>
-    {% endif %}
-    {% if members %}
-    <div>
-        <strong>Change Managers</strong>
-        <form action='' method="post">
-            <table>
-                {% for member in members: %}
-                    <tr>
-                        <td><input type="checkbox" name={{member}} {% if isOwner[member] %} disabled {% endif %}{% if isManager[member] %} checked {% endif %} name={{member}}></td>
-                        <td>{{member}}</td>
-                    </tr>
-                {% endfor %}
-                </table>
-                <input type="submit" name="submit" value="Save Managers" class="btn btn-primary btn-sm" style="margin-top: 4px;">
-            </form>
-    </div>
-    <hr>
-    {% endif %}
-    {% if isOwner %}
-    <div>
-        <strong>Change Owners</strong>
-        <form action='' method="post">
-            <table>
-                {% for member in members: %}
-                    <tr>
-                        <td><input type="checkbox" name={{member}} {% if isOwner[member] %} checked {% endif %} name={{member}}></td>
-                        <td>{{member}}</td>
-                    </tr>
-                {% endfor %}
-                </table>
-                <input type="submit" name="submit" value="Save Owners" class="btn btn-primary btn-sm" style="margin-top: 4px;">
-            </form>
-    </div>
-    <hr>
-    {% endif %}
-    {% if selected %}
-    <div>
+    <div class="p-md-3 text-center">
         <form action="" method="post">
             <input type="submit" name="submit" value="Delete Group" class="btn btn-primary btn-sm" style="margin-top: 4px;">
         </form>
     </div>
     <hr>
     {% endif %}
-    <div class="p-md-3">
+    <div class="p-md-3 text-center">
         <strong>Change Admins</strong>
         <form action='' method="post">
             <table>
@@ -108,10 +110,10 @@
             </form>
     </div>
     <hr>
-    <div class="p-md-3">
+    <div class="p-md-3 text-center">
         <strong>Admins</strong>
-        <form action='' method="post">
-            <table>
+        <form action='' method="post" class="p-md-3 text-center">
+            <table >
                 {% for admin in admins: %}
                     <tr>
                         <td>{{admin}}</td>
