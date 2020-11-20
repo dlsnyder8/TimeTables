@@ -38,46 +38,44 @@
             <div class="col-sm ">
                 <strong>Change Users</strong>
                 <form action='' method="post">
-                    <table>
+                    <table class="table" style="text-align: left; border: 1px solid black;">
                         {% for user in users: %}
-                            <tr align="center">
-                                <td><input type="checkbox" name={{user}} {% if selected[user] %} checked {% endif %}></td>
-                                <td> &nbsp;{{user}} {% if mgrs[user][1] %} <span class="text-muted"> ({{mgrs[user][0]}})</span>
+                            <tr>
+                                <td><input type="checkbox" name={{user}} {% if selected[user] %} checked {% endif %}>
+                                &nbsp;{{user}} {% if mgrs[user][1] %} <span class="text-muted"> ({{mgrs[user][0]}})</span>
                                     {% endif %}</td>
                             </tr>
                         {% endfor %}
-                        </table>
-                        <input type="submit" name="submit" value="Save Users" class="btn btn-primary btn-sm" style="margin-top: 4px;">
-                    </form>
+                    </table>
+                    <input type="submit" name="submit" value="Save Users" class="btn btn-primary btn-sm" style="margin-top: 4px;">
+                </form>
             </div>
-            <hr>
             {% endif %}
             {% if members %}
             <div class="col-sm">
                 <strong>Change Managers</strong>
                 <form action='' method="post">
-                    <table>
+                    <table class="table" style="text-align: left; border: 1px solid black;">
                         {% for member in members: %}
-                            <tr  align="center">
-                                <td><input type="checkbox" name={{member}} {% if isOwner[member] %} disabled {% endif %}{% if isManager[member] %} checked {% endif %} name={{member}}></td>
-                                <td>{{member}}</td>
+                            <tr>
+                                <td><input type="checkbox" name={{member}} {% if isOwner[member] %} disabled {% endif %}{% if isManager[member] %} checked {% endif %} name={{member}}>
+                                {{member}}</td>
                             </tr>
                         {% endfor %}
-                        </table>
-                        <input type="submit" name="submit" value="Save Managers" class="btn btn-primary btn-sm" style="margin-top: 4px;">
-                    </form>
+                    </table>
+                    <input type="submit" name="submit" value="Save Managers" class="btn btn-primary btn-sm" style="margin-top: 4px;">
+                </form>
             </div>
-            <hr>
             {% endif %}
             {% if isOwner %}
             <div class="col-sm">
                 <strong>Change Owners</strong>
                 <form action='' method="post">
-                    <table>
+                    <table class="table" style="text-align: left; border: 1px solid black;">
                         {% for member in members: %}
-                            <tr align="center">
-                                <td><input type="checkbox" name={{member}} {% if isOwner[member] %} checked {% endif %} name={{member}}></td>
-                                <td>{{member}}</td>
+                            <tr>
+                                <td><input type="checkbox" name={{member}} {% if isOwner[member] %} checked {% endif %} name={{member}}>
+                                {{member}}</td>
                             </tr>
                         {% endfor %}
                         </table>
@@ -86,7 +84,6 @@
             </div>
         </div>
     </div>
-    <hr>
     {% endif %}
     {% if selected %}
     <div class="p-md-3 text-center">
@@ -98,7 +95,7 @@
     {% endif %}
     <div class="p-md-3 text-center">
         <strong>Change Admins</strong>
-        <form action='' method="post" class="p-md-3 text-center">
+        <form action='' method="post">
             <table>
                 {% for user in users: %}
                     {% if user != username %}
