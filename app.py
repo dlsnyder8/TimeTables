@@ -294,6 +294,7 @@ def admin():
     if not (user_exists(username)):
         return redirect(url_for('createProfile'))
 
+
     isAd = is_admin(username)
     # needs to be all groups, not just included ones
     groups = get_all_groups()
@@ -310,8 +311,13 @@ def admin():
 
     # gets admins
     if request.method == "GET":
+<<<<<<< HEAD
         html = render_template('admin.html', groups=groups_by_name, admins=admins, isAdmin=isAdmin, users=users)
         print("hi")
+=======
+        html = render_template('admin.html', groups=groups_by_name, admins = admins)
+>>>>>>> 63e332468e7a87568015320ed335f136f0655505
+>>>>>>> b34b2dc23a6be14166cbfc9c41f7e5eab6cd94b5
         response = make_response(html)
         return response
     else:
@@ -324,6 +330,10 @@ def admin():
         isManager = {}
         managers = []
         mgrs = {}
+<<<<<<< HEAD
+
+=======
+>>>>>>> 63e332468e7a87568015320ed335f136f0655505
         for user in users:
             selected[user] = False
             if user in curr_members:
@@ -357,8 +367,16 @@ def admin():
                 selected[user] = False
                 mgrs[user] = ("notGroup", False)
 
+<<<<<<< HEAD
             html = render_template('admin.html', groups=groups_by_name, groupname=get_group_name(groupid), users=users, isAdmin=isAdmin,
                 selected=selected, mgrs=mgrs, members=selectedUsers, isManager=isManager, admins=admins, username=username)
+=======
+<<<<<<< HEAD
+            html = render_template('admin.html', groups=groups_by_name, groupname=get_group_name(groupid), users=users, selected=selected, mgrs=mgrs, members=selectedUsers, isManager=isManager)
+=======
+            html = render_template('admin.html', groups=groups_by_name, groupname=get_group_name(groupid), users=users, isAdmin= isAdmin, 
+                selected=selected, mgrs=mgrs, members=selectedUsers, isManager=isManager, admins = admins, username = username)
+>>>>>>> b34b2dc23a6be14166cbfc9c41f7e5eab6cd94b5
             response = make_response(html)
             return response
         elif output == "Change Admins":
@@ -378,7 +396,12 @@ def admin():
 
             admins = selectedAdmins 
             html = render_template('admin.html', groups=groups_by_name, groupname=get_group_name(groupid), users=users,
+<<<<<<< HEAD
                                    selected=selected, mgrs=mgrs, members=curr_members, isManager=isManager, isAdmin=isAdmin, admins=admins, username=username)
+=======
+                                   selected=selected, mgrs=mgrs, members=curr_members, isManager=isManager, isAdmin= isAdmin, admins = admins, username = username)
+>>>>>>> 63e332468e7a87568015320ed335f136f0655505
+>>>>>>> b34b2dc23a6be14166cbfc9c41f7e5eab6cd94b5
             response = make_response(html)
             return response
         elif output == "Save Managers":
@@ -397,12 +420,20 @@ def admin():
                 isManager[user] = False
 
             html = render_template('admin.html', groups=groups_by_name, groupname=get_group_name(groupid), users=users,
+<<<<<<< HEAD
+                                   selected=selected, mgrs=mgrs, members=curr_members, isManager=isManager)
+            response = make_response(html)
+            return response
+        else:
+            html = render_template('admin.html', groups=groups_by_name, groupname=get_group_name(groupid), users=users, selected=selected, mgrs=mgrs, members=curr_members, isManager=isManager)
+=======
                 selected=selected, mgrs=mgrs, members=curr_members, isManager=isManager, isAdmin= isAdmin, admins = admins, username = username)
             response = make_response(html)
             return response
         else:
             html = render_template('admin.html', groups=groups_by_name, groupname=get_group_name(groupid), users=users,
                 selected=selected, mgrs=mgrs, members=curr_members, isManager=isManager, isAdmin= isAdmin, admins = admins, username = username)
+>>>>>>> 63e332468e7a87568015320ed335f136f0655505
             response = make_response(html)
             response.set_cookie('adminGroup', groupname)
             return response
