@@ -164,8 +164,7 @@
             {% endfor %}
             <br>
             <form action="/editdraft">
-                <!--- draft schedule page-->
-                <input class="btn btn-primary btn-sm" type="submit" value="Edit draft" style="margin-top: 4px;">
+                <input class="btn btn-primary btn-sm" type="submit" name = "submit" value="Edit Draft" style="margin-top: 4px;">
             </form>
             <br>
             <h5 class="mb-3">Publish Schedule</h5>
@@ -210,10 +209,14 @@
                             {% endfor %}
                             <br>
                             {% endfor %}
+                            <form action="/editdraft">
+                                <input class="btn btn-primary btn-sm" type="submit" name = "submit" value="Edit This Week" style="margin-top: 4px;">
+                            </form>
                             {% else %}
                             <p>No schedule has been generated for this week yet - go to generate schedule to create one!
                             </p>
                             {% endif %}
+                            
                         </div>
                     </div>
 
@@ -230,6 +233,9 @@
                             {% endfor %}
                             <br>
                             {% endfor %}
+                            <form action="/editdraft">
+                                <input class="btn btn-primary btn-sm" type="submit" name = "submit" value="Edit Next Week" style="margin-top: 4px;">
+                            </form>
                             {% else %}
                             <p>No schedule has been generated for next week yet. Go to generate schedule to create one!
                             </p>

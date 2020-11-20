@@ -11,7 +11,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title> Edit Draft Schedule </title>
+    <title> Edit {{scheduletype}} Schedule </title>
 
     <!-- Bootstrap core CSS -->
     <link href="../static/vendor/bootstrap/css/bootstrap.css" rel="stylesheet">
@@ -25,7 +25,7 @@
     <!-- Page Content -->
     <div class=" p-md-3">
         <div class="col-md-8 order-md-1 mx-auto">
-            <h1 class="display-4 font-weight-normal">Edit Draft Schedule for {{groupname}} {% if notgroupintitle %}
+            <h1 class="display-4 font-weight-normal">Edit {{scheduletype}} Schedule for {{groupname}} {% if notgroupintitle %}
                 Group {% endif %}
             </h1>
             <hr>
@@ -34,7 +34,7 @@
 
     <div class="col-md-8 order-md-1 mx-auto">
         <div class="container">
-            <h2 class="mb-3">Draft Schedule</h2>
+            <h2 class="mb-3">{{scheduletype}} Schedule</h2>
 
             <p>Users displayed with an asterisk (*)
                 have indicated that they would prefer not to work that shift.</p>
@@ -44,6 +44,7 @@
             <strong>{{shift}}</strong>:
             <form action='' method="post">
                 <span hidden><input type="text" name="shift" value="{{shift}}"></span>
+                <span hidden><input tpye="text" name="scheduletype" value="{{scheduletype}}"></span>
                 <table>
                     {% if selected["shift"] == shift %}
                     {% for netid in groupMembers: %}
@@ -75,7 +76,7 @@
             <br>
             {% endfor %}
             {% else %}
-            <p>You haven't generated a draft schedule yet.
+            <p>You haven't generated this schedule yet.
             </p>
             {% endif %}
             <form action="/manage">

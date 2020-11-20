@@ -14,7 +14,7 @@ import urllib.parse as urlparse
 # -------------------
 # CAS Authentication cannot be run locally unfortunately
 # Set this variable to False if local, and change to True before pushing
-PROD_ENV = True
+PROD_ENV = False
 
 # ----------
 
@@ -676,15 +676,18 @@ def manage():
                 conflicts = parse_conflicts(draftsched, preferences, fshifts, memberlist)
             except:
                 draftsched = None
+                conflicts = None
+                errormsg = True
             if (draftsched == {}):
                 draftsched = None
-                errormsg = True
 
             # Store schedule, conflicts in DB
             if draftsched is not None:
                 change_draft_schedule(groupid, draftsched)
                 draftsched = formatDisplaySched(draftsched)
                 generatenotif = True
+            else:
+                draftsched = formatDisplaySched(get_draft_schedule(groupid))
             if conflicts is not None:
                 change_group_conflicts(groupid, conflicts)
             else:
@@ -793,40 +796,90 @@ def editdraft():
     conflicts = formatDisplaySched(conflicts)
 
     selected = {}
-    
-    if request.method == 'POST':
+    scheduletype = ""
+    if request.method == 'GET':      
+        if request.args.get("submit") == "Edit Draft":
+            scheduletype = "Draft"
+        elif request.args.get("submit") == "Edit This Week":
+            scheduletype = "This Week's"
+            raw_schedule = get_group_schedule(groupid)
+            schedule = formatDisplaySched(raw_schedule)
+        elif request.args.get("submit") == "Edit Next Week":
+            scheduletype = "Next Week's"
+            raw_schedule = get_group_schedule_next(groupid)
+            schedule = formatDisplaySched(raw_schedule)
+
+    elif request.method == 'POST':
         if request.form["submit"] == "Save":
+            scheduletype = request.form.get('scheduletype')
+            print(scheduletype)
             rawShift = request.form.get("shift")
             shift = rawShift.split()
-            
             day = shift[0]
             start = shift[1]
+            start = start.split(":")
             if shift[2] == 'PM':
-                start = start.split(":")
                 start = str(int(start[0]) + 12) + ":" + start[1]
+            elif int(start[0]) < 10:
+                start = "0" + start[0] + ":"  + start[1]
+            else:
+                start = start[0] + ":"  + start[1]
             end = shift[4]
+            end = end.split(":")
             if shift[5] == 'PM':
-                end = end.split(":")
                 end = str(int(end[0]) + 12) + ":" + end[1]
+            elif int(start[0]) < 10:
+                end = "0" + end[0] + ":"  + end[1]
+            else:
+                 end = end[0] + ":"  + end[1]
+
             shift = shiftstr_to_key(day, start, end)
             
             selected["shift"] = rawShift
+
             for member in groupMembers:
                 status = request.form.get(member)
                 if status is not None:
                     selected[member] = True
-                    if member not in raw_schedule[shift]:
-                        add_user_to_draft_schedule(groupid, shift, member)
+                    if scheduletype == "Draft":
+                        if member not in raw_schedule[shift]:
+                            add_user_to_draft_schedule(groupid, shift, member)
+
+                    elif scheduletype == "This Week's":
+                        raw_schedule = get_group_schedule(groupid)
+                        schedule = schedule = formatDisplaySched(raw_schedule)
+                        if member not in raw_schedule[shift]:
+                            add_user_to_shift_schedule(groupid, shift, member)
+
+                    elif scheduletype == "Next Week's":
+                        raw_schedule = get_group_schedule_next(groupid)
+                        schedule = schedule = formatDisplaySched(raw_schedule)
+                        if member not in raw_schedule[shift]:
+                            add_user_to_shift_schedule_next(groupid, shift, member)
+
+                    
                 else:
                     selected[member] = False
-                    if member in raw_schedule[shift]:
-                        remove_user_from_draft_schedule(groupid, shift, member)
+                    if scheduletype == "Draft":
+                        if member in raw_schedule[shift]:
+                            remove_user_from_draft_schedule(groupid, shift, member)
+                    elif scheduletype == "This Week's":
+                        raw_schedule = get_group_schedule(groupid)
+                        schedule = schedule = formatDisplaySched(raw_schedule)
+                        if member in raw_schedule[shift]:
+                            remove_user_from_shift_schedule(groupid, shift, member)
+                    elif scheduletype == "Next Week's":
+                        raw_schedule = get_group_schedule_next(groupid)
+                        schedule = schedule = formatDisplaySched(raw_schedule)
+                        if member in raw_schedule[shift]:
+                            remove_user_from_shift_schedule_next(groupid, shift, member)
+                            
             
             
 
     html = render_template('editdraft.html', schedule=schedule, groupname=groupname, inGroup=True, isMgr=isMgr, groupMembers=groupMembers,
                     conflicts=conflicts, shifts=get_group_shifts(groupid), isOwner=isOwner, isAdmin=isAd, notgroupintitle = notGroupInTitle,
-                    selected=selected)
+                    selected=selected, scheduletype=scheduletype)
 
     response = make_response(html)
     return response

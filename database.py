@@ -319,6 +319,36 @@ def remove_user_from_shift_schedule(groupid, shift, netid):
         return -1
     change_group_schedule(groupid, schedule)
 
+# Change final schedule next
+def add_user_to_shift_schedule_next(groupid, shift, netid):
+    schedule = get_group_schedule_next(groupid)
+    if schedule is None:
+        print('Empty Schedule', file=stderr)
+        return -1
+    if shift not in schedule:
+        print('Invalid Shift',file=stderr)
+        return -1
+    if netid in schedule[shift]:
+        print('Cannot add the same user twice', file = stderr)
+        return -1
+    schedule[shift].append(netid)
+    change_group_schedule_next(groupid, schedule)
+
+def remove_user_from_shift_schedule_next(groupid, shift, netid):
+    schedule = get_group_schedule_next(groupid)
+    if schedule is None:
+        print('Empty Schedule', file=stderr)
+        return -1
+    if shift not in schedule:
+        print('Invalid Shift',file=stderr)
+        return -1
+    try:
+        schedule[shift].remove(netid)
+    except:
+        print('Invalid Shift/User', file=stderr)
+        return -1
+    change_group_schedule_next(groupid, schedule)
+
 
 # replaces weekly preferences of user. If none specified, 
 # replaces it with global preferences
@@ -730,6 +760,9 @@ if __name__=="__main__":
     #change_group_schedule(52, {"6_5_2":["batyas","bates", "kevin"], "0_2_3":["hi1"],"1_4_5":["hi2"],"1_0_1":["hi3","b"]})
     #print(parse_user_schedule("batyas", get_group_schedule(52)))
     
-    print(get_group_schedule(81))
+    change_draft_schedule(81, None)
+    change_group_schedule(81, None)
+    change_group_schedule_next(81, None)
+    change_group_conflicts(81, None)
     #change_group_conflicts(81, {})
     #print(get_group_conflicts(81))
