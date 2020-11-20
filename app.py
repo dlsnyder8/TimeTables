@@ -14,7 +14,7 @@ import urllib.parse as urlparse
 # -------------------
 # CAS Authentication cannot be run locally unfortunately
 # Set this variable to False if local, and change to True before pushing
-PROD_ENV = True
+PROD_ENV = False
 
 # ----------
 
@@ -215,6 +215,11 @@ def shiftkey_to_str(shiftkey, full=False):
     shiftString = "{} {} - {}".format(nums_to_days[int(split[0])], military_to_us_time(split[1]),
                                       military_to_us_time(split[2]))
     return shiftString
+
+def shiftstr_to_key(day, start, end):
+    days_to_nums = {'Sunday': 0, 'Monday': 1, 'Tuesday': 2, 'Wednesday': 3, 'Thursday': 4, 'Friday': 5,
+                            'Saturday': 6}
+    return "{}_{}_{}".format(days_to_nums[day], start.split(":")[0], end.split(":")[0])
 
 
 def formatDisplaySched(currsched):
@@ -600,8 +605,6 @@ def manage():
         groupid = get_group_id(groupname)
 
         if request.form["submit"] == "Add":
-            days_to_nums = {'Sunday': 0, 'Monday': 1, 'Tuesday': 2, 'Wednesday': 3, 'Thursday': 4, 'Friday': 5,
-                            'Saturday': 6}
 
             day = request.form["day"]
             start = request.form["start"]
@@ -609,7 +612,7 @@ def manage():
             npeople = request.form["npeople"]
 
             shift = [day, start, end, npeople]
-            shiftid = "{}_{}_{}".format(days_to_nums[day], start.split(":")[0], end.split(":")[0])
+            shiftid = shiftstr_to_key(day, start, end)
             shifts[shiftid] = shift
 
             # change double array of shifts to dict, update db
