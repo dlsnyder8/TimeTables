@@ -262,6 +262,7 @@ def index():
     numGroups = len(groups)
     inGroup = (numGroups != 0)
     isMgr = getIsMgr(username, inGroup, request, groups)
+    canCreate = can_create_group(username)
     if isMgr == -1:
         groupname = groupid = None
     else:
@@ -279,7 +280,7 @@ def index():
 
     if request.method == 'GET':
         html = render_template('index.html', groups=groups_by_name, groupname=groupname, numGroups=numGroups,
-                               inGroup=inGroup, isMgr=isMgr, isOwner=isOwner, isAdmin=isAd)
+                               inGroup=inGroup, isMgr=isMgr, isOwner=isOwner, isAdmin=isAd, canCreate=canCreate)
         response = make_response(html)
         return response
 
@@ -290,7 +291,7 @@ def index():
         isOwner = (get_user_role(username, groupid) == 'owner')
 
         html = render_template('index.html', groups=groups_by_name, groupname=groupname, numGroups=numGroups,
-                               inGroup=inGroup, isMgr=isMgr, isOwner=isOwner, isAdmin=isAd)
+                               inGroup=inGroup, isMgr=isMgr, isOwner=isOwner, isAdmin=isAd, canCreate=canCreate)
         response = make_response(html)
         response.set_cookie('groupname', groupname)
         response.set_cookie('groupid', str(groupid))
