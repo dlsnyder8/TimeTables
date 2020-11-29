@@ -19,8 +19,11 @@ def main():
 
 
             # Save this weeks schedule 
-
         
+        print("Schedule has been succesfully updated")
+
+    else:
+        print("Failed to update weekly schedule because it is not Saturday")
 
 
 
