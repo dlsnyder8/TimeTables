@@ -983,35 +983,6 @@ def editGroup():
 
         return redirect(url_for('group'))
 
-
-@app.route('/populateUsers', methods=['GET'])
-def populateUsers():
-    add_user('John', 'Doe', 'jdoe')
-    add_user('Jane', 'Doe', 'jadoe')
-    add_user('Bland', 'Land', 'bland')
-    add_user('Dan', 'Man', 'dman')
-    add_user('Tom', 'Till', 'ttill')
-    add_user('Jen', 'Jill', 'jjill')
-    print("Populated Users")
-    return redirect(url_for('index'))
-
-
-@app.route('/cleanGroups', methods=['GET'])
-def cleanGroups():
-    username = get_username()
-
-    isAd = is_admin(username)
-    groups = get_user_groups(username)
-    if len(groups) == 0:
-        return redirect(url_for('index'))
-    # groups is list of tuples - (groupid, groupname), so create list of groupids from group list
-    groupIds = [g[0] for g in groups]
-    for groupId in groupIds:
-        remove_group(groupId)
-    print("DELETED ALL GROUPS")
-    return redirect(url_for('index'))
-
-
 @app.route('/viewGroup', methods=['GET'])
 def viewGroup():
     username = get_username()
