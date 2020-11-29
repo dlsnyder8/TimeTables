@@ -3,7 +3,7 @@ import datetime
 def main():
     # because the scheduler runs daily (heroku limitation)
     # we have to check if the current day is saturday
-    if datetime.datetime.today().weekday() is 5:
+    if datetime.datetime.today().weekday() == 5:
 
         groups = get_all_groups()
 
