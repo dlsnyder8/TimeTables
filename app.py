@@ -306,6 +306,9 @@ def admin():
     username = get_username()
     if not (user_exists(username)):
         return redirect(url_for('createProfile'))
+    if not is_admin(username):
+        print("non admin accessed admin page")
+        return redirect(url_for('index'))
     inGroup = in_group(username)
     groups = get_all_groups()
     groups_by_name = [g[1] for g in groups]
