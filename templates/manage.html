@@ -164,7 +164,8 @@
             {% endfor %}
             <br>
             <form action="/editdraft">
-                <input class="btn btn-primary btn-sm" type="submit" name = "submit" value="Edit Draft" style="margin-top: 4px;">
+                <input class="btn btn-primary btn-sm" type="submit" name="submit" value="Edit Draft"
+                    style="margin-top: 4px;">
             </form>
             <br>
             <h5 class="mb-3">Publish Schedule</h5>
@@ -173,9 +174,11 @@
             Note that all groupmembers' weekly preferences will reset to their global preferences once a schedule is
             published. <br> <br>
             <form action='' method="post">
-                <input type="radio" name="week" value="next" checked> Publish schedule for <strong>next</strong> week
-                <span class="text-muted">(recommended)</span> <br>
-                <input type="radio" name="week" value="this"> Publish schedule for <strong>this</strong> week <br>
+                <input type="radio" name="week" value="next" checked> Publish schedule for <strong>next week </strong>
+                ({{nextWeekSpan}})
+                <span class="text-muted">recommended</span> <br>
+                <input type="radio" name="week" value="this"> Publish schedule for <strong>this week </strong>
+                ({{thisWeekSpan}})<br>
 
                 <input type="submit" name="submit" value="Publish draft" class="btn btn-primary btn-sm"
                     style="margin-top: 4px;">
@@ -198,7 +201,8 @@
                 <div class="card-deck mb-3">
                     <div class="card">
                         <div class="card-header text-center">
-                            <h4 class="my-0 font-weight-normal">This Week</h4>
+                            <h4 class="my-0 font-weight-normal">This Week </h4>
+                            <h5 class="font-weight-normal text-muted"> ({{thisWeekSpan}})</h5>
                         </div>
                         <div class="card-body">
                             {% if thisWeekSched %}
@@ -210,19 +214,21 @@
                             <br>
                             {% endfor %}
                             <form action="/editdraft">
-                                <input class="btn btn-primary btn-sm" type="submit" name = "submit" value="Edit This Week" style="margin-top: 4px;">
+                                <input class="btn btn-primary btn-sm" type="submit" name="submit" value="Edit This Week"
+                                    style="margin-top: 4px;">
                             </form>
                             {% else %}
                             <p>No schedule has been generated for this week yet - go to generate schedule to create one!
                             </p>
                             {% endif %}
-                            
+
                         </div>
                     </div>
 
                     <div class="card">
                         <div class="card-header text-center">
-                            <h4 class="my-0 font-weight-normal">Next Week</h4>
+                            <h4 class="my-0 font-weight-normal">Next Week </h4>
+                            <h5 class="font-weight-normal text-muted"> ({{nextWeekSpan}})</h5>
                         </div>
                         <div class="card-body">
                             {% if nextWeekSched %}
@@ -234,7 +240,8 @@
                             <br>
                             {% endfor %}
                             <form action="/editdraft">
-                                <input class="btn btn-primary btn-sm" type="submit" name = "submit" value="Edit Next Week" style="margin-top: 4px;">
+                                <input class="btn btn-primary btn-sm" type="submit" name="submit" value="Edit Next Week"
+                                    style="margin-top: 4px;">
                             </form>
                             {% else %}
                             <p>No schedule has been generated for next week yet. Go to generate schedule to create one!

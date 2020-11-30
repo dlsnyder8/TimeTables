@@ -5,6 +5,7 @@ from flask_mail import Mail, Message
 
 from database import *
 from shifttest import *
+from dates import *
 
 import os
 import json
@@ -15,7 +16,7 @@ from itertools import chain
 # -------------------
 # CAS Authentication cannot be run locally unfortunately
 # Set this variable to False if local, and change to True before pushing
-PROD_ENV = True
+PROD_ENV = False
 
 # ----------
 
@@ -65,7 +66,8 @@ def email_group(groupid, groupName):
 
             output = formatDisplaySched(sched)
 
-            html = "<strong>Your shifts this week are:</strong><br>"
+            # adds dates to week assuming email is sent on saturday
+            html = "<strong>Your shifts this week ({}) are:</strong><br>".format(get_next_week_span())
 
             for (key, value) in output.items():
                 print(key)
@@ -597,6 +599,9 @@ def manage():
     if not shifts:
         shifts = {}
 
+    thisWeekSpan = get_this_week_span()
+    nextWeekSpan = get_next_week_span()
+
     thisWeekSched = get_group_schedule(groupid)
     thisWeekSched = formatDisplaySched(thisWeekSched)
 
@@ -609,8 +614,8 @@ def manage():
     if request.method == 'GET':
         shifts = shiftdict_to_us_time(shifts)
         html = render_template('manage.html', groupname=groupname, notgroupintitle=notGroupInTitle, inGroup=True, isMgr=isMgr,
-                               shifts=shifts, users=users, mgrs=mgrs, selected=selected, schedule=schedule, 
-                               nextWeekSched=nextWeekSched, draftsched = draftsched,
+                               shifts=shifts, users=users, mgrs=mgrs, selected=selected, thisWeekSpan=thisWeekSpan, nextWeekSpan=nextWeekSpan,
+                               schedule=schedule, nextWeekSched=nextWeekSched, draftsched = draftsched,
                                username=username, isOwner=isOwner, isAdmin=isAd)
         response = make_response(html)
         return response
@@ -721,8 +726,8 @@ def manage():
         
         shifts = shiftdict_to_us_time(shifts)
         html = render_template('manage.html', groupname=groupname, inGroup=True, isMgr=isMgr, shifts=shifts,
-                               users=users, mgrs=mgrs, selected=selected, thisWeekSched=thisWeekSched, 
-                               nextWeekSched=nextWeekSched, week=week,
+                               users=users, mgrs=mgrs, selected=selected, thisWeekSpan=thisWeekSpan, nextWeekSpan=nextWeekSpan,
+                               thisWeekSched=thisWeekSched, nextWeekSched=nextWeekSched, week=week,
                                publishnotif=publishnotif, generatenotif=generatenotif, errormsg=errormsg, 
                                isOwner=isOwner, username=username, isAdmin=isAd, draftsched=draftsched)
         response = make_response(html)
@@ -746,21 +751,25 @@ def schedule():
     isMgr = getIsMgr(username, True, request, groups)
     isOwner = getIsOwner(username, True, groupid)
 
+    thisWeekSpan = get_this_week_span()
+    nextWeekSpan = get_next_week_span()
+
     schedule = get_group_schedule(groupid)
     if schedule is not None:
         schedule = get_double_array(parse_user_schedule(username, schedule))
+
+        # check if sched exists but user not scheduled to work at all this week --
         if not any(chain(*schedule)):
             schedule = -1
-    # check if sched exists but user not scheduled to work at all this week --
     
     
     nextWeekSched = get_next_group_schedule(groupid)
     if nextWeekSched is not None:
         nextWeekSched = get_double_array(parse_user_schedule(username, nextWeekSched))
+
+        # check if sched exists but user not scheduled to work at all this week --
         if not any(chain(*nextWeekSched)):
             nextWeekSched = -1
-
-    # check if sched exists but user not scheduled to work at all this week --
     
     shifts = get_group_shifts(groupid)
     if not shifts:
@@ -768,7 +777,8 @@ def schedule():
     else:
         shifts = shiftdict_to_us_time(shifts)
 
-    html = render_template('schedule.html', schedule=schedule, nextWeekSched=nextWeekSched, groupname=groupname, 
+    html = render_template('schedule.html', schedule=schedule, withdate=True, thisWeekSpan=thisWeekSpan, nextWeekSpan=nextWeekSpan,
+                            dates=get_this_week_array(), nextWeekDates=get_next_week_array(), nextWeekSched=nextWeekSched, groupname=groupname, 
                             inGroup=True, isMgr=isMgr, editable=False, isOwner=isOwner, isAdmin=isAd)
     response = make_response(html)
 

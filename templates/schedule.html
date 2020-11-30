@@ -65,6 +65,7 @@
         <div class="card">
             <div class="card-header text-center">
                 <h4 class="my-0 font-weight-normal">This Week</h4>
+                <h5 class="font-weight-normal text-muted"> ({{thisWeekSpan}})</h5>
             </div>
             <div class="card-body">
                 {% if schedule is not none %}
@@ -92,6 +93,7 @@
         <div class="card">
             <div class="card-header text-center">
                 <h4 class="my-0 font-weight-normal">Next Week</h4>
+                <h5 class="font-weight-normal text-muted"> ({{nextWeekSpan}})</h5>
             </div>
             <div class="card-body">
                 {% if nextWeekSched is not none %}
@@ -105,13 +107,20 @@
                     <thead>
                         <tr>
                             <th></th>
-                            <th scope="col">Sunday</th>
-                            <th scope="col">Monday</th>
-                            <th scope="col">Tuesday</th>
-                            <th scope="col">Wednesday</th>
-                            <th scope="col">Thursday</th>
-                            <th scope="col">Friday</th>
-                            <th scope="col">Saturday</th>
+                            <th scope="col" class="text-center"> {{nextWeekDates[0]}} <br> <span class="text-muted"> Sun
+                                </span> </th>
+                            <th scope="col" class="text-center"> {{nextWeekDates[1]}} <br> <span class="text-muted"> Mon
+                                </span> </th>
+                            <th scope="col" class="text-center"> {{nextWeekDates[2]}} <br> <span class="text-muted">
+                                    Tues </span> </th>
+                            <th scope="col" class="text-center"> {{nextWeekDates[3]}} <br> <span class="text-muted"> Wed
+                                </span> </th>
+                            <th scope="col" class="text-center"> {{nextWeekDates[4]}} <br> <span class="text-muted">
+                                    Thurs </span> </th>
+                            <th scope="col" class="text-center"> {{nextWeekDates[5]}} <br> <span class="text-muted"> Fri
+                                </span> </th>
+                            <th scope="col" class="text-center"> {{nextWeekDates[6]}} <br> <span class="text-muted"> Sat
+                                </span> </th>
                         </tr>
                     </thead>
                     <tbody>
