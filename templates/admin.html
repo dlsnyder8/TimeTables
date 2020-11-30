@@ -42,7 +42,7 @@
                         {% for user in users: %}
                             <tr>
                                 <td><input type="checkbox" name={{user}} {% if selected[user] %} checked {% endif %}>
-                                &nbsp;{{user}} {% if mgrs[user][1] %} <span class="text-muted"> ({{mgrs[user][0]}})</span>
+                                &nbsp;{{user}}: {{fullNames[user]}} {% if mgrs[user][1] %} <span class="text-muted"> ({{mgrs[user][0]}})</span>
                                     {% endif %}</td>
                             </tr>
                         {% endfor %}
@@ -59,7 +59,7 @@
                         {% for member in members: %}
                             <tr>
                                 <td><input type="checkbox" name={{member}} {% if isOwner[member] %} disabled {% endif %}{% if isManager[member] %} checked {% endif %} name={{member}}>
-                                {{member}}</td>
+                                {{member}}: {{fullNames[member]}}</td>
                             </tr>
                         {% endfor %}
                     </table>
@@ -75,7 +75,7 @@
                         {% for member in members: %}
                             <tr>
                                 <td><input type="checkbox" name={{member}} {% if isOwner[member] %} checked {% endif %} name={{member}}>
-                                {{member}}</td>
+                                {{member}}: {{fullNames[member]}}</td>
                             </tr>
                         {% endfor %}
                         </table>
@@ -101,7 +101,7 @@
                     {% if user != username %}
                     <tr>
                         <td><input type="checkbox" {% if isAdmin[user] %} checked {% endif %} name={{user}}></td>
-                        <td> &nbsp;{{user}}</td>
+                        <td> &nbsp;{{user}}: {{fullNames[user]}}</td>
                     </tr>
                     {% endif %}
                 {% endfor %}
@@ -116,7 +116,7 @@
             <table >
                 {% for admin in admins: %}
                     <tr>
-                        <td>{{admin}}</td>
+                        <td>{{admin}}: {{fullNames[admin]}}</td>
                     </tr>
                 {% endfor %}
                 </table>
@@ -131,7 +131,7 @@
                     {% if user != username %}
                     <tr>
                         <td><input type="checkbox" name={{user}}></td>
-                        <td> &nbsp;{{user}}</td>
+                        <td>{{user}}: {{fullNames[user]}}</td>
                     </tr>
                     {% endif %}
                 {% endfor %}
