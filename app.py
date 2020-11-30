@@ -471,6 +471,24 @@ def admin():
             response.set_cookie('groupname', groupname)
             response.set_cookie('groupid', str(groupid))
             return response
+        elif output == "Delete Users":
+            deletedUsers = []
+            print("deleting users")
+            for user in users:
+                if request.form.get(user) is not None:
+                    deletedUsers.append(user)
+            for user in deletedUsers:
+                remove_user(user)
+                print("removed " + user + " from database")
+                users.remove(user)
+                if user in admins:
+                    admins.remove(user)
+
+            html = render_template('admin.html', groups=groups_by_name, inGroup=inGroup, admins=admins, isAdmin=isAdmin,
+                                   users=users,
+                                   username=username)
+            response = make_response(html)
+            return response
         else:
             html = render_template('admin.html', groups=groups_by_name, groupname=get_group_name(groupid), users=users,
                                    selected=selected, mgrs=mgrs, members=curr_members, isManager=isManager,
