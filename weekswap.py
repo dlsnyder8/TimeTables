@@ -1,4 +1,6 @@
-from database import get_all_groups,get_group_schedule_next,change_group_schedule, change_group_schedule_next
+from database import get_all_groups, get_group_schedule_next, change_group_schedule, change_group_schedule_next,get_group_name
+                    
+from app import email_group
 import datetime
 def main():
     # because the scheduler runs daily (heroku limitation)
@@ -17,7 +19,7 @@ def main():
 
             change_group_schedule(groupid, nextSched)
 
-
+            email_group(groupid,get_group_name(groupid))
             # Save this weeks schedule 
         
         print("Schedule has been succesfully updated")
