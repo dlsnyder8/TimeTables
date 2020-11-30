@@ -615,7 +615,7 @@ def manage():
         shifts = shiftdict_to_us_time(shifts)
         html = render_template('manage.html', groupname=groupname, notgroupintitle=notGroupInTitle, inGroup=True, isMgr=isMgr,
                                shifts=shifts, users=users, mgrs=mgrs, selected=selected, thisWeekSpan=thisWeekSpan, nextWeekSpan=nextWeekSpan,
-                               schedule=schedule, nextWeekSched=nextWeekSched, draftsched = draftsched,
+                               thisWeekSched=thisWeekSched, nextWeekSched=nextWeekSched, draftsched = draftsched,
                                username=username, isOwner=isOwner, isAdmin=isAd)
         response = make_response(html)
         return response
