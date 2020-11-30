@@ -265,7 +265,7 @@
                     <tr>
                         <td><input type="checkbox" name={{user}} {% if mgrs[user][1] %} disabled {% endif %}
                                 {% if selected[user] %} checked {% endif %}></td>
-                        <td> &nbsp;{{user}} {% if mgrs[user][1] %} <span class="text-muted">
+                        <td> &nbsp;{{user}}: {{fullNames[user]}} {% if mgrs[user][1] %} <span class="text-muted">
                                 ({{mgrs[user][0]}})</span>
                             {% endif %}</td>
                     </tr>

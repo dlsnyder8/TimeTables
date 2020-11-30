@@ -40,7 +40,7 @@
                 <table>
                     {% for name in names: %}
                     <tr>
-                        <td>{{name}}</td>
+                        <td>{{name}}: {{fullNames[name]}}</td>
                         <td><input type="checkbox" name={{name}}></td>
                     </tr>
                     {% endfor %}

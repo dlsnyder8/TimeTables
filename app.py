@@ -522,7 +522,10 @@ def owner():
     managers = []
     roles = {}
     isManager = {}
+    fullNames = {}
     for user in users:
+        info = get_profile_info(user)
+        fullNames[user] = info[0] + " " + info[1]
         role = get_user_role(user, groupid)
         roles[user] = role
         if role == "manager":
@@ -533,7 +536,7 @@ def owner():
 
     if request.method == "GET":
         html = render_template('owner.html', inGroup=inGroup, users=users, isManager=isManager, groupname=groupname,
-                               isMgr=True, isOwner=True, isAdmin=isAd)
+                               isMgr=True, isOwner=True, isAdmin=isAd, fullNames=fullNames)
         response = make_response(html)
         return response
     else:
@@ -552,7 +555,7 @@ def owner():
             isManager[user] = False
 
         html = render_template('owner.html', inGroup=inGroup, users=users, isManager=isManager, groupname=groupname,
-                               isMgr=True, isOwner=True, isAdmin=isAd)
+                               isMgr=True, isOwner=True, isAdmin=isAd, fullNames=fullNames)
         response = make_response(html)
         return response
 
@@ -612,8 +615,11 @@ def manage():
     isOwner = getIsOwner(username, True, groupid)
     selected = {}
     mgrs = {}
+    fullNames = {}
 
     for user in users:
+        info = get_profile_info(user)
+        fullNames[user] = info[0] + " " + info[1]
         selected[user] = False
         if user in curr_members:
             user_role = get_user_role(user, groupid)
@@ -644,7 +650,7 @@ def manage():
         html = render_template('manage.html', groupname=groupname, notgroupintitle=notGroupInTitle, inGroup=True, isMgr=isMgr,
                                shifts=shifts, users=users, mgrs=mgrs, selected=selected, thisWeekSpan=thisWeekSpan, nextWeekSpan=nextWeekSpan,
                                thisWeekSched=thisWeekSched, nextWeekSched=nextWeekSched, draftsched = draftsched,
-                               username=username, isOwner=isOwner, isAdmin=isAd)
+                               username=username, isOwner=isOwner, isAdmin=isAd, fullNames=fullNames)
         response = make_response(html)
         return response
 
@@ -757,7 +763,7 @@ def manage():
                                users=users, mgrs=mgrs, selected=selected, thisWeekSpan=thisWeekSpan, nextWeekSpan=nextWeekSpan,
                                thisWeekSched=thisWeekSched, nextWeekSched=nextWeekSched, week=week,
                                publishnotif=publishnotif, generatenotif=generatenotif, errormsg=errormsg, 
-                               isOwner=isOwner, username=username, isAdmin=isAd, draftsched=draftsched)
+                               isOwner=isOwner, username=username, isAdmin=isAd, draftsched=draftsched, fullNames=fullNames)
         response = make_response(html)
         return response
 
@@ -1036,9 +1042,16 @@ def viewGroup():
     isOwner = getIsOwner(username, True, groupId)
 
     members = get_group_users(groupId)
+    fullNames = {}
+    for member in members:
+        info = get_profile_info(member)
+        fullNames[member] = info[0] + " " + info[1]
+
+    print(members)
+    print(fullNames)
     members_w_roles = [(member, get_user_role(member, groupId)) for member in members]
     html = render_template('viewGroup.html', gName=gName, notgroupintitle=notGroupInTitle, members=members_w_roles,
-                           inGroup=True, isMgr=isMgr, isOwner=isOwner, isAdmin=isAd)
+                           inGroup=True, isMgr=isMgr, isOwner=isOwner, isAdmin=isAd, fullNames=fullNames)
     response = make_response(html)
 
     return response
@@ -1060,10 +1073,14 @@ def createGroup():
     except:  # remove method errors if element not within
         ()
 
-    if request.method == 'GET':
+    fullNames = {}
+    for name in names:
+        info = get_profile_info(name)
+        fullNames[name] = info[0] + " " + info[1]
 
+    if request.method == 'GET':
         html = render_template('createGroup.html', names=names, inGroup=inGroup, isMgr=isMgr, isOwner=isOwner,
-                               isAdmin=isAd)
+                               isAdmin=isAd, fullNames=fullNames)
         response = make_response(html)
         return response
 
