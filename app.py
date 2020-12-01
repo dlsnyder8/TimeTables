@@ -215,6 +215,8 @@ def military_to_us_time(time):
         time = str(int(time.split(":")[0])) + ":00 AM"
     elif int(time.split(':')[0]) > 12:
         time = str(int(time.split(":")[0]) - 12) + ":00 PM"
+    else:
+        time = str(int(time.split(":")[0])) + ":00 PM"
     return time
 
 
@@ -728,7 +730,7 @@ def manage():
         elif request.form["submit"] == "Generate Schedule":
             try:
                 draftsched, preferences, fshifts, memberlist = generate_schedule(groupid)
-                conflicts = parse_conflicts(draftsched, preferences, fshifts, memberlist)
+                conflicts = parse_conflicts(preferences, fshifts, memberlist)
             except:
                 draftsched = None
                 conflicts = None
@@ -888,19 +890,29 @@ def editdraft():
             start = shift[1]
             start = start.split(":")
             if shift[2] == 'PM':
-                start = str(int(start[0]) + 12) + ":" + start[1]
+                if int(start[0]) != 12:
+                    start = str(int(start[0]) + 12) + ":" + start[1]
+                else:
+                    start = str(int(start[0])) + ":" + start[1]
             elif int(start[0]) < 10:
                 start = "0" + start[0] + ":"  + start[1]
             else:
+                if(int(start[0])) == 12:
+                    start[0] = "00"
                 start = start[0] + ":"  + start[1]
             end = shift[4]
             end = end.split(":")
             if shift[5] == 'PM':
-                end = str(int(end[0]) + 12) + ":" + end[1]
+                if int(end[0]) != 12:
+                    end = str(int(end[0]) + 12) + ":" + end[1]
+                else:
+                    end = str(int(end[0])) + ":" + end[1]
             elif int(start[0]) < 10:
                 end = "0" + end[0] + ":"  + end[1]
             else:
-                 end = end[0] + ":"  + end[1]
+                if(int(end[0])) == 12:
+                    end[0] = "00"
+                end = end[0] + ":"  + end[1]
 
             shift = shiftstr_to_key(day, start, end)
             

@@ -81,22 +81,21 @@ def generate_schedule(groupid):
     return format_schedule(edict, memberlist), prefs, fshifts, memberlist
 
 # Parses conflicts
-def parse_conflicts(schedule, prefs, fshifts, memberlist):
+def parse_conflicts(prefs, fshifts, memberlist):
     conflicts = {}
     for preference in prefs:
         keystring = str(preference[2]) + "_" + fshifts[preference[1]]
         netid = memberlist[preference[0]]
-        if memberlist[preference[0]] in schedule[keystring]:
-            if keystring not in conflicts:
-                conflicts[keystring] = []
-            conflicts[keystring].append(netid)
+          
+        if keystring not in conflicts:
+            conflicts[keystring] = []
+        conflicts[keystring].append(netid)
     return conflicts
-            
         
 def main():
     schedule, prefs, fshifts, memberlist = generate_schedule(81)
     change_group_schedule(81, schedule)
-    print(parse_conflicts(schedule, prefs, fshifts, memberlist))
+    print(parse_conflicts(prefs, fshifts, memberlist))
     
     
 
