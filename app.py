@@ -43,10 +43,10 @@ def is_working(netid):
                     return True
 
         shiftsNext = get_group_schedule_next(groupid)
-            for (key, value) in shifts.items():
-                for name in value:
-                    if name == netid:
-                        return True
+        for (key, value) in shifts.items():
+            for name in value:
+                if name == netid:
+                    return True
     return False
 
 def filter_shifts(netid, shifts):
