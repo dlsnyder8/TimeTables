@@ -33,7 +33,15 @@ app.config.update(dict(
     # MAIL_PASSWORD = os.environ['MAIL_PW'],
 ))
 mail = Mail(app)
-
+def is_working(netid):
+    groups = get_all_groups()
+    for groupid in groups:
+        shifts = get_group_schedule(groupid)
+        for (key, value) in shifts.items():
+            for name in value:
+                if name == netid:
+                    return True
+    return False
 
 def filter_shifts(netid, shifts):
     newdict = dict()
