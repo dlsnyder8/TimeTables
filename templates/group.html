@@ -20,6 +20,17 @@
         @media screen and (max-width: 660px) {
             .table {
                 font-size: 12px;
+                position: relative;
+                display: -ms-flexbox;
+                display: flex;
+                -ms-flex-direction: column;
+                flex-direction: column;
+                min-width: 0;
+                word-wrap: break-word;
+                background-color: #fff;
+                background-clip: border-box;
+                border: 1px solid rgba(0, 0, 0, 0.125);
+                border-radius: 0.25rem;
             }
         }
     </style>
@@ -30,7 +41,7 @@
 <body class="body">
     {% include 'header.html' %}
     <div class=" p-md-3 container">
-        <div class="col-md-9 order-md-1 mx-auto">
+        <div class="col-md-8 order-md-1 mx-auto">
             <h1 class="display-4 font-weight-normal">{{groupname}} {% if notgroupintitle %} Group {% endif %}
                 Preferences</h1>
             <form action="/editGroup">
@@ -39,7 +50,7 @@
         </div>
     </div>
     <div class="container">
-        <div class="col-md-9 order-md-1 mx-auto">
+        <div class="col-md-8 order-md-1 mx-auto">
             <div class="mb-3">
                 <hr>
                 <h2> Notification Preferences</h2>
@@ -59,9 +70,7 @@
                     schedule is released. <br>
                     (Your weekly preferences for each group are independent of each other).<br>
                 </p>
-                <div class="card">
-                    {% include 'scheduleElement.html' %}
-                </div>
+                {% include 'scheduleElement.html' %}
                 <hr>
 
             </div>
