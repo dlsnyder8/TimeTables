@@ -10,13 +10,29 @@ def create_requests(pshifts, prefArray, employeeNum, currentPrefs):
         # check each day for any given shift
         for i in range(len(pshifts[key])):
             if pshifts[key][i] != 0:
-                for j in range(int(start), int(end)):
-                    if prefArray[j][i] == False:
-                        currentPrefs.append((employeeNum, shiftNum, i, 10000))
-                        break
+                if int(start) < int(end):
+                    for j in range(int(start), int(end)):
+                        if prefArray[j][i] == False:
+                            currentPrefs.append((employeeNum, shiftNum, i, 10000))
+                            break
+                # handle overnight shifts
+                else:
+                    prefFound = False
+                    for j in range(int(start), 24):
+                        if prefArray[j][i] == False:
+                            prefFound = True
+                            currentPrefs.append((employeeNum, shiftNum, i, 10000))
+                            break
+                    if not prefFound:
+                        for j in range(0, int(end)):
+                            if prefArray[j][(i+1)%7] == False:
+                                currentPrefs.append((employeeNum, shiftNum, i, 10000))
+                                break
         shiftNum += 1
 
     return currentPrefs
+
+
 
 
 # parse shifts from get_group_shifts in database
