@@ -864,7 +864,7 @@ def schedule():
 
     html = render_template('schedule.html', schedule=schedule, withdate=True, thisWeekSpan=thisWeekSpan, nextWeekSpan=nextWeekSpan,
                             dates=get_this_week_array(), nextWeekDates=get_next_week_array(), nextWeekSched=nextWeekSched, groupname=groupname, 
-                            inGroup=True, isMgr=isMgr, editable=False, isOwner=isOwner, isAdmin=isAd)
+                            shifts=shifts, inGroup=True, isMgr=isMgr, editable=False, isOwner=isOwner, isAdmin=isAd)
     response = make_response(html)
 
     return response
