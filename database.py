@@ -213,11 +213,21 @@ def remove_user(netid):
         )
         session.flush()
         session.commit()
-    except:
+    except Exception as e:
         session.rollback()
+        print(e)
         print('Remove User Failed',file=stderr)
         return -1
     return
+
+# is user in groups table as original owner of a group (true if yes, false if not)
+def is_original_owner(netid):
+    try:
+        isOwner = session.query(Groups).filter_by(owner=netid).first()
+        return (isOwner != None)
+    except:
+        print('is_original_owner failed', file=stderr)
+        return -1
 
 #replaces the personal preferences of a user, global
 def change_user_preferences_global(netid, preferences):
@@ -774,4 +784,5 @@ if __name__=="__main__":
     
     #change_group_conflicts(81, {})
     #print(get_group_conflicts(81))
-    add_user('batya','stein', 'batyas')
+    #add_user('batya','stein', 'batyas')
+    print(is_original_owner('dlsnyder'))
