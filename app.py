@@ -402,6 +402,9 @@ def admin():
                 selected[user] = False
                 mgrs[user] = ("notGroup", False)
 
+            groups = get_user_groups(username)
+            inGroup = (len(groups) != 0)
+
             html = render_template('admin.html', groups=groups_by_name, groupname=get_group_name(groupid), users=users,
                                    isAdmin=isAdmin, isMgr = isMgr,
                                    selected=selected, mgrs=mgrs, members=selectedUsers, isManager=isManager,
@@ -461,7 +464,8 @@ def admin():
                 isManager[user] = False
                 mgrs[user] = ('member', False)
 
-
+            groups = get_user_groups(username)
+            inGroup = (len(groups) != 0)
             
             isMgr = getIsMgr(username, inGroup, request)
             html = render_template('admin.html', groups=groups_by_name, groupname=get_group_name(groupid), users=users,
@@ -487,7 +491,8 @@ def admin():
                 change_group_role(groupid, user, 'member')
                 isGroupOwner[user] = False
                 mgrs[user] = ('member', False)
-
+            groups = get_user_groups(username)
+            inGroup = (len(groups) != 0)
             isOwner = getIsOwner(username, inGroup, request=request)
             html = render_template('admin.html', groups=groups_by_name, groupname=get_group_name(groupid), users=users,
                                    selected=selected, mgrs=mgrs, members=curr_members, isManager=isManager,
