@@ -536,9 +536,16 @@ def owner():
     if not (user_exists(username)):
         return redirect(url_for('createProfile'))
 
+
+
     isAd = is_admin(username)
     groups = get_user_groups(username)
+    if len(groups) == 0:
+        return redirect(url_for('index'))
     inGroup = (len(groups) != 0)
+    isOwner = getIsOwner(username, inGroup, request=request)
+    if not isOwner:
+        return redirect(url_for('index'))
     groupname, groupid = getCurrGroupnameAndId(request, groups, inGroup)
 
     users = get_group_users(groupid)
