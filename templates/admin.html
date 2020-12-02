@@ -69,7 +69,7 @@
                         <table class="table table-bordered" style="text-align: left;">
                             {% for member in members: %}
                             <tr>
-                                <td><input type="checkbox" name={{member}} {% if isOwner[member] %} disabled
+                                <td><input type="checkbox" name={{member}} {% if isGroupOwner[member] %} disabled
                                         {% endif %}{% if isManager[member] %} checked {% endif %} name={{member}}>
                                     {{member}}: {{fullNames[member]}}</td>
                             </tr>
@@ -82,7 +82,7 @@
                 </div>
             </div>
             {% endif %}
-            {% if isOwner %}
+            {% if isGroupOwner %}
             <div class="card">
                 <div class="card-header text-center">
                     <h5>Change {{groupname}} Owners</h5>
@@ -92,7 +92,7 @@
                         <table class="table table-bordered" style="text-align: left;">
                             {% for member in members: %}
                             <tr>
-                                <td><input type="checkbox" name={{member}} {% if isOwner[member] %} checked {% endif %}
+                                <td><input type="checkbox" name={{member}} {% if [member] %} checked {% endif %}
                                         name={{member}}>
                                     {{member}}: {{fullNames[member]}}</td>
                             </tr>
