@@ -92,7 +92,7 @@
                         <table class="table table-bordered" style="text-align: left;">
                             {% for member in members: %}
                             <tr>
-                                <td><input type="checkbox" name={{member}} {% if [member] %} checked {% endif %}
+                                <td><input type="checkbox" name={{member}} {% if isGroupOwner[member] %} checked {% endif %}
                                         name={{member}}>
                                     {{member}}: {{fullNames[member]}}</td>
                             </tr>
