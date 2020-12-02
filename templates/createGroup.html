@@ -38,6 +38,10 @@
                 <h2>Group Members</h2>
                 <hr>
                 <table>
+                    <tr>
+                        <td>{{username}}: {{nameOfUser}}</td>
+                        <td><input type="checkbox" checked disabled></td>
+                    </tr>
                     {% for name in names: %}
                     <tr>
                         <td>{{name}}: {{fullNames[name]}}</td>

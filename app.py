@@ -1130,9 +1130,12 @@ def createGroup():
         info = get_profile_info(name)
         fullNames[name] = info[0] + " " + info[1]
 
+    currUserInfo = get_profile_info(username)
+    nameOfUser = currUserInfo[0] + " " + currUserInfo[1]
+
     if request.method == 'GET':
         html = render_template('createGroup.html', names=names, inGroup=inGroup, isMgr=isMgr, isOwner=isOwner,
-                               isAdmin=isAd, fullNames=fullNames)
+                               isAdmin=isAd, username=username, nameOfUser=nameOfUser, fullNames=fullNames)
         response = make_response(html)
         return response
 
