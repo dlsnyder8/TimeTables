@@ -16,7 +16,7 @@ from itertools import chain
 # -------------------
 # CAS Authentication cannot be run locally unfortunately
 # Set this variable to False if local, and change to True before pushing
-PROD_ENV = True
+PROD_ENV = False
 
 # ----------
 
@@ -751,7 +751,10 @@ def manage():
                 conflicts = None
                 errormsg = True
             if (draftsched == {}):
-                draftsched = None
+                print(type(draftsched))
+                for shift in get_group_shifts(groupid):
+                    draftsched[shift] = []
+                errormsg = True
 
             # Store schedule, conflicts in DB
             if draftsched is not None:

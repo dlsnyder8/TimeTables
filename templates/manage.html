@@ -125,7 +125,23 @@
                 <input type="submit" name="submit" value="Generate Schedule" class="btn btn-primary btn-sm"
                     style="margin-top: 10px;">
             </form>
-            {% if generatenotif %}
+            {% if generatenotif and errormsg %}
+            <div class="container"
+                style="position: fixed; bottom: 0; left: 20px; margin-bottom: 10px; width: 30%; z-index: 100;">
+                <div class="alert alert-warning alert-dismissible" role="alert">
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    {% if draftsched is none %}
+                    <strong>Warning:</strong><br> Make sure you've inputted at least one shift.
+                    {% else %}
+                    <strong>Warning:</strong><br> Our algorithm could not generate a schedule based on the given shifts and available users.  <br>
+                    However, a blank draft schedule has been created for you to edit.
+                    <br><br>
+                    You can either edit the draft, or change your shifts and try running the algorithm again. <br> Publish your schedule it once it's finalized!
+                    {% endif %}
+                </div>
+            </div>
+            {% elif generatenotif %}
             <div class="container"
                 style="position: fixed; bottom: 0; left: 20px; margin-bottom: 10px; width: 30%; z-index: 100;">
                 <div class="alert alert-success alert-dismissible" role="alert">
@@ -136,17 +152,14 @@
                     You can make edits to the draft as wanted. <br> Publish your schedule it once it's finalized!
                 </div>
             </div>
-            {% endif %}
-            {% if errormsg %}
+            
+            {% elif errormsg %}
             <div class="container"
                 style="position: fixed; bottom: 0; left: 20px; margin-bottom: 10px; width: 40%; z-index: 100;">
                 <div class="alert alert-danger alert-dismissible" role="alert">
                     <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
                             aria-hidden="true">&times;</span></button>
-                    <strong>Create New Schedule Failed!</strong><br> A new schedule could not be generated based on
-                    current shift demands and user
-                    preferences. <br>
-                    Make sure that you've included at least one shift, or try decreasing the number of people per shift.
+                    <strong>Create New Schedule Failed!</strong><br> There was a database error, please contact an admin. <br>
                 </div>
             </div>
             {% endif %}

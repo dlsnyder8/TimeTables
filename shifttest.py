@@ -94,6 +94,7 @@ def generate_schedule(groupid):
         prefs = create_requests(pshifts, get_double_array(get_group_preferences(groupid, member)), i, prefs)
         i+= 1  
     edict = solve_shift_scheduling("", "", len(memberlist), 1, fshifts, [], prefs, weekly_cover_demands)
+    print(fshifts)
     return format_schedule(edict, memberlist), prefs, fshifts, memberlist
 
 # Parses conflicts
