@@ -39,13 +39,13 @@
                 <hr>
                 <table>
                     <tr>
-                        <td>{{username}}: {{nameOfUser}}</td>
                         <td><input type="checkbox" checked disabled></td>
+                        <td>&nbsp;{{username}}: {{nameOfUser}}</td>
                     </tr>
                     {% for name in names: %}
                     <tr>
-                        <td>{{name}}: {{fullNames[name]}}</td>
                         <td><input type="checkbox" name={{name}}></td>
+                        <td>&nbsp;{{name}}: {{fullNames[name]}}</td>
                     </tr>
                     {% endfor %}
                 </table>
