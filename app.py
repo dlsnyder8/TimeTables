@@ -512,10 +512,14 @@ def admin():
             return response
         elif output == "Delete Users":
             deletedUsers = []
+            isOrigOwner = False
             print("deleting users")
             for user in users:
                 if request.form.get(user) is not None:
-                    deletedUsers.append(user)
+                    if not is_original_owner(user):
+                        deletedUsers.append(user)
+                    else:
+                        isOrigOwner = True
             for user in deletedUsers:
                 remove_user(user)
                 print("removed " + user + " from database")
@@ -524,7 +528,7 @@ def admin():
                     admins.remove(user)
 
             html = render_template('admin.html', groups=groups_by_name, inGroup=inGroup, admins=admins, isAdmin=isAdmin, isMgr=isMgr,
-                                    isOwner=isOwner, users=users, username=username, fullNames=fullNames)
+                                    isOwner=isOwner, users=users, username=username, fullNames=fullNames, isOrigOwner=isOrigOwner)
             response = make_response(html)
             return response
         else:

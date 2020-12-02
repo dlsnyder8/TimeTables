@@ -112,10 +112,39 @@
             <hr>
             <h4>Click to delete {{groupname}}</h4>
             <div class="text-center">
+                <!--
                 <form action="" method="post">
                     <input type="submit" name="submit" value="Delete Group" class="btn btn-danger btn-sm"
                         style="margin-top: 4px;">
-                </form>
+                </form> -->
+                <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#deleteGroupModal"
+                    style="margin-top: 4px;">
+                    Delete Group
+                </button>
+
+                <!-- Modal -->
+                <div class="modal fade" id="deleteGroupModal" tabindex="-1" role="dialog"
+                    aria-labelledby="deleteGroupModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="deleteGroupModalLabel">Delete Group</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                Are you sure you want to delete {{groupname}}? <br>This cannot be undone.
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
+                                <form action="" method="post">
+                                    <input type="submit" name="submit" value="Delete Group" class="btn btn-danger">
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
             <hr>
             {% endif %}
@@ -170,22 +199,47 @@
                         {% endfor %}
                     </table>
                     <br>
-                    <input type="submit" name="submit" value="Delete Users" class="btn btn-danger btn-sm"
-                        style="margin-top: 4px;">
+
+                    <button type="button" class="btn btn-danger btn-sm" data-toggle="modal"
+                        data-target="#deleteUsersModal" style="margin-top: 4px;">
+                        Delete Users
+                    </button>
+
+                    <!-- Modal -->
+                    <div class="modal fade" id="deleteUsersModal" tabindex="-1" role="dialog"
+                        aria-labelledby="deleteUsersModalLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="deleteUsersModalLabel">Delete Users</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    Are you sure you want to delete users? <br>This cannot be undone.
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
+                                    <input type="submit" name="submit" value="Delete Users" class="btn btn-danger">
                 </form>
             </div>
-            {% if isOrigOwner %}
-            <div class="container"
-                style="position: fixed; bottom: 0; left: 20px; margin-bottom: 10px; width: 40%; z-index: 100;">
-                <div class="alert alert-danger alert-dismissible" role="alert">
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
-                            aria-hidden="true">&times;</span></button>
-                    <strong>Delete User Failed!</strong><br> User cannot be deleted if they are original group owner.
-                    <br>
-                </div>
-            </div>
-            {% endif %}
         </div>
+    </div>
+    </div>
+    </div>
+    {% if isOrigOwner %}
+    <div class="container"
+        style="position: fixed; bottom: 0; left: 20px; margin-bottom: 10px; width: 40%; z-index: 100;">
+        <div class="alert alert-danger alert-dismissible" role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
+                    aria-hidden="true">&times;</span></button>
+            <strong>Delete User Failed!</strong><br> Users cannot be deleted if they are an original group owner.
+            <br>
+        </div>
+    </div>
+    {% endif %}
+    </div>
     </div>
     <!-- Bootstrap core JavaScript -->
     <script src="../static/vendor/jquery/jquery.min.js"></script>
