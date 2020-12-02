@@ -16,7 +16,7 @@ from itertools import chain
 # -------------------
 # CAS Authentication cannot be run locally unfortunately
 # Set this variable to False if local, and change to True before pushing
-PROD_ENV = False
+PROD_ENV = True
 
 # ----------
 
@@ -281,7 +281,7 @@ def index():
     inGroup = (numGroups != 0)
     isMgr = getIsMgr(username, inGroup, request, groups)
     canCreate = can_create_group(username)
-    if isMgr == -1:
+    if isMgr == -1: # eg get user role failed
         groupname = groupid = None
     else:
         groupname, groupid = getCurrGroupnameAndId(request, groups, inGroup)
@@ -427,6 +427,12 @@ def admin():
             print(groupid)
 
             admins = selectedAdmins
+            html = render_template('admin.html', groups=groups_by_name, admins=admins, isAdmin=isAdmin, inGroup=inGroup, users=users,
+                               isMgr=isMgr, isOwner=isOwner, username=username, fullNames=fullNames)
+            '''
+            # doing this means that if cookie is still set but you never selected a group on that visit you still get shown 
+            # group related stuff when post request sends
+
             if groupid == -1:
                 html = render_template('admin.html', groups=groups_by_name, admins=admins, isAdmin=isAdmin, inGroup=inGroup, users=users,
                                isMgr=isMgr, isOwner=isOwner, username=username, fullNames=fullNames)
@@ -435,6 +441,7 @@ def admin():
                                    selected=selected, mgrs=mgrs, members=curr_members, isManager=isManager,
                                    isAdmin=isAdmin, isMgr=isMgr, admins=admins, inGroup=inGroup, username=username, isOwner=isOwner, isGroupOwner=isGroupOwner,
                                        fullNames=fullNames)
+            '''
             response = make_response(html)
             return response
         elif output == "Save Managers":
@@ -490,12 +497,13 @@ def admin():
             return response
         elif output == "Delete Group":
             remove_group(groupid)
-            groups = get_all_groups()
-            inGroup = (len(groups) > 0)
+            allGroups = get_all_groups()
+            userGroups = get_user_groups(username)
+            inGroup = (len(userGroups) > 0)
             if inGroup:
-                groupid = groups[0][0]
-                groupname = groups[0][1]
-            groups_by_name = [g[1] for g in groups]
+                groupid = userGroups[0][0]
+                groupname = userGroups[0][1]
+            groups_by_name = [g[1] for g in allGroups]
             html = render_template('admin.html', groups=groups_by_name, inGroup=inGroup, admins=admins, isAdmin=isAdmin, isMgr=isMgr, users=users,
                                    isOwner=isOwner, username=username, fullNames=fullNames)
             response = make_response(html)
