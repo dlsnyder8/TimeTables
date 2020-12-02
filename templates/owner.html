@@ -12,7 +12,15 @@
 
     <!-- Bootstrap core CSS -->
     <link href="../static/vendor/bootstrap/css/bootstrap.css" rel="stylesheet">
-
+    <style>
+        /* Small devices (tablets, 768px and up) */
+        @media (max-width: 768px) {
+        
+        #welcomebanner{
+          font-size: 2.3rem;
+        }
+        }
+    </style>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 </head>
 
@@ -20,7 +28,8 @@
     {% include 'header.html' %}
     <div class=" p-md-3">
         <div class="col-md-8 order-md-1 mx-auto">
-            <h1 class="display-4 font-weight-normal">Set managers of {{groupname}}</h1>
+            <br>
+            <h2 id ="welcomebanner" class=" p-2 display-4 font-weight-normal">Set managers of {{groupname}}</h1>
             <hr>
             <form action='' method="post">
                 <table>
@@ -32,6 +41,7 @@
                     </tr>
                     {% endfor %}
                 </table>
+                <br>
                 <input type="submit" name="submit" value="Save" class="btn btn-primary">
             </form>
         </div>
