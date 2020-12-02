@@ -129,6 +129,11 @@
                             <td><input type="checkbox" {% if isAdmin[user] %} checked {% endif %} name={{user}}></td>
                             <td> &nbsp;{{user}}: {{fullNames[user]}}</td>
                         </tr>
+                        {% else %}
+                        <tr>
+                            <td><input type="checkbox" checked disabled name={{user}}></td>
+                            <td> &nbsp;{{user}}: {{fullNames[user]}}</td>
+                        </tr>
                         {% endif %}
                         {% endfor %}
                     </table>
