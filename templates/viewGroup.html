@@ -24,11 +24,13 @@
             <h1 class="display-4 font-weight-normal">{{gName}} {% if notgroupintitle %} Group {% endif %} Members</h1>
             <hr>
             {% for member in members: %}
-            {{member[0]}}: {{fullNames[member[0]]}} {% if member[1] == 'owner' %} <span class="text-muted">(owner)</span>
+            {{member[0]}}: {{fullNames[member[0]]}} {% if member[1] == 'owner' %} <span
+                class="text-muted">(owner)</span>
             {% elif member[1] == "manager" %}<span class="text-muted">(manager)</span> {% endif %}<br>
             {% endfor %}
         </div>
     </div>
+    {% include 'footer.html' %}
 
     <!-- Bootstrap core JavaScript -->
     <script src="../static/vendor/jquery/jquery.min.js"></script>

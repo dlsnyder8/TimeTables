@@ -120,7 +120,8 @@
             Once the schedule is generated, it will display in the "Schedule Draft" section, where you can make manual
             edits to it. <br>
             <br>
-            If the algorithm cannot generate a schedule based on the given shifts, a blank draft schedule will be created,
+            If the algorithm cannot generate a schedule based on the given shifts, a blank draft schedule will be
+            created,
             and you'll be able to manually create the schedule instead. <br><br>
             (Note that the schedule will not be sent to users until you publish it.)
             <br>
@@ -137,10 +138,12 @@
                     {% if draftsched is none %}
                     <strong>Warning:</strong><br> Make sure you've inputted at least one shift.
                     {% else %}
-                    <strong>Warning:</strong><br> Our algorithm could not generate a schedule based on the given shifts and available users.  <br>
+                    <strong>Warning:</strong><br> Our algorithm could not generate a schedule based on the given shifts
+                    and available users. <br>
                     However, a blank draft schedule has been created for you to edit.
                     <br><br>
-                    You can either edit the draft, or change your shifts and try running the algorithm again. <br> Publish your schedule it once it's finalized!
+                    You can either edit the draft, or change your shifts and try running the algorithm again. <br>
+                    Publish your schedule it once it's finalized!
                     {% endif %}
                 </div>
             </div>
@@ -155,14 +158,15 @@
                     You can make edits to the draft as wanted. <br> Publish your schedule it once it's finalized!
                 </div>
             </div>
-            
+
             {% elif errormsg %}
             <div class="container"
                 style="position: fixed; bottom: 0; left: 20px; margin-bottom: 10px; width: 40%; z-index: 100;">
                 <div class="alert alert-danger alert-dismissible" role="alert">
                     <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
                             aria-hidden="true">&times;</span></button>
-                    <strong>Create New Schedule Failed!</strong><br> There was a database error, please contact an admin. <br>
+                    <strong>Create New Schedule Failed!</strong><br> There was a database error, please contact an
+                    admin. <br>
                 </div>
             </div>
             {% endif %}
@@ -290,10 +294,35 @@
                 <input type="submit" name="submit" value="Save" class="btn btn-primary btn-sm" style="margin-top: 4px;">
             </form>
             <hr>
-            <h2 class="mb-3">Delete Group</h2>
-            <form action='' method="post">
-                <input type="submit" name="submit" value="Delete" class="btn btn-primary btn-sm">
-            </form>
+            <h2 class="mb-3">Delete</h2>
+            <button type="button" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#deleteGroupModal">
+                Delete Group
+            </button>
+
+            <!-- Modal -->
+            <div class="modal fade" id="deleteGroupModal" tabindex="-1" role="dialog"
+                aria-labelledby="deleteGroupModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="deleteGroupModalLabel">Delete Group</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            Are you sure you want to delete {{groupname}}? <br>This cannot be undone.
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
+                            <form action="" method="post">
+                                <input type="submit" name="submit" value="Delete" class="btn btn-danger">
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <br>
             <br>
         </div>
     </div>
