@@ -170,9 +170,7 @@ def is_admin(netid):
 def get_all_users():
     try: 
         ids = session.query(Users.netid).all()
-        id_array = []
-        for id in ids:
-            id_array.append(id[0])
+        id_array = [id[0] for id in ids]
         return id_array
     except:
         print("unable to get all users",file=stderr)
@@ -252,9 +250,7 @@ def get_global_preferences(netid):
 def get_group_members(groupid):
     try:
         ids = session.query(Group_members.netid).filter_by(groupid=groupid).all()
-        id_array = []
-        for id in ids:
-            id_array.append(id[0])
+        id_array = [id[0] for id in ids]
         return id_array
     except:
         print('get_group_members() failed',file=stderr)
@@ -753,9 +749,7 @@ def get_user_role(netid, groupid):
 def get_group_users(groupid):
     try:
         netids = session.query(Group_members.netid).filter_by(groupid=groupid)
-        id_array = []
-        for netid in netids:
-            id_array.append(netid[0])
+        id_array = [netid[0] for netid in netids]
         return id_array
     except Exception as e:
         print("exception")
