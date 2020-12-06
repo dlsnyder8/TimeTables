@@ -225,6 +225,24 @@ def military_to_us_time(time):
         time = str(int(time.split(":")[0])) + ":00 PM"
     return time
 
+def us_to_military_time(time, am_pm):
+    time = time.split(':')
+    if am_pm == 'PM':
+        if int(time[0]) != 12:
+            time = str(int(time[0]) + 12) + ":" + time[1]
+        else:
+            time = str(int(time[0])) + ":" + time[1]
+    elif int(time[0]) < 10:
+        if len(time[0]) == 1:
+            time = "0" + time[0] + ":"  + time[1]
+        else:
+            time = time[0] + ":" + time[1]
+    else:
+        if(int(time[0])) == 12:
+            time[0] = "00"
+        time = time[0] + ":"  + time[1]
+    return time
+
 # converts dictionary of shifts to us time
 def shiftdict_to_us_time(shifts):
     for i in shifts:
@@ -625,194 +643,206 @@ def profile():
 
 @app.route('/manage', methods=['GET', 'POST'])
 def manage():
-    try:
-        username = get_username()
+    username = get_username()
 
-        if not (user_exists(username)):
-            return redirect(url_for('createProfile'))
+    if not (user_exists(username)):
+        return redirect(url_for('createProfile'))
 
-        isAd = is_admin(username)
-        groups = get_user_groups(username)
+    isAd = is_admin(username)
+    groups = get_user_groups(username)
 
-        if len(groups) == 0:
-            return redirect(url_for('index'))
+    if len(groups) == 0:
+        return redirect(url_for('index'))
 
-        isMgr = getIsMgr(username, True, request, groups)
-        if not isMgr:
-            return redirect(url_for('index'))
+    isMgr = getIsMgr(username, True, request, groups)
+    if not isMgr:
+        return redirect(url_for('index'))
 
-        users = get_all_users()
-        users.remove(username)
-        groupname, groupid = getCurrGroupnameAndId(username, request, groups, True)
-        notGroupInTitle = (not groupname.split()[-1].lower() == 'group')
+    users = get_all_users()
+    users.remove(username)
+    groupname, groupid = getCurrGroupnameAndId(username, request, groups, True)
+    notGroupInTitle = (not groupname.split()[-1].lower() == 'group')
 
-        curr_members = get_group_users(groupid)
-        isOwner = getIsOwner(username, True, groupid)
-        selected = {}
-        mgrs = {}
-        fullNames = {}
+    curr_members = get_group_users(groupid)
+    isOwner = getIsOwner(username, True, groupid)
+    selected = {}
+    mgrs = {}
+    fullNames = {}
 
-        for user in users:
-            info = get_profile_info(user)
-            fullNames[user] = info[0] + " " + info[1]
-            selected[user] = False
-            if user in curr_members:
-                user_role = get_user_role(user, groupid)
+    for user in users:
+        info = get_profile_info(user)
+        fullNames[user] = info[0] + " " + info[1]
+        selected[user] = False
+        if user in curr_members:
+            user_role = get_user_role(user, groupid)
+        else:
+            user_role = "notGroup"
+        mgrs[user] = (user_role, (user_role in ['owner', 'manager']))
+    for member in curr_members:
+        selected[member] = True
+
+    shifts = get_group_shifts(groupid)
+    if not shifts:
+        shifts = {}
+
+    thisWeekSpan = get_this_week_span()
+    nextWeekSpan = get_next_week_span()
+
+    thisWeekSched = get_group_schedule(groupid)
+    thisWeekSched = formatDisplaySched(thisWeekSched)
+
+    nextWeekSched = get_next_group_schedule(groupid)
+    nextWeekSched = formatDisplaySched(nextWeekSched)
+
+    draftsched = get_draft_schedule(groupid)
+    draftsched = formatDisplaySched(draftsched)
+
+    if request.method == 'GET':
+        shifts = OrderedDict(sorted(shifts.items()))
+        shifts = shiftdict_to_us_time(shifts)
+        html = render_template('manage.html', groupname=groupname, notgroupintitle=notGroupInTitle, inGroup=True, isMgr=isMgr,
+                            shifts=shifts, users=users, mgrs=mgrs, selected=selected, thisWeekSpan=thisWeekSpan, nextWeekSpan=nextWeekSpan,
+                            thisWeekSched=thisWeekSched, nextWeekSched=nextWeekSched, draftsched = draftsched,
+                            username=username, isOwner=isOwner, isAdmin=isAd, fullNames=fullNames)
+        response = make_response(html)
+        return response
+
+    else:
+        publishnotif = generatenotif = errormsg = False
+        week = None
+
+        if request.form["submit"] == "Add":
+
+            day = request.form["day"]
+            start = request.form["start"]
+            end = request.form["end"]
+            print(start)
+            print(end)
+            npeople = request.form["npeople"]
+
+            ustime_re = re.compile(r'^((((0[1-9])|(1[0-2])):([0-5]\d))\s([AP][M]))$')
+            miltime_re = re.compile(r'^(([01]\d|2[0-3]):([0-5]\d)|24:00)$')
+
+            if ustime_re.match(start) != None:
+                start = start.split()
+                start = us_to_military_time(start[0], start[1])
+                print(start)
+            if ustime_re.match(end) != None:
+                end = end.split()
+                end = us_to_military_time(end[0], end[1])
+                print(end)
+            # reject invalid start/endtime inputs
+            if miltime_re.match(start) == None or miltime_re.match(end) == None:
+                print(start)
+                print(end)
+                html = render_template('manage.html', groupname=groupname, inGroup=True, isMgr=isMgr, invalidshift=True, shifts=shifts,
+                            users=users, mgrs=mgrs, selected=selected, thisWeekSpan=thisWeekSpan, nextWeekSpan=nextWeekSpan,
+                            thisWeekSched=thisWeekSched, nextWeekSched=nextWeekSched, week=week,
+                            publishnotif=publishnotif, generatenotif=generatenotif, errormsg=errormsg, 
+                            isOwner=isOwner, username=username, isAdmin=isAd, draftsched=draftsched, fullNames=fullNames)
+                response = make_response(html)
+                return response
             else:
-                user_role = "notGroup"
-            mgrs[user] = (user_role, (user_role in ['owner', 'manager']))
-        for member in curr_members:
-            selected[member] = True
+                shift = [day, start, end, npeople]
+                shiftid = shiftstr_to_key(day, start, end)
+                shifts[shiftid] = shift
 
-        shifts = get_group_shifts(groupid)
-        if not shifts:
-            shifts = {}
+                # change double array of shifts to dict, update db
+                change_group_shifts(groupid, shifts)
 
-        thisWeekSpan = get_this_week_span()
-        nextWeekSpan = get_next_week_span()
+        elif request.form["submit"] == "Save":
+            n_user_list = []
+            curr_members.remove(username)
+            for user in users:  # adds users
+                if request.form.get(user) is not None:
+                    exists = False
+                    n_user_list.append(user)
+                    for member in curr_members:
+                        if user == member:
+                            exists = True
+                    if not exists:
+                        add_user_to_group(groupid, user, 'member')
+            for member in curr_members:  # removes users
+                remains = False
+                for user in n_user_list:
+                    if member == user:
+                        remains = True
+                if not remains:
+                    remove_user_from_group(member, groupid)
 
-        thisWeekSched = get_group_schedule(groupid)
-        thisWeekSched = formatDisplaySched(thisWeekSched)
-
-        nextWeekSched = get_next_group_schedule(groupid)
-        nextWeekSched = formatDisplaySched(nextWeekSched)
-
-        draftsched = get_draft_schedule(groupid)
-        draftsched = formatDisplaySched(draftsched)
-
-        if request.method == 'GET':
-            shifts = OrderedDict(sorted(shifts.items()))
-            shifts = shiftdict_to_us_time(shifts)
-            html = render_template('manage.html', groupname=groupname, notgroupintitle=notGroupInTitle, inGroup=True, isMgr=isMgr,
-                                shifts=shifts, users=users, mgrs=mgrs, selected=selected, thisWeekSpan=thisWeekSpan, nextWeekSpan=nextWeekSpan,
-                                thisWeekSched=thisWeekSched, nextWeekSched=nextWeekSched, draftsched = draftsched,
-                                username=username, isOwner=isOwner, isAdmin=isAd, fullNames=fullNames)
-            response = make_response(html)
+            selected = {}
+            for user in users:
+                selected[user] = False
+            for n_user in n_user_list:
+                selected[n_user] = True
+        elif request.form["submit"] == "Delete":
+            remove_group(groupid)
+            groups = get_user_groups(username)
+            inGroup = (len(groups) > 0)
+            if inGroup:
+                groupid = groups[0][0]
+                groupname = groups[0][1]
+            response = make_response(redirect(url_for("index")))
+            response.set_cookie('groupid', str(groupid))
             return response
+        elif request.form["submit"] == "Generate Schedule":
+            try:
+                draftsched, preferences, fshifts, memberlist = generate_schedule(groupid)
+                conflicts = parse_conflicts(preferences, fshifts, memberlist)
+            except:
+                draftsched = None
+                conflicts = None
+                errormsg = True
+            if (draftsched == {}):
+                for shift in get_group_shifts(groupid):
+                    draftsched[shift] = []
+                errormsg = True
+
+            # Store schedule, conflicts in DB
+            if draftsched is not None:
+                change_draft_schedule(groupid, draftsched)
+                draftsched = formatDisplaySched(draftsched)
+                generatenotif = True
+            else:
+                draftsched = formatDisplaySched(get_draft_schedule(groupid))
+            if conflicts is not None:
+                change_group_conflicts(groupid, conflicts)
+            else:
+                change_group_conflicts(groupid, {})
+
+        elif request.form["submit"] == "Publish draft":
+            draftsched = get_draft_schedule(groupid)
+            week = request.form["week"]
+            if week == "this":
+                change_group_schedule(groupid, draftsched)
+                # change this week currsched
+                thisWeekSched = formatDisplaySched(draftsched)
+            if week == "next":
+                change_next_group_schedule(groupid, draftsched)
+                # reset weekly group prefs of all group members
+                groupmems = get_group_members(groupid)
+                for mem in groupmems:
+                    change_user_preferences_group(groupid, mem)
+                nextWeekSched = formatDisplaySched(draftsched)
+            # delete draft sched
+            change_draft_schedule(groupid, None)
+            draftsched = None
+            publishnotif = True
 
         else:
-            publishnotif = generatenotif = errormsg = False
-            week = None
-
-            if request.form["submit"] == "Add":
-
-                day = request.form["day"]
-                start = request.form["start"]
-                end = request.form["end"]
-                npeople = request.form["npeople"]
-
-                # reject invalid start/endtime inputs
-                time_re = re.compile(r'^(([01]\d|2[0-3]):([0-5]\d)|24:00)$')
-                if time_re.match(start) == None or time_re.match(end) == None:
-                    html = render_template('manage.html', groupname=groupname, inGroup=True, isMgr=isMgr, invalidshift=True, shifts=shifts,
-                                users=users, mgrs=mgrs, selected=selected, thisWeekSpan=thisWeekSpan, nextWeekSpan=nextWeekSpan,
-                                thisWeekSched=thisWeekSched, nextWeekSched=nextWeekSched, week=week,
-                                publishnotif=publishnotif, generatenotif=generatenotif, errormsg=errormsg, 
-                                isOwner=isOwner, username=username, isAdmin=isAd, draftsched=draftsched, fullNames=fullNames)
-                    response = make_response(html)
-                    return response
-                else:
-                    shift = [day, start, end, npeople]
-                    shiftid = shiftstr_to_key(day, start, end)
-                    shifts[shiftid] = shift
-
-                    # change double array of shifts to dict, update db
-                    change_group_shifts(groupid, shifts)
-
-            elif request.form["submit"] == "Save":
-                n_user_list = []
-                curr_members.remove(username)
-                for user in users:  # adds users
-                    if request.form.get(user) is not None:
-                        exists = False
-                        n_user_list.append(user)
-                        for member in curr_members:
-                            if user == member:
-                                exists = True
-                        if not exists:
-                            add_user_to_group(groupid, user, 'member')
-                for member in curr_members:  # removes users
-                    remains = False
-                    for user in n_user_list:
-                        if member == user:
-                            remains = True
-                    if not remains:
-                        remove_user_from_group(member, groupid)
-
-                selected = {}
-                for user in users:
-                    selected[user] = False
-                for n_user in n_user_list:
-                    selected[n_user] = True
-            elif request.form["submit"] == "Delete":
-                remove_group(groupid)
-                groups = get_user_groups(username)
-                inGroup = (len(groups) > 0)
-                if inGroup:
-                    groupid = groups[0][0]
-                    groupname = groups[0][1]
-                response = make_response(redirect(url_for("index")))
-                response.set_cookie('groupid', str(groupid))
-                return response
-            elif request.form["submit"] == "Generate Schedule":
-                try:
-                    draftsched, preferences, fshifts, memberlist = generate_schedule(groupid)
-                    conflicts = parse_conflicts(preferences, fshifts, memberlist)
-                except:
-                    draftsched = None
-                    conflicts = None
-                    errormsg = True
-                if (draftsched == {}):
-                    for shift in get_group_shifts(groupid):
-                        draftsched[shift] = []
-                    errormsg = True
-
-                # Store schedule, conflicts in DB
-                if draftsched is not None:
-                    change_draft_schedule(groupid, draftsched)
-                    draftsched = formatDisplaySched(draftsched)
-                    generatenotif = True
-                else:
-                    draftsched = formatDisplaySched(get_draft_schedule(groupid))
-                if conflicts is not None:
-                    change_group_conflicts(groupid, conflicts)
-                else:
-                    change_group_conflicts(groupid, {})
-
-            elif request.form["submit"] == "Publish draft":
-                draftsched = get_draft_schedule(groupid)
-                week = request.form["week"]
-                if week == "this":
-                    change_group_schedule(groupid, draftsched)
-                    # change this week currsched
-                    thisWeekSched = formatDisplaySched(draftsched)
-                if week == "next":
-                    change_next_group_schedule(groupid, draftsched)
-                    # reset weekly group prefs of all group members
-                    groupmems = get_group_members(groupid)
-                    for mem in groupmems:
-                        change_user_preferences_group(groupid, mem)
-                    nextWeekSched = formatDisplaySched(draftsched)
-                # delete draft sched
-                change_draft_schedule(groupid, None)
-                draftsched = None
-                publishnotif = True
-
-            else:
-                shiftid = request.form["submit"]
-                del shifts[shiftid]
-                change_group_shifts(groupid, shifts)
-            
-            shifts = shiftdict_to_us_time(shifts)
-            html = render_template('manage.html', groupname=groupname, inGroup=True, isMgr=isMgr, shifts=shifts,
-                                users=users, mgrs=mgrs, selected=selected, thisWeekSpan=thisWeekSpan, nextWeekSpan=nextWeekSpan,
-                                thisWeekSched=thisWeekSched, nextWeekSched=nextWeekSched, week=week,
-                                publishnotif=publishnotif, generatenotif=generatenotif, errormsg=errormsg, 
-                                isOwner=isOwner, username=username, isAdmin=isAd, draftsched=draftsched, fullNames=fullNames)
-            response = make_response(html)
-            return response
-    except:
-        return redirect(url_for('error'))
+            shiftid = request.form["submit"]
+            del shifts[shiftid]
+            change_group_shifts(groupid, shifts)
+        
+        shifts = shiftdict_to_us_time(shifts)
+        html = render_template('manage.html', groupname=groupname, inGroup=True, isMgr=isMgr, shifts=shifts,
+                            users=users, mgrs=mgrs, selected=selected, thisWeekSpan=thisWeekSpan, nextWeekSpan=nextWeekSpan,
+                            thisWeekSched=thisWeekSched, nextWeekSched=nextWeekSched, week=week,
+                            publishnotif=publishnotif, generatenotif=generatenotif, errormsg=errormsg, 
+                            isOwner=isOwner, username=username, isAdmin=isAd, draftsched=draftsched, fullNames=fullNames)
+        response = make_response(html)
+        return response
+    
 
 @app.route('/schedule', methods=['GET'])
 def schedule():
@@ -869,134 +899,109 @@ def schedule():
 
 @app.route('/editdraft', methods=['GET', 'POST'])
 def editdraft():
-    try:
-        username = get_username()
+    username = get_username()
 
-        if not (user_exists(username)):
-            return redirect(url_for('createProfile'))
+    if not (user_exists(username)):
+        return redirect(url_for('createProfile'))
 
-        isAd = is_admin(username)
-        groups = get_user_groups(username)
+    isAd = is_admin(username)
+    groups = get_user_groups(username)
 
-        if len(groups) == 0:
-            return redirect(url_for('index'))
+    if len(groups) == 0:
+        return redirect(url_for('index'))
 
-        isMgr = getIsMgr(username, True, request, groups)
-        if not isMgr:
-            return redirect(url_for('index'))
-        
+    isMgr = getIsMgr(username, True, request, groups)
+    if not isMgr:
+        return redirect(url_for('index'))
+    
 
-        
-        groupname, groupid = getCurrGroupnameAndId(username, request, groups, True)
-        notGroupInTitle = (not groupname.split()[-1].lower() == 'group')
-        isOwner = getIsOwner(username, True, groupid)
+    
+    groupname, groupid = getCurrGroupnameAndId(username, request, groups, True)
+    notGroupInTitle = (not groupname.split()[-1].lower() == 'group')
+    isOwner = getIsOwner(username, True, groupid)
 
-        groupMembers = get_group_members(groupid)
+    groupMembers = get_group_members(groupid)
 
-        raw_schedule = get_draft_schedule(groupid)
-        schedule = formatDisplaySched(raw_schedule)
+    raw_schedule = get_draft_schedule(groupid)
+    schedule = formatDisplaySched(raw_schedule)
 
-        conflicts = get_group_conflicts(groupid)
-        conflicts = formatDisplaySched(conflicts)
+    conflicts = get_group_conflicts(groupid)
+    conflicts = formatDisplaySched(conflicts)
 
-        selected = {}
-        scheduletype = ""
-        if request.method == 'GET':      
-            if request.args.get("submit") == "Edit Draft":
-                scheduletype = "Draft"
-            elif request.args.get("submit") == "Edit This Week":
-                scheduletype = "This Week's"
-                raw_schedule = get_group_schedule(groupid)
-                schedule = formatDisplaySched(raw_schedule)
-            elif request.args.get("submit") == "Edit Next Week":
-                scheduletype = "Next Week's"
-                raw_schedule = get_group_schedule_next(groupid)
-                schedule = formatDisplaySched(raw_schedule)
+    selected = {}
+    scheduletype = ""
+    if request.method == 'GET':      
+        if request.args.get("submit") == "Edit Draft":
+            scheduletype = "Draft"
+        elif request.args.get("submit") == "Edit This Week":
+            scheduletype = "This Week's"
+            raw_schedule = get_group_schedule(groupid)
+            schedule = formatDisplaySched(raw_schedule)
+        elif request.args.get("submit") == "Edit Next Week":
+            scheduletype = "Next Week's"
+            raw_schedule = get_group_schedule_next(groupid)
+            schedule = formatDisplaySched(raw_schedule)
 
-        elif request.method == 'POST':
-            if request.form["submit"] == "Save":
-                scheduletype = request.form.get('scheduletype')
-                rawShift = request.form.get("shift")
-                shift = rawShift.split()
-                day = shift[0]
-                start = shift[1]
-                start = start.split(":")
-                if shift[2] == 'PM':
-                    if int(start[0]) != 12:
-                        start = str(int(start[0]) + 12) + ":" + start[1]
-                    else:
-                        start = str(int(start[0])) + ":" + start[1]
-                elif int(start[0]) < 10:
-                    start = "0" + start[0] + ":"  + start[1]
+    elif request.method == 'POST':
+        if request.form["submit"] == "Save":
+            scheduletype = request.form.get('scheduletype')
+            rawShift = request.form.get("shift")
+            shift = rawShift.split()
+            day = shift[0]
+            start = shift[1]
+            start = us_to_military_time(start, shift[2])
+            
+            end = shift[4]
+            end = us_to_military_time(end, shift[5])
+
+            shift = shiftstr_to_key(day, start, end)
+            
+            selected["shift"] = rawShift
+
+            for member in groupMembers:
+                status = request.form.get(member)
+                if status is not None:
+                    selected[member] = True
+                    if scheduletype == "Draft":
+                        if member not in raw_schedule[shift]:
+                            add_user_to_draft_schedule(groupid, shift, member)
+
+                    elif scheduletype == "This Week's":
+                        raw_schedule = get_group_schedule(groupid)
+                        schedule = schedule = formatDisplaySched(raw_schedule)
+                        if member not in raw_schedule[shift]:
+                            add_user_to_shift_schedule(groupid, shift, member)
+
+                    elif scheduletype == "Next Week's":
+                        raw_schedule = get_group_schedule_next(groupid)
+                        schedule = schedule = formatDisplaySched(raw_schedule)
+                        if member not in raw_schedule[shift]:
+                            add_user_to_shift_schedule_next(groupid, shift, member)
+
+                    
                 else:
-                    if(int(start[0])) == 12:
-                        start[0] = "00"
-                    start = start[0] + ":"  + start[1]
-                end = shift[4]
-                end = end.split(":")
-
-                if shift[5] == 'PM':
-                    if int(end[0]) != 12:
-                        end = str(int(end[0]) + 12) + ":" + end[1]
-                    else:
-                        end = str(int(end[0])) + ":" + end[1]
-                elif int(end[0]) < 10:
-                    end = "0" + end[0] + ":"  + end[1]
-                else:
-                    if(int(end[0])) == 12:
-                        end[0] = "00"
-
-                    end = end[0] + ":"  + end[1]
-
-                shift = shiftstr_to_key(day, start, end)
-                
-                selected["shift"] = rawShift
-
-                for member in groupMembers:
-                    status = request.form.get(member)
-                    if status is not None:
-                        selected[member] = True
-                        if scheduletype == "Draft":
-                            if member not in raw_schedule[shift]:
-                                add_user_to_draft_schedule(groupid, shift, member)
-
-                        elif scheduletype == "This Week's":
-                            raw_schedule = get_group_schedule(groupid)
-                            schedule = schedule = formatDisplaySched(raw_schedule)
-                            if member not in raw_schedule[shift]:
-                                add_user_to_shift_schedule(groupid, shift, member)
-
-                        elif scheduletype == "Next Week's":
-                            raw_schedule = get_group_schedule_next(groupid)
-                            schedule = schedule = formatDisplaySched(raw_schedule)
-                            if member not in raw_schedule[shift]:
-                                add_user_to_shift_schedule_next(groupid, shift, member)
-
+                    selected[member] = False
+                    if scheduletype == "Draft":
+                        if member in raw_schedule[shift]:
+                            remove_user_from_draft_schedule(groupid, shift, member)
+                    elif scheduletype == "This Week's":
+                        raw_schedule = get_group_schedule(groupid)
+                        schedule = schedule = formatDisplaySched(raw_schedule)
+                        if member in raw_schedule[shift]:
+                            remove_user_from_shift_schedule(groupid, shift, member)
+                    elif scheduletype == "Next Week's":
+                        raw_schedule = get_group_schedule_next(groupid)
+                        schedule = schedule = formatDisplaySched(raw_schedule)
+                        if member in raw_schedule[shift]:
+                            remove_user_from_shift_schedule_next(groupid, shift, member)
                         
-                    else:
-                        selected[member] = False
-                        if scheduletype == "Draft":
-                            if member in raw_schedule[shift]:
-                                remove_user_from_draft_schedule(groupid, shift, member)
-                        elif scheduletype == "This Week's":
-                            raw_schedule = get_group_schedule(groupid)
-                            schedule = schedule = formatDisplaySched(raw_schedule)
-                            if member in raw_schedule[shift]:
-                                remove_user_from_shift_schedule(groupid, shift, member)
-                        elif scheduletype == "Next Week's":
-                            raw_schedule = get_group_schedule_next(groupid)
-                            schedule = schedule = formatDisplaySched(raw_schedule)
-                            if member in raw_schedule[shift]:
-                                remove_user_from_shift_schedule_next(groupid, shift, member)
-                            
-        html = render_template('editdraft.html', schedule=schedule, groupname=groupname, inGroup=True, isMgr=isMgr, groupMembers=groupMembers,
-                        conflicts=conflicts, shifts=get_group_shifts(groupid), isOwner=isOwner, isAdmin=isAd, notgroupintitle = notGroupInTitle,
-                        selected=selected, scheduletype=scheduletype)
+    html = render_template('editdraft.html', schedule=schedule, groupname=groupname, inGroup=True, isMgr=isMgr, groupMembers=groupMembers,
+                    conflicts=conflicts, shifts=get_group_shifts(groupid), isOwner=isOwner, isAdmin=isAd, notgroupintitle = notGroupInTitle,
+                    selected=selected, scheduletype=scheduletype)
 
-        response = make_response(html)
-        return response
-    except:
-        return redirect(url_for('error'))
+    response = make_response(html)
+    return response
+   
 
 
 @app.route('/group', methods=['GET'])
