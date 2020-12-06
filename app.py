@@ -16,7 +16,7 @@ from itertools import chain
 # -------------------
 # CAS Authentication cannot be run locally unfortunately
 # Set this variable to False if local, and change to True before pushing
-PROD_ENV = False
+PROD_ENV = True
 
 # ----------
 
@@ -311,6 +311,16 @@ def index():
         response.set_cookie('groupid', str(groupid))
         return response
 
+@app.route('/changeNotif', methods=['POST'])
+def changeNotifs():
+    username = get_username()
+    prefemail = request.args.get('prefemail')
+    groupid = request.args.get('groupid')
+    if prefemail == 'on':
+        prefemail = True
+    else:
+        prefemail = False
+    change_group_notifications(groupid, username, prefemail)
 
 # administrator page
 @app.route('/admin', methods=['GET', 'POST'])
@@ -1039,18 +1049,7 @@ def editGroup():
                                editable=True, isAdmin=isAd)
         response = make_response(html)
         return response
-    else:
-        prefemail = request.form.get('prefemail')
-        if prefemail == 'on':
-            prefemail = True
-        else:
-            prefemail = False
-        change_group_notifications(groupid, username, prefemail)
-
-        prefs = create_preferences(parseSchedule())
-        change_user_preferences_group(groupid, username, prefs)
-
-        return redirect(url_for('group'))
+    
 
 @app.route('/viewGroup', methods=['GET'])
 def viewGroup():
@@ -1208,6 +1207,8 @@ def editProfile():
 
         return redirect(url_for('profile'))
 
+app.add_url_rule('/favicon.ico',
+                 redirect_to=url_for('static', filename='favicon.ico'))
 
 if __name__ == '__main__':
     app.run()
