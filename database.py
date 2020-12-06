@@ -719,14 +719,6 @@ def get_group_name(groupid):
         print('get groupid failed', file=stderr)
         return -1
 
-def get_group_id(groupname):
-    try:
-        groupid = session.query(Groups.groupid).filter_by(groupname=groupname).first()
-        return groupid.groupid
-    except:
-        print('failed to get groupid',file=stderr)
-        return -1
-
 # return True if user in 1+ groups, False if in none
 def in_any_group(netid):
     try:
