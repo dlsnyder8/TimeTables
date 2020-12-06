@@ -30,9 +30,10 @@
             <br>
             <form action="" method="post">
                 {% for g in groups %}
-                <input type="radio" disabled name="groupname" value="{{g}}" {% if groupname == g %} checked {% endif %}>
-                <input style="margin-bottom: 4px;" class="btn btn-primary btn-sm" type="submit" name="groupname"
-                    value="{{g}}">
+                <input type="radio" disabled name="groupid" value="{{g[0]}}" {% if groupid == g[0] %} checked
+                    {% endif %}>
+                <button style="margin-bottom: 4px;" class="btn btn-primary btn-sm" type="submit" name="groupid"
+                    value="{{g[0]}}"> {{g[1]}}</button>
                 {% endfor %}
             </form>
         </div>
@@ -63,8 +64,6 @@
                     </form>
                 </div>
             </div>
-            {% endif %}
-            {% if members %}
             <div class="card">
                 <div class="card-header text-center">
                     <h5>Change {{groupname}} Managers</h5>
@@ -86,8 +85,6 @@
                     </form>
                 </div>
             </div>
-            {% endif %}
-            {% if isGroupOwner %}
             <div class="card">
                 <div class="card-header text-center">
                     <h5>Change {{groupname}} Owners</h5>
@@ -104,7 +101,8 @@
                             {% endfor %}
                         </table>
                         <div class="text-center"><input type="submit" name="submit" value="Save Owners"
-                                class="btn btn-primary btn-sm text-center" style="margin-top: 4px;"></div>
+                                class="btn btn-primary btn-sm text-center" style="margin-top: 4px;">
+                        </div>
                         <br>
                     </form>
                 </div>
@@ -112,8 +110,8 @@
         </div>
 
         {% endif %}
-        {% if selected %}
         <div class="text-center">
+            {% if selected %}
             <hr>
             <h4>Click to delete {{groupname}}</h4>
             <div class="text-center">
@@ -233,6 +231,7 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
                 </form>
             </div>
         </div>
