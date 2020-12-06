@@ -16,7 +16,7 @@ from itertools import chain
 # -------------------
 # CAS Authentication cannot be run locally unfortunately
 # Set this variable to False if local, and change to True before pushing
-PROD_ENV = True
+PROD_ENV = False
 
 # ----------
 
@@ -301,8 +301,9 @@ def index():
     # POST request - change group user is viewing site as
     else:
         groupid = request.form.get('groupid')
-        isMgr = (get_user_role(username, groupid) in ["manager", "owner"])
-        isOwner = (get_user_role(username, groupid) == 'owner')
+        role = get_user_role(username, groupid)
+        isMgr = (role in ["manager", "owner"])
+        isOwner = (role == 'owner')
 
         html = render_template('index.html', groups=groups, groupid=int(groupid), numGroups=numGroups,
                                inGroup=inGroup, isMgr=isMgr, isOwner=isOwner, isAdmin=isAd, canCreate=canCreate)
@@ -496,7 +497,6 @@ def admin():
         elif output == "Delete Users":
             deletedUsers = []
             isOrigOwner = False
-            print("deleting users")
             for user in users:
                 if request.form.get(user) is not None:
                     if not is_original_owner(user):
@@ -505,7 +505,6 @@ def admin():
                         isOrigOwner = True
             for user in deletedUsers:
                 remove_user(user)
-                print("removed " + user + " from database")
                 users.remove(user)
                 if user in admins:
                     admins.remove(user)
@@ -683,7 +682,6 @@ def manage():
     else:
         publishnotif = generatenotif = errormsg = False
         week = None
-        groupid = get_group_id(groupname)
 
         if request.form["submit"] == "Add":
 
@@ -710,16 +708,13 @@ def manage():
                             exists = True
                     if not exists:
                         add_user_to_group(groupid, user, 'member')
-                        print("added user" + user)
             for member in curr_members:  # removes users
                 remains = False
                 for user in n_user_list:
                     if member == user:
                         remains = True
-                        print("user remains" + user)
                 if not remains:
                     remove_user_from_group(member, groupid)
-                    print("removed" + member)
 
             selected = {}
             for user in users:
@@ -745,7 +740,6 @@ def manage():
                 conflicts = None
                 errormsg = True
             if (draftsched == {}):
-                print(type(draftsched))
                 for shift in get_group_shifts(groupid):
                     draftsched[shift] = []
                 errormsg = True
@@ -895,7 +889,6 @@ def editdraft():
     elif request.method == 'POST':
         if request.form["submit"] == "Save":
             scheduletype = request.form.get('scheduletype')
-            print(scheduletype)
             rawShift = request.form.get("shift")
             shift = rawShift.split()
             day = shift[0]
@@ -914,16 +907,18 @@ def editdraft():
                 start = start[0] + ":"  + start[1]
             end = shift[4]
             end = end.split(":")
+
             if shift[5] == 'PM':
                 if int(end[0]) != 12:
                     end = str(int(end[0]) + 12) + ":" + end[1]
                 else:
                     end = str(int(end[0])) + ":" + end[1]
-            elif int(start[0]) < 10:
+            elif int(end[0]) < 10:
                 end = "0" + end[0] + ":"  + end[1]
             else:
                 if(int(end[0])) == 12:
                     end[0] = "00"
+
                 end = end[0] + ":"  + end[1]
 
             shift = shiftstr_to_key(day, start, end)
@@ -966,10 +961,7 @@ def editdraft():
                         schedule = schedule = formatDisplaySched(raw_schedule)
                         if member in raw_schedule[shift]:
                             remove_user_from_shift_schedule_next(groupid, shift, member)
-                            
-            
-            
-
+                        
     html = render_template('editdraft.html', schedule=schedule, groupname=groupname, inGroup=True, isMgr=isMgr, groupMembers=groupMembers,
                     conflicts=conflicts, shifts=get_group_shifts(groupid), isOwner=isOwner, isAdmin=isAd, notgroupintitle = notGroupInTitle,
                     selected=selected, scheduletype=scheduletype)
@@ -1039,8 +1031,6 @@ def editGroup():
         groupprefs = get_global_preferences(username)
     weeklyPref = get_double_array(groupprefs)
 
-    # later add code to reset groupprefs to global prefs on sunday
-
     prevemailPref = get_group_notifications(username, groupid).emailnotif
 
     if request.method == 'GET':
@@ -1082,8 +1072,6 @@ def viewGroup():
         info = get_profile_info(member)
         fullNames[member] = info[0] + " " + info[1]
 
-    print(members)
-    print(fullNames)
     members_w_roles = [(member, get_user_role(member, groupId)) for member in members]
     html = render_template('viewGroup.html', gName=gName, notgroupintitle=notGroupInTitle, members=members_w_roles,
                            inGroup=True, isMgr=isMgr, isOwner=isOwner, isAdmin=isAd, fullNames=fullNames)
@@ -1101,7 +1089,6 @@ def createGroup():
     isMgr = getIsMgr(username, inGroup, request)
     isOwner = getIsOwner(username, inGroup, request=request)
 
-    # names = {"bob", "joe", "jill", username}
     names = get_all_users()
     try:
         names.remove(username)
@@ -1167,15 +1154,13 @@ def createProfile():
 
         email = request.form['email']
 
-        # notification preferences default to false currently - can change if wanted
+        # notification preferences default to false 
         prefemail = False
 
         globalPreferences = parseSchedule()
 
-        # groupid = 1  # for prototype - add user to group one
         if not (user_exists(username)):
             add_user(fname, lname, username, email, create_preferences(globalPreferences))
-            # add_user_to_group(groupid, username, "member", prefemail, create_preferences(globalPreferences))
         else:
             update_profile_info(fname, lname, username, email, create_preferences(globalPreferences))
 
