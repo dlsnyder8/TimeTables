@@ -9,6 +9,7 @@ from dates import *
 
 import os
 import json
+import re
 from sys import stderr, exit
 import urllib.parse as urlparse
 from itertools import chain
@@ -700,12 +701,24 @@ def manage():
                 end = request.form["end"]
                 npeople = request.form["npeople"]
 
-                shift = [day, start, end, npeople]
-                shiftid = shiftstr_to_key(day, start, end)
-                shifts[shiftid] = shift
+                # reject invalid start/endtime inputs
+                time_re = re.compile(r'^(([01]\d|2[0-3]):([0-5]\d)|24:00)$')
+                if time_re.match(start) == None or time_re.match(end) == None:
+                    html = render_template('manage.html', groupname=groupname, inGroup=True, isMgr=isMgr, invalidshift=True, shifts=shifts,
+                                users=users, mgrs=mgrs, selected=selected, thisWeekSpan=thisWeekSpan, nextWeekSpan=nextWeekSpan,
+                                thisWeekSched=thisWeekSched, nextWeekSched=nextWeekSched, week=week,
+                                publishnotif=publishnotif, generatenotif=generatenotif, errormsg=errormsg, 
+                                isOwner=isOwner, username=username, isAdmin=isAd, draftsched=draftsched, fullNames=fullNames)
+                    response = make_response(html)
+                    return response
+                else:
+                    shift = [day, start, end, npeople]
+                    shiftid = shiftstr_to_key(day, start, end)
+                    shifts[shiftid] = shift
 
-                # change double array of shifts to dict, update db
-                change_group_shifts(groupid, shifts)
+                    # change double array of shifts to dict, update db
+                    change_group_shifts(groupid, shifts)
+
             elif request.form["submit"] == "Save":
                 n_user_list = []
                 curr_members.remove(username)
