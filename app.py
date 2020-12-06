@@ -274,45 +274,42 @@ def getDifferences(newlist, oldlist):
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
 def index():
-    try:
-        username = get_username()
+    username = get_username()
 
-        if not (user_exists(username)):
-            return redirect(url_for('createProfile'))
+    if not (user_exists(username)):
+        return redirect(url_for('createProfile'))
 
-        isAd = is_admin(username)
-        groups = get_user_groups(username)
-        numGroups = len(groups)
-        inGroup = (numGroups != 0)
-        isMgr = getIsMgr(username, inGroup, request, groups)
-        isOwner = getIsOwner(username, inGroup, request=request, groups=groups)
+    isAd = is_admin(username)
+    groups = get_user_groups(username)
+    numGroups = len(groups)
+    inGroup = (numGroups != 0)
+    isMgr = getIsMgr(username, inGroup, request, groups)
+    isOwner = getIsOwner(username, inGroup, request=request, groups=groups)
 
-        canCreate = can_create_group(username)
+    canCreate = can_create_group(username)
 
-        if isMgr == -1: # eg get user role failed
-            groupname = groupid = None
-        else:
-            groupname, groupid = getCurrGroupnameAndId(username, request, groups, inGroup)
-        
-        if request.method == 'GET':
-            html = render_template('index.html', groups=groups, groupid=int(groupid), numGroups=numGroups,
-                                inGroup=inGroup, isMgr=isMgr, isOwner=isOwner, isAdmin=isAd, canCreate=canCreate)
-            response = make_response(html)
-            return response
-        # POST request - change group user is viewing site as
-        else:
-            groupid = request.form.get('groupid')
-            role = get_user_role(username, groupid)
-            isMgr = (role in ["manager", "owner"])
-            isOwner = (role == 'owner')
+    if isMgr == -1: # eg get user role failed
+        groupname = groupid = None
+    else:
+        groupname, groupid = getCurrGroupnameAndId(username, request, groups, inGroup)
+    
+    if request.method == 'GET':
+        html = render_template('index.html', groups=groups, groupid=int(groupid), numGroups=numGroups,
+                            inGroup=inGroup, isMgr=isMgr, isOwner=isOwner, isAdmin=isAd, canCreate=canCreate)
+        response = make_response(html)
+        return response
+    # POST request - change group user is viewing site as
+    else:
+        groupid = request.form.get('groupid')
+        role = get_user_role(username, groupid)
+        isMgr = (role in ["manager", "owner"])
+        isOwner = (role == 'owner')
 
-            html = render_template('index.html', groups=groups, groupid=int(groupid), numGroups=numGroups,
-                                inGroup=inGroup, isMgr=isMgr, isOwner=isOwner, isAdmin=isAd, canCreate=canCreate)
-            response = make_response(html)
-            response.set_cookie('groupid', str(groupid))
-            return response
-    except:
-        return redirect(url_for('error'))
+        html = render_template('index.html', groups=groups, groupid=int(groupid), numGroups=numGroups,
+                            inGroup=inGroup, isMgr=isMgr, isOwner=isOwner, isAdmin=isAd, canCreate=canCreate)
+        response = make_response(html)
+        response.set_cookie('groupid', str(groupid))
+        return response
 
 # administrator page
 @app.route('/admin', methods=['GET', 'POST'])
@@ -1059,6 +1056,19 @@ def editGroup():
                                 editable=True, isAdmin=isAd)
             response = make_response(html)
             return response
+        else:
+            prefemail = request.form.get('prefemail')
+            if prefemail == 'on':
+                prefemail = True
+            else:
+                prefemail = False
+            change_group_notifications(groupid, username, prefemail)
+
+            prefs = create_preferences(parseSchedule())
+            change_user_preferences_group(groupid, username, prefs)
+
+            return redirect(url_for('group'))
+
     except:
         return redirect(url_for('error'))
     
