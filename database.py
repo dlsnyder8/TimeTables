@@ -118,8 +118,8 @@ def parse_user_schedule(netid, groupschedule):
     
 def get_all_groups():
     try:
-        return session.query(Groups.groupid,Groups.groupname).all()
-
+        groups = session.query(Groups.groupid,Groups.groupname).all()
+        return sorted(groups, key= lambda group: group[1])
     except: 
         print("Failed to get all groups")
         session.rollback()
@@ -171,7 +171,7 @@ def get_all_users():
     try: 
         ids = session.query(Users.netid).all()
         id_array = [id[0] for id in ids]
-        return id_array
+        return sorted(id_array)
     except:
         print("unable to get all users",file=stderr)
         return -1
@@ -251,7 +251,7 @@ def get_group_members(groupid):
     try:
         ids = session.query(Group_members.netid).filter_by(groupid=groupid).all()
         id_array = [id[0] for id in ids]
-        return id_array
+        return sorted(id_array)
     except:
         print('get_group_members() failed',file=stderr)
         return -1
@@ -698,7 +698,7 @@ def get_user_groups(netid):
         for g in groups:
             name = session.query(Groups.groupname).filter_by(groupid=g.groupid).first()
             group_list.append((g.groupid,name[0]))
-        return group_list
+        return sorted(group_list, key = lambda g:g[1])
     except:
         print('get user groups failed',file=stderr)
         return -1
@@ -750,7 +750,7 @@ def get_group_users(groupid):
     try:
         netids = session.query(Group_members.netid).filter_by(groupid=groupid)
         id_array = [netid[0] for netid in netids]
-        return id_array
+        return sorted(id_array)
     except Exception as e:
         print("exception")
         print(e)
@@ -792,6 +792,4 @@ if __name__=="__main__":
     #add_user('batya','stein', 'batyas')
     #print(is_original_owner('dlsnyder'))
     #print(get_group_name("108"))
-    print(in_group("batyas", 102))
-    print(group_exists(102))
-    print(group_exists(6))
+    print(get_all_groups())
