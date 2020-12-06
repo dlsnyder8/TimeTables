@@ -12,6 +12,7 @@ import json
 from sys import stderr, exit
 import urllib.parse as urlparse
 from itertools import chain
+from collections import OrderedDict
 
 # -------------------
 # CAS Authentication cannot be run locally unfortunately
@@ -679,6 +680,7 @@ def manage():
         draftsched = formatDisplaySched(draftsched)
 
         if request.method == 'GET':
+            shifts = OrderedDict(sorted(shifts.items()))
             shifts = shiftdict_to_us_time(shifts)
             html = render_template('manage.html', groupname=groupname, notgroupintitle=notGroupInTitle, inGroup=True, isMgr=isMgr,
                                 shifts=shifts, users=users, mgrs=mgrs, selected=selected, thisWeekSpan=thisWeekSpan, nextWeekSpan=nextWeekSpan,
