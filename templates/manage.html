@@ -33,7 +33,64 @@
     </div>
 
     <div class="col-md-8 order-md-1 mx-auto">
+
         <div class="container">
+            <h2 class="mb-3">Current Schedule</h2>
+            <div class="container">
+                <div class="card-deck mb-3">
+                    <div class="card">
+                        <div class="card-header text-center">
+                            <h4 class="my-0 font-weight-normal">This Week </h4>
+                            <h5 class="font-weight-normal text-muted"> ({{thisWeekSpan}})</h5>
+                        </div>
+                        <div class="card-body">
+                            {% if thisWeekSched %}
+                            {% for shift in thisWeekSched %}
+                            <strong>{{shift}}</strong>:
+                            {% for netid in thisWeekSched[shift] %}
+                            {{netid}}{% if loop.index < thisWeekSched[shift]|length %},{% endif %}
+                            {% endfor %}
+                            <br>
+                            {% endfor %}
+                            <form action="/editdraft">
+                                <input class="btn btn-primary btn-sm" type="submit" name="submit" value="Edit This Week"
+                                    style="margin-top: 4px;">
+                            </form>
+                            {% else %}
+                            <p>No schedule has been generated for this week yet - go to generate schedule to create one!
+                            </p>
+                            {% endif %}
+
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header text-center">
+                            <h4 class="my-0 font-weight-normal">Next Week </h4>
+                            <h5 class="font-weight-normal text-muted"> ({{nextWeekSpan}})</h5>
+                        </div>
+                        <div class="card-body">
+                            {% if nextWeekSched %}
+                            {% for shift in nextWeekSched %}
+                            <strong>{{shift}}</strong>:
+                            {% for netid in nextWeekSched[shift] %}
+                            {{netid}}{% if loop.index < nextWeekSched[shift]|length %},{% endif %}
+                            {% endfor %}
+                            <br>
+                            {% endfor %}
+                            <form action="/editdraft">
+                                <input class="btn btn-primary btn-sm" type="submit" name="submit" value="Edit Next Week"
+                                    style="margin-top: 4px;">
+                            </form>
+                            {% else %}
+                            <p>No schedule has been generated for next week yet. Go to generate schedule to create one!
+                            </p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr>
             <span id="shifts"></span>
             <h2 class="mb-3"> Current Shifts</h2>
             {% if shifts|length > 0 %}
@@ -229,62 +286,7 @@
                 </div>
             </div>
             {% endif %}
-            <h2 class="mb-3">Current Schedule</h2>
-            <div class="container">
-                <div class="card-deck mb-3">
-                    <div class="card">
-                        <div class="card-header text-center">
-                            <h4 class="my-0 font-weight-normal">This Week </h4>
-                            <h5 class="font-weight-normal text-muted"> ({{thisWeekSpan}})</h5>
-                        </div>
-                        <div class="card-body">
-                            {% if thisWeekSched %}
-                            {% for shift in thisWeekSched %}
-                            <strong>{{shift}}</strong>:
-                            {% for netid in thisWeekSched[shift] %}
-                            {{netid}}{% if loop.index < thisWeekSched[shift]|length %},{% endif %}
-                            {% endfor %}
-                            <br>
-                            {% endfor %}
-                            <form action="/editdraft">
-                                <input class="btn btn-primary btn-sm" type="submit" name="submit" value="Edit This Week"
-                                    style="margin-top: 4px;">
-                            </form>
-                            {% else %}
-                            <p>No schedule has been generated for this week yet - go to generate schedule to create one!
-                            </p>
-                            {% endif %}
 
-                        </div>
-                    </div>
-
-                    <div class="card">
-                        <div class="card-header text-center">
-                            <h4 class="my-0 font-weight-normal">Next Week </h4>
-                            <h5 class="font-weight-normal text-muted"> ({{nextWeekSpan}})</h5>
-                        </div>
-                        <div class="card-body">
-                            {% if nextWeekSched %}
-                            {% for shift in nextWeekSched %}
-                            <strong>{{shift}}</strong>:
-                            {% for netid in nextWeekSched[shift] %}
-                            {{netid}}{% if loop.index < nextWeekSched[shift]|length %},{% endif %}
-                            {% endfor %}
-                            <br>
-                            {% endfor %}
-                            <form action="/editdraft">
-                                <input class="btn btn-primary btn-sm" type="submit" name="submit" value="Edit Next Week"
-                                    style="margin-top: 4px;">
-                            </form>
-                            {% else %}
-                            <p>No schedule has been generated for next week yet. Go to generate schedule to create one!
-                            </p>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <hr>
             <h2 class="mb-3">Edit Group Members</h2>
             <form action='' method="post">
                 <table>
