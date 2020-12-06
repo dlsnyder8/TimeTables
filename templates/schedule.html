@@ -73,7 +73,7 @@
                 <h4 class="my-0 font-weight-normal">This Week</h4>
                 <h5 class="font-weight-normal text-muted"> ({{thisWeekSpan}})</h5>
             </div>
-            <div class="card-body">
+            <div class="card-body text-center">
                 {% if schedule is not none %}
                 {% if schedule == -1 %}
                 You are not scheduled to work any shifts this week. <br>
@@ -82,7 +82,7 @@
                 {% include 'scheduleElement.html' %}
                 {% endif %}
                 {% else %}
-                <div class="col-lg-12 text-center">
+                <div class="col-lg-12">
                     <p>This week's schedule has not been generated yet.</p>
                     <hr>
                     You still have time to input your weekly preferences:
@@ -101,7 +101,7 @@
                 <h4 class="my-0 font-weight-normal">Next Week</h4>
                 <h5 class="font-weight-normal text-muted"> ({{nextWeekSpan}})</h5>
             </div>
-            <div class="card-body">
+            <div class="card-body text-center">
                 {% if nextWeekSched is not none %}
                 {% if nextWeekSched == -1 %}
                 You are not scheduled to work any shifts next week. <br>
@@ -542,7 +542,7 @@
                 </table>
                 {% endif %}
                 {% else %}
-                <div class="col-lg-12 text-center">
+                <div class="col-lg-12">
                     <p>Next week's schedule has not been generated yet.</p>
                     <hr>
                     You still have time to input your weekly preferences:
@@ -556,11 +556,12 @@
         </div>
 
         <hr>
-        {% include 'footer.html' %}
+    </div>
+    {% include 'footer.html' %}
 
-        <!-- Bootstrap core JavaScript -->
-        <script src="../static/vendor/jquery/jquery.min.js"></script>
-        <script src="../static/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <!-- Bootstrap core JavaScript -->
+    <script src="../static/vendor/jquery/jquery.min.js"></script>
+    <script src="../static/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 
 </body>
 

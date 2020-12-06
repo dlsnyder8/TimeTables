@@ -21,6 +21,11 @@
     <!-- Page Content -->
     <div class="p-5 container">
         <div class="p-4 text-center">
+            <h1 class="display-4 font-weight-normal">Admin Page</h1>
+            <p>Promote other users to admins, or delete users.<br>
+                Select a group to add/ remove users, change managers and owners, or delete the group.</br>
+            </p>
+            <hr>
             <h1>Select Group</h1>
             <br>
             <form action="" method="post">
@@ -149,7 +154,21 @@
             <hr>
             {% endif %}
             <div class="p-3 text-center">
+                <h4>Current Admins</h4>
+                <form action='' method="post" class="p-md-3 text-center">
+                    <table style="margin: auto;">
+                        {% for admin in admins: %}
+                        <tr>
+                            <td>{{admin}}: {{fullNames[admin]}}</td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </form>
+            </div>
+            <hr>
+            <div class="p-3 text-center">
                 <h4>Change Admins</h4>
+                <br>
                 <form action='' method="post">
                     <table style="margin: auto;">
                         {% for user in users: %}
@@ -172,28 +191,17 @@
                 </form>
             </div>
             <hr>
-            <div class="p-3 text-center">
-                <h4>Admins</h4>
-                <form action='' method="post" class="p-md-3 text-center">
-                    <table style="margin: auto;">
-                        {% for admin in admins: %}
-                        <tr>
-                            <td>{{admin}}: {{fullNames[admin]}}</td>
-                        </tr>
-                        {% endfor %}
-                    </table>
-                </form>
-            </div>
-            <hr>
+
             <div class="p-3 text-center">
                 <h4>Delete Users</h4>
+                <br>
                 <form action="" method="post">
                     <table style="margin: auto;">
                         {% for user in users: %}
                         {% if user != username %}
                         <tr>
                             <td><input type="checkbox" name={{user}}></td>
-                            <td>{{user}}: {{fullNames[user]}}</td>
+                            <td>&nbsp;{{user}}: {{fullNames[user]}}</td>
                         </tr>
                         {% endif %}
                         {% endfor %}
@@ -222,11 +230,12 @@
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
                                     <input type="submit" name="submit" value="Delete Users" class="btn btn-danger">
+                                </div>
+                            </div>
+                        </div>
                 </form>
             </div>
         </div>
-    </div>
-    </div>
     </div>
     {% if isOrigOwner %}
     <div class="container"
@@ -239,8 +248,7 @@
         </div>
     </div>
     {% endif %}
-    </div>
-    </div>
+
     {% include 'footer.html' %}
 
     <!-- Bootstrap core JavaScript -->

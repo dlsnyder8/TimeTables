@@ -26,6 +26,22 @@
                 font-size: 2.5rem;
             }
         }
+
+        html {
+            position: relative;
+            min-height: 100%;
+        }
+
+        body {
+            margin-bottom: 60px;
+        }
+
+        .footer {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 60px;
+        }
     </style>
 </head>
 
@@ -63,8 +79,14 @@
         {% endif %}
         {% endif %}
     </div>
-    {% include 'footer.html' %}
-
+    <footer class="footer mx-auto py-3">
+        <div class="container">
+            <span class="text-muted">TimeTables, a COS 333 Project by Batya Stein,
+                AJ Kawczynski, Kevin Zheng, Bates Brodie,
+                and Dylan Snyder
+            </span>
+        </div>
+    </footer>
     <!-- Bootstrap core JavaScript -->
     <script src="../static/vendor/jquery/jquery.min.js"></script>
     <script src="../static/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
