@@ -33,6 +33,7 @@ app.config.update(dict(
     # MAIL_PASSWORD = os.environ['MAIL_PW'],
 ))
 mail = Mail(app)
+
 def is_working(netid):
     groups = get_all_groups()
     for groupid in groups:
@@ -49,6 +50,7 @@ def is_working(netid):
                     return True
     return False
 
+# get shifts netid is working from all shifts scheduled for group
 def filter_shifts(netid, shifts):
     newdict = dict()
     for (key, value) in shifts.items():
@@ -110,8 +112,9 @@ def get_username():
         return 'batyas'
 
 
-# if user in group, gets groupname and id stored in cookie
-# if nothing stored, defaults to first group in list of user's groups
+# if groupid cookie is set, returns groupid & groupname from cookie
+# otherwise if user is in group, returns groupid & groupname that are first on list of user groups
+# if user in no group, returns None for both
 def getCurrGroupnameAndId(username, request, groups, inGroup=True):
     groupid = request.cookies.get('groupid')
     # if cookie not set, choose first group in user's group list
@@ -148,8 +151,7 @@ def getIsMgr(username, inGroup, request, groups=None):
     else:
         return False
 
-
-# returns bool if owner
+# returns bool - is user owner
 def getIsOwner(username, inGroup, groupid=None, request=None, groups=None):
     if not inGroup:
         return False
@@ -161,7 +163,7 @@ def getIsOwner(username, inGroup, groupid=None, request=None, groups=None):
     return role == "owner"
 
 
-# takes a request and returns the schedule values
+# takes a request (schedule element of checkboxes) and returns the schedule values
 def parseSchedule():
     table_values = []
     slot_num = 24  # number of time slots in schedule, should be even
@@ -205,18 +207,11 @@ def testSchedule():
     return table_values
 
 
-# creates a blank schedule
+# returns a blank schedule - 24*7 array (array for each hour of day, with slot for each day of week) - all set to False
 def blankSchedule():
-    table_values = []
-    slot_num = 24  # number of time slots in schedule, should be even
-    for i in range(slot_num):  # iterates through time slots
-        week = []
-        for day in range(7):  # iterates through days in a week
-            week.append(False)
-        table_values.append(week)
-    return table_values
+    return [[False]*7]*24
 
-
+# convert military time to us time
 def military_to_us_time(time):
     if int(time.split(':')[0]) == 0:
         time = "12:00 AM"
@@ -228,27 +223,27 @@ def military_to_us_time(time):
         time = str(int(time.split(":")[0])) + ":00 PM"
     return time
 
-
+# converts dictionary of shifts to us time
 def shiftdict_to_us_time(shifts):
     for i in shifts:
         shifts[i][1] = military_to_us_time(shifts[i][1])
         shifts[i][2] = military_to_us_time(shifts[i][2])
     return shifts
 
-
+# converts shift key, from "0_0_0" (day of week as int, military starttime, military endtime)
+# to "Monday 12:00 AM - 12:00 AM" (day as string, us starttime, us endtime)
 def shiftkey_to_str(shiftkey, full=False):
-    days_to_nums = {'Sunday': 0, 'Monday': 1, 'Tuesday': 2, 'Wednesday': 3, 'Thursday': 4, 'Friday': 5, 'Saturday': 6}
     nums_to_days = {0: 'Sunday', 1: 'Monday', 2: 'Tuesday', 3: 'Wednesday', 4: 'Thursday', 5: 'Friday', 6: 'Saturday'}
     split = shiftkey.split('_')
     shiftString = "{} {} - {}".format(nums_to_days[int(split[0])], military_to_us_time(split[1]),
                                       military_to_us_time(split[2]))
     return shiftString
 
+# converts shift string to key format ("0_0_0")
 def shiftstr_to_key(day, start, end):
     days_to_nums = {'Sunday': 0, 'Monday': 1, 'Tuesday': 2, 'Wednesday': 3, 'Thursday': 4, 'Friday': 5,
                             'Saturday': 6}
     return "{}_{}_{}".format(days_to_nums[day], start.split(":")[0], end.split(":")[0])
-
 
 def formatDisplaySched(currsched):
     if currsched:
@@ -260,7 +255,6 @@ def formatDisplaySched(currsched):
     else:
         currsched = None
     return currsched
-
 
 # returns list of elements in new but not old, and users in old but not new
 def getDifferences(newlist, oldlist):
@@ -290,31 +284,29 @@ def index():
     numGroups = len(groups)
     inGroup = (numGroups != 0)
     isMgr = getIsMgr(username, inGroup, request, groups)
+    isOwner = getIsOwner(username, inGroup, request=request, groups=groups)
+
     canCreate = can_create_group(username)
+
     if isMgr == -1: # eg get user role failed
         groupname = groupid = None
     else:
         groupname, groupid = getCurrGroupnameAndId(username, request, groups, inGroup)
-    isOwner = getIsOwner(username, inGroup, request=request, groups=groups)
     
-    print("groupid is: ", groupid)
-
     if request.method == 'GET':
         html = render_template('index.html', groups=groups, groupid=int(groupid), numGroups=numGroups,
                                inGroup=inGroup, isMgr=isMgr, isOwner=isOwner, isAdmin=isAd, canCreate=canCreate)
         response = make_response(html)
         return response
-
+    # POST request - change group user is viewing site as
     else:
-        groupid = int(request.form.get('groupid'))
-        #print("hi:", groupid)
+        groupid = request.form.get('groupid')
         isMgr = (get_user_role(username, groupid) in ["manager", "owner"])
         isOwner = (get_user_role(username, groupid) == 'owner')
 
-        html = render_template('index.html', groups=groups, groupid=groupid, numGroups=numGroups,
+        html = render_template('index.html', groups=groups, groupid=int(groupid), numGroups=numGroups,
                                inGroup=inGroup, isMgr=isMgr, isOwner=isOwner, isAdmin=isAd, canCreate=canCreate)
         response = make_response(html)
-        #response.set_cookie('groupname', groupname)
         response.set_cookie('groupid', str(groupid))
         return response
 
@@ -327,12 +319,12 @@ def admin():
         return redirect(url_for('createProfile'))
     if not is_admin(username):
         return redirect(url_for('index'))
+
     inGroup = in_any_group(username)
     isMgr = getIsMgr(username, inGroup, request)
     isOwner = getIsOwner(username, inGroup, request=request)
 
     groups = get_all_groups()
-    groups_by_name = [g[1] for g in groups]
     users = get_all_users()
     admins = []
     isAdmin = {}
@@ -348,16 +340,16 @@ def admin():
 
     # gets admins
     if request.method == "GET":
-        html = render_template('admin.html', groups=groups_by_name, admins=admins, isAdmin=isAdmin, isMgr=isMgr, 
+        html = render_template('admin.html', groups=groups, admins=admins, isAdmin=isAdmin, isMgr=isMgr, 
                                isOwner=isOwner, inGroup=inGroup, users=users,
                                username=username, fullNames=fullNames)
         response = make_response(html)
         return response
     else:
-        groupname = request.form.get('groupname')
-        if groupname is None:
-            groupname = request.cookies.get('adminGroup')
-        groupid = get_group_id(groupname)
+        groupid = request.form.get('groupid')
+        if groupid is None:
+            groupid = request.cookies.get('adminGroup')
+        groupname = get_group_name(groupid)
         curr_members = get_group_users(groupid)
         selected = {}
         isManager = {}
@@ -404,10 +396,10 @@ def admin():
                 selected[user] = False
                 mgrs[user] = ("notGroup", False)
 
-            groups = get_user_groups(username)
-            inGroup = (len(groups) != 0)
+            userGroups = get_user_groups(username)
+            inGroup = (len(userGroups) != 0)
 
-            html = render_template('admin.html', groups=groups_by_name, groupname=get_group_name(groupid), users=users,
+            html = render_template('admin.html', groups=groups, groupid=int(groupid), groupname=groupname, users=users,
                                    isAdmin=isAdmin, isMgr = isMgr,
                                    selected=selected, mgrs=mgrs, members=selectedUsers, isManager=isManager,
                                    admins=admins, username=username, inGroup=inGroup, isOwner=isOwner, isGroupOwner=isGroupOwner,
@@ -428,24 +420,10 @@ def admin():
                 change_admin(user, False)
                 isAdmin[user] = False
 
-            print(groupid)
-
             admins = selectedAdmins
-            html = render_template('admin.html', groups=groups_by_name, admins=admins, isAdmin=isAdmin, inGroup=inGroup, users=users,
+            html = render_template('admin.html', groups=groups, admins=admins, isAdmin=isAdmin, inGroup=inGroup, users=users,
                                isMgr=isMgr, isOwner=isOwner, username=username, fullNames=fullNames)
-            '''
-            # doing this means that if cookie is still set but you never selected a group on that visit you still get shown 
-            # group related stuff when post request sends
-
-            if groupid == -1:
-                html = render_template('admin.html', groups=groups_by_name, admins=admins, isAdmin=isAdmin, inGroup=inGroup, users=users,
-                               isMgr=isMgr, isOwner=isOwner, username=username, fullNames=fullNames)
-            else:
-                html = render_template('admin.html', groups=groups_by_name, groupname=get_group_name(groupid), users=users,
-                                   selected=selected, mgrs=mgrs, members=curr_members, isManager=isManager,
-                                   isAdmin=isAdmin, isMgr=isMgr, admins=admins, inGroup=inGroup, username=username, isOwner=isOwner, isGroupOwner=isGroupOwner,
-                                       fullNames=fullNames)
-            '''
+           
             response = make_response(html)
             return response
         elif output == "Save Managers":
@@ -465,11 +443,11 @@ def admin():
                 isManager[user] = False
                 mgrs[user] = ('member', False)
 
-            groups = get_user_groups(username)
-            inGroup = (len(groups) != 0)
+            userGroups = get_user_groups(username)
+            inGroup = (len(userGroups) != 0)
             
             isMgr = getIsMgr(username, inGroup, request)
-            html = render_template('admin.html', groups=groups_by_name, groupname=get_group_name(groupid), users=users,
+            html = render_template('admin.html', groups=groups, groupid=int(groupid), groupname=groupname, users=users,
                                    selected=selected, mgrs=mgrs, members=curr_members, isManager=isManager,
                                    isAdmin=isAdmin, isMgr=isMgr, admins=admins,inGroup=inGroup,  username=username, isOwner=isOwner,isGroupOwner=isGroupOwner,
                                    fullNames=fullNames)
@@ -492,10 +470,10 @@ def admin():
                 change_group_role(groupid, user, 'member')
                 isGroupOwner[user] = False
                 mgrs[user] = ('member', False)
-            groups = get_user_groups(username)
-            inGroup = (len(groups) != 0)
+            userGroups = get_user_groups(username)
+            inGroup = (len(userGroups) != 0)
             isOwner = getIsOwner(username, inGroup, request=request)
-            html = render_template('admin.html', groups=groups_by_name, groupname=get_group_name(groupid), users=users,
+            html = render_template('admin.html', groups=groups, groupid=int(groupid), groupname=groupname, users=users,
                                    selected=selected, mgrs=mgrs, members=curr_members, isManager=isManager,
                                    isAdmin=isAdmin, isMgr=isMgr, admins=admins,inGroup=inGroup,  username=username, isOwner=isOwner,isGroupOwner=isGroupOwner,
                                    fullNames=fullNames)
@@ -508,12 +486,11 @@ def admin():
             inGroup = (len(userGroups) > 0)
             if inGroup:
                 groupid = userGroups[0][0]
-                groupname = userGroups[0][1]
-            groups_by_name = [g[1] for g in allGroups]
-            html = render_template('admin.html', groups=groups_by_name, inGroup=inGroup, admins=admins, isAdmin=isAdmin, isMgr=isMgr, users=users,
+            else:
+                groupid = None
+            html = render_template('admin.html', groups=allGroups, inGroup=inGroup, admins=admins, isAdmin=isAdmin, isMgr=isMgr, users=users,
                                    isOwner=isOwner, username=username, fullNames=fullNames)
             response = make_response(html)
-            response.set_cookie('groupname', groupname)
             response.set_cookie('groupid', str(groupid))
             return response
         elif output == "Delete Users":
@@ -533,17 +510,17 @@ def admin():
                 if user in admins:
                     admins.remove(user)
 
-            html = render_template('admin.html', groups=groups_by_name, inGroup=inGroup, admins=admins, isAdmin=isAdmin, isMgr=isMgr,
+            html = render_template('admin.html', groups=groups, inGroup=inGroup, admins=admins, isAdmin=isAdmin, isMgr=isMgr,
                                     isOwner=isOwner, users=users, username=username, fullNames=fullNames, isOrigOwner=isOrigOwner)
             response = make_response(html)
             return response
         else:
-            html = render_template('admin.html', groups=groups_by_name, groupname=get_group_name(groupid), users=users,
+            html = render_template('admin.html', groups=groups, groupid=int(groupid), groupname=groupname, users=users,
                                    selected=selected, mgrs=mgrs, members=curr_members, isManager=isManager,
                                    isAdmin=isAdmin, isMgr=isMgr, admins=admins, username=username, inGroup=inGroup,  isOwner=isOwner, isGroupOwner=isGroupOwner,
                                    fullNames=fullNames)
             response = make_response(html)
-            response.set_cookie('adminGroup', groupname)
+            response.set_cookie('adminGroup', groupid)
             return response
 
 
@@ -757,7 +734,6 @@ def manage():
                 groupid = groups[0][0]
                 groupname = groups[0][1]
             response = make_response(redirect(url_for("index")))
-            response.set_cookie('groupname', groupname)
             response.set_cookie('groupid', str(groupid))
             return response
         elif request.form["submit"] == "Generate Schedule":
@@ -1154,7 +1130,6 @@ def createGroup():
             if selected:
                 add_user_to_group(groupId, name, 'member')
         response = redirect(url_for('manage'))
-        response.set_cookie('groupname', gName)
         response.set_cookie('groupid', str(groupId))
         return response
 
