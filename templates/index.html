@@ -64,9 +64,9 @@
             You can come back here and switch groups at any time.</p>
         <form action="" method="post">
             {% for g in groups %}
-            <input type="radio" disabled name="groupname" value="{{g}}" {% if groupname == g %} checked {% endif %}>
-            <input style="margin-bottom: 4px;" class="btn btn-primary btn-sm" type="submit" name="groupname"
-                value="{{g}}">
+            <input type="radio" disabled name="groupid" value="{{g[0]}}" {% if groupid == g[0] %} checked {% endif %}>
+            <button style="margin-bottom: 4px;" class="btn btn-primary btn-sm" type="submit" name="groupid"
+                value="{{g[0]}}">{{g[1]}}</button>
             <br>
             {% endfor %}
         </form>
