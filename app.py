@@ -52,12 +52,12 @@ def is_working(netid):
 def filter_shifts(netid, shifts):
     newdict = dict()
     for (key, value) in shifts.items():
-        print(key, value)
+        #print(key, value)
         for name in value:
-            print("name:", name)
+            #print("name:", name)
             if name == netid:
                 newdict[key] = name
-    print("dict:\n", newdict)
+    #print("dict:\n", newdict)
     return newdict
 
 
@@ -84,7 +84,7 @@ def email_group(groupid, groupName):
             html = "<strong>Your shifts this week ({}) are:</strong><br>".format(get_next_week_span())
 
             for (key, value) in output.items():
-                print(key)
+                #print(key)
                 html += key + "<br>"
 
             subject = "Your weekly schedule for: %s" % groupName
@@ -112,16 +112,25 @@ def get_username():
 
 # if user in group, gets groupname and id stored in cookie
 # if nothing stored, defaults to first group in list of user's groups
-def getCurrGroupnameAndId(request, groups, inGroup=True):
-    groupname = request.cookies.get('groupname')
-    if groupname == None and inGroup:
-        groupname = groups[0][1]
-
+def getCurrGroupnameAndId(username, request, groups, inGroup=True):
     groupid = request.cookies.get('groupid')
+    # if cookie not set, choose first group in user's group list
     if groupid == None and inGroup:
         groupid = groups[0][0]
+        groupname = groups[0][1]
+    # if group no longer exists, choose first group in list
+    elif not group_exists(groupid) and inGroup:
+        groupid = groups[0][0]
+        groupname = groups[0][1]
+    # if group exists but user not in group, choose first group in list
+    elif inGroup and not in_group(username, groupid):
+        groupid = groups[0][0]
+        groupname = groups[0][1]
     elif inGroup:
-        groupid = int(groupid)
+        groupname = get_group_name(groupid)
+    else:
+        groupname = None
+
     return groupname, groupid
 
 
@@ -131,7 +140,7 @@ def getIsMgr(username, inGroup, request, groups=None):
     if inGroup:
         if groups == None:
             groups = get_user_groups(username)
-        _, groupid = getCurrGroupnameAndId(request, groups)
+        _, groupid = getCurrGroupnameAndId(username, request, groups)
         role = get_user_role(username, groupid)
         if role == -1:
             return role
@@ -147,7 +156,7 @@ def getIsOwner(username, inGroup, groupid=None, request=None, groups=None):
     if inGroup and groupid == None:
         if groups == None:
             groups = get_user_groups(username)
-        _, groupid = getCurrGroupnameAndId(request, groups)
+        _, groupid = getCurrGroupnameAndId(username, request, groups)
     role = get_user_role(username, groupid)
     return role == "owner"
 
@@ -275,6 +284,7 @@ def index():
 
     if not (user_exists(username)):
         return redirect(url_for('createProfile'))
+
     isAd = is_admin(username)
     groups = get_user_groups(username)
     numGroups = len(groups)
@@ -284,34 +294,27 @@ def index():
     if isMgr == -1: # eg get user role failed
         groupname = groupid = None
     else:
-        groupname, groupid = getCurrGroupnameAndId(request, groups, inGroup)
+        groupname, groupid = getCurrGroupnameAndId(username, request, groups, inGroup)
     isOwner = getIsOwner(username, inGroup, request=request, groups=groups)
-    groups_by_name = [g[1] for g in groups]
-
-    teststring = "user = " + username
-    if isMgr:
-        teststring += "is manager "
-    else:
-        teststring += "is not manager "
-    # teststring += "of group " + groupname
-    print(teststring)
+    
+    print("groupid is: ", groupid)
 
     if request.method == 'GET':
-        html = render_template('index.html', groups=groups_by_name, groupname=groupname, numGroups=numGroups,
+        html = render_template('index.html', groups=groups, groupid=int(groupid), numGroups=numGroups,
                                inGroup=inGroup, isMgr=isMgr, isOwner=isOwner, isAdmin=isAd, canCreate=canCreate)
         response = make_response(html)
         return response
 
     else:
-        groupname = request.form['groupname']
-        groupid = get_group_id(groupname)
+        groupid = int(request.form.get('groupid'))
+        #print("hi:", groupid)
         isMgr = (get_user_role(username, groupid) in ["manager", "owner"])
         isOwner = (get_user_role(username, groupid) == 'owner')
 
-        html = render_template('index.html', groups=groups_by_name, groupname=groupname, numGroups=numGroups,
+        html = render_template('index.html', groups=groups, groupid=groupid, numGroups=numGroups,
                                inGroup=inGroup, isMgr=isMgr, isOwner=isOwner, isAdmin=isAd, canCreate=canCreate)
         response = make_response(html)
-        response.set_cookie('groupname', groupname)
+        #response.set_cookie('groupname', groupname)
         response.set_cookie('groupid', str(groupid))
         return response
 
@@ -323,9 +326,8 @@ def admin():
     if not (user_exists(username)):
         return redirect(url_for('createProfile'))
     if not is_admin(username):
-        print("non admin accessed admin page")
         return redirect(url_for('index'))
-    inGroup = in_group(username)
+    inGroup = in_any_group(username)
     isMgr = getIsMgr(username, inGroup, request)
     isOwner = getIsOwner(username, inGroup, request=request)
 
@@ -422,7 +424,6 @@ def admin():
             for user in newAdmins:
                 change_admin(user, True)
                 isAdmin[user] = True
-                print("hit" + user)
             for user in oldAdmins:
                 change_admin(user, False)
                 isAdmin[user] = False
@@ -563,7 +564,7 @@ def owner():
     isOwner = getIsOwner(username, inGroup, request=request)
     if not isOwner:
         return redirect(url_for('index'))
-    groupname, groupid = getCurrGroupnameAndId(request, groups, inGroup)
+    groupname, groupid = getCurrGroupnameAndId(username, request, groups, inGroup)
 
     users = get_group_users(groupid)
     users.remove(username)
@@ -617,7 +618,7 @@ def profile():
 
     isAd = is_admin(username)
     userInfo = get_profile_info(username)
-    inGroup = in_group(username)
+    inGroup = in_any_group(username)
     isMgr = getIsMgr(username, inGroup, request)
     isOwner = getIsOwner(username, inGroup, request=request)
 
@@ -656,7 +657,7 @@ def manage():
 
     users = get_all_users()
     users.remove(username)
-    groupname, groupid = getCurrGroupnameAndId(request, groups, True)
+    groupname, groupid = getCurrGroupnameAndId(username, request, groups, True)
     notGroupInTitle = (not groupname.split()[-1].lower() == 'group')
 
     curr_members = get_group_users(groupid)
@@ -832,7 +833,7 @@ def schedule():
     if len(groups) == 0:
         return redirect(url_for('index'))
 
-    groupname, groupid = getCurrGroupnameAndId(request, groups)
+    groupname, groupid = getCurrGroupnameAndId(username, request, groups)
     isMgr = getIsMgr(username, True, request, groups)
     isOwner = getIsOwner(username, True, groupid)
 
@@ -889,7 +890,7 @@ def editdraft():
     
 
     
-    groupname, groupid = getCurrGroupnameAndId(request, groups, True)
+    groupname, groupid = getCurrGroupnameAndId(username, request, groups, True)
     notGroupInTitle = (not groupname.split()[-1].lower() == 'group')
     isOwner = getIsOwner(username, True, groupid)
 
@@ -1014,19 +1015,16 @@ def group():
     if len(groups) == 0:
         return redirect(url_for('index'))
 
-    groupname, groupid = getCurrGroupnameAndId(request, groups)
+    groupname, groupid = getCurrGroupnameAndId(username, request, groups)
     notGroupInTitle = (not groupname.split()[-1].lower() == 'group')
 
     isMgr = getIsMgr(username, True, request, groups)
     isOwner = getIsOwner(username, True, groupid)
     groupprefs = get_group_preferences(groupid, username)
-    print(groupprefs)
     if groupprefs == None:
         change_user_preferences_global(username, create_preferences(blankSchedule()))
         groupprefs = get_global_preferences(username)
     weeklyPref = get_double_array(groupprefs)
-
-    # later add code to reset groupprefs to global prefs on sunday
 
     notifPrefs = get_group_notifications(username, groupid)
     if notifPrefs != None and notifPrefs != -1:
@@ -1054,7 +1052,7 @@ def editGroup():
     if len(groups) == 0:
         return redirect(url_for('index'))
 
-    groupname, groupid = getCurrGroupnameAndId(request, groups)
+    groupname, groupid = getCurrGroupnameAndId(username, request, groups)
     notGroupInTitle = (not groupname.split()[-1].lower() == 'group')
     isMgr = getIsMgr(username, True, request, groups)
     isOwner = getIsOwner(username, True, groupid)
@@ -1091,13 +1089,13 @@ def editGroup():
 @app.route('/viewGroup', methods=['GET'])
 def viewGroup():
     username = get_username()
-    inGroup = in_group(username)
+    inGroup = in_any_group(username)
     isAd = is_admin(username)
     if not inGroup:
         return redirect(url_for('index'))
     groups = get_user_groups(username)
     isMgr = getIsMgr(username, True, request, groups)
-    gName, groupId = getCurrGroupnameAndId(request, groups)
+    gName, groupId = getCurrGroupnameAndId(username, request, groups)
     notGroupInTitle = (not gName.split()[-1].lower() == 'group')
 
     isOwner = getIsOwner(username, True, groupId)
@@ -1123,7 +1121,7 @@ def createGroup():
     username = get_username()
 
     isAd = is_admin(username)
-    inGroup = in_group(username)
+    inGroup = in_any_group(username)
     isMgr = getIsMgr(username, inGroup, request)
     isOwner = getIsOwner(username, inGroup, request=request)
 
@@ -1214,7 +1212,7 @@ def editProfile():
     username = get_username()
 
     isAd = is_admin(username)
-    inGroup = in_group(username)
+    inGroup = in_any_group(username)
     isMgr = getIsMgr(username, inGroup, request)
     isOwner = getIsOwner(username, inGroup, request=request)
     userInfo = get_profile_info(username)

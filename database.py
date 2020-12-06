@@ -22,7 +22,8 @@ get_all_users()
 get_user_groups(netid)
 user_exists(netid)
 get_profile_info(netid)
-in_group(netid)
+in_any_group(netid)
+in_group(netid, groupid)
 
 change_user_preferences_global(netid, preferences)
 
@@ -34,7 +35,7 @@ change_user_preferences_group(groupid, netid, preferences = None)
 
 add_group(owner, groupName, shiftSchedule = None, globalshifts=None)
 remove_group(groupid)
-get_group_id(groupname)
+get_group_name(groupid)
 
 // These are for the 'global' or recurring shifts week to week
 get_group_shifts(groupid)
@@ -88,12 +89,8 @@ def create_preferences(hoursList):
     return output
 
 # dict to double array
-# NOTE: Append recreates the array every time to add a new item to the end. Would be better to use a set sized array instead of expanding
-# especially for big arrays
 def get_double_array(preferences):
-    output = []
-    for i in range(len(preferences)):
-        output.append(preferences[str(i)])
+    output = [preferences[i] for i in preferences]
     return output
 
 def parse_user_schedule(netid, groupschedule):
@@ -204,7 +201,7 @@ def remove_user_from_group(netid, groupid):
 # removes user from db
 def remove_user(netid):
     try:
-        if in_group(netid):
+        if in_any_group(netid):
             session.execute(
                 "DELETE FROM groupmembers WHERE netid=:param", {"param":netid}
             )
@@ -398,6 +395,14 @@ def get_user_id(groupid,netid):
         return userid
     except:
         print('get_user_id() failed',file=stderr)
+        return -1
+
+def group_exists(groupid):
+    try:
+        groupid = session.query(Groups.groupid).filter_by(groupid=groupid).first()
+        return (groupid != None)
+    except:
+        print("does group exist check failed", file=stderr)
         return -1
 
 # Adds a group, shiftSchedule is optional argument if known
@@ -702,7 +707,13 @@ def get_user_groups(netid):
         print('get user groups failed',file=stderr)
         return -1
 
-
+def in_group(netid, groupid):
+    try:
+        in_group = session.query(Group_members.netid).filter_by(groupid=groupid, netid=netid).first()
+        return (in_group != None)
+    except:
+        print("in group query failed", file=stderr)
+        return -1
 
 # returns groupname matching id
 def get_group_name(groupid):
@@ -721,7 +732,7 @@ def get_group_id(groupname):
         return -1
 
 # return True if user in 1+ groups, False if in none
-def in_group(netid):
+def in_any_group(netid):
     try:
         ingroup = session.query(Group_members.netid).filter_by(netid=netid).first()
         return (ingroup != None)
@@ -785,4 +796,8 @@ if __name__=="__main__":
     #change_group_conflicts(81, {})
     #print(get_group_conflicts(81))
     #add_user('batya','stein', 'batyas')
-    print(is_original_owner('dlsnyder'))
+    #print(is_original_owner('dlsnyder'))
+    #print(get_group_name("108"))
+    print(in_group("batyas", 102))
+    print(group_exists(102))
+    print(group_exists(6))
