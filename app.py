@@ -107,7 +107,10 @@ def email_group(groupid, groupName):
 def get_username():
     if PROD_ENV:
         username = CASClient().authenticate()
-        username = username.rstrip('\n')
+        try:
+            username = username.rstrip('\n')
+        except:
+            pass
         return username
 
     else:
