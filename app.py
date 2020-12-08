@@ -746,6 +746,7 @@ def manage():
                 shift = [day, start, end, npeople]
                 shiftid = shiftstr_to_key(day, start, end)
                 shifts[shiftid] = shift
+                shifts = OrderedDict(sorted(shifts.items()))
 
                 # change double array of shifts to dict, update db
                 change_group_shifts(groupid, shifts)
