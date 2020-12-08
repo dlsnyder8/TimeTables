@@ -187,24 +187,7 @@ def solve_shift_scheduling(params, output_proto, num_employees, num_weeks, shift
 
     # Fixed assignment: (employee, shift, day).
     # This fixes the first 2 days of the schedule.
-    '''fixed_assignments = [
-        (0, 0, 0),
-        (1, 0, 0),
-        (2, 1, 0),
-        (3, 1, 0),
-        (4, 2, 0),
-        (5, 2, 0),
-        (6, 2, 3),
-        (7, 3, 0),
-        (0, 1, 1),
-        (1, 1, 1),
-        (2, 2, 1),
-        (3, 2, 1),
-        (4, 2, 1),
-        (5, 0, 1),
-        (6, 0, 1),
-        (7, 3, 1),
-    ]'''
+    '''fixed_assignments = [(0, 0, 0)]'''
 
     # Request: (employee, shift, day, weight)
     # A negative weight indicates that the employee desire this assignment.
@@ -222,7 +205,7 @@ def solve_shift_scheduling(params, output_proto, num_employees, num_weeks, shift
     #             soft_max, hard_max, max_penalty)
     shift_constraints = [
         # One or two consecutive days of rest, this is a hard constraint.
-        (0, 1, 1, 0, 7, 7, 0),
+        (0, 1, 1, 0, 4, 7, 100),
         # betweem 2 and 3 consecutive days of night shifts, 1 and 4 are
         # possible but penalized.
         #(2, 1, 2, 20, 2, 4, 5),
@@ -232,20 +215,12 @@ def solve_shift_scheduling(params, output_proto, num_employees, num_weeks, shift
     #     (shift, hard_min, soft_min, min_penalty,
     #             soft_max, hard_max, max_penalty)
     weekly_sum_constraints = [
-        # Constraints on rests per week.
-        (0, 1, 2, 7, 7, 7, 0),
-        # At least 1 night shift per week (penalized). At most 4 (hard).
-        #(2, 0, 0, 2, 4, 4, 0),
+        (0, 1, 2, 0, 4, 7, 100),
     ]
 
     # Penalized transitions:
     #     (previous_shift, next_shift, penalty (0 means forbidden))
-    penalized_transitions = [
-        # Afternoon to night has a penalty of 4.
-        #(1, 2, 4),
-        # Night to morning is forbidden.
-        #(2, 1, 0),
-    ]
+    penalized_transitions = []
 
     # daily demands for work shifts (morning, afternon, night) for each day
     # of the week starting on Monday.
@@ -410,7 +385,7 @@ def solve_shift_scheduling(params, output_proto, num_employees, num_weeks, shift
 
 def main(args):
     """Main."""
-    solve_shift_scheduling(args.params, args.output_proto, 7, 3, ['O', 'M', 'A', 'N'], [], [])
+    solve_shift_scheduling(args.params, args.output_proto, 7, 3, ['O', 'M', 'A', 'N'], [], [], [])
 
 
 if __name__ == '__main__':
