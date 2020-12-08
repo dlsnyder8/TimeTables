@@ -2,8 +2,6 @@
 
 Authors: Dylan Snyder, Bates Brodie, Batya Stein, Kevin Zheng, and AJ Kawczynski
 
-## About: Time Tables is a employee scheduling application for use by Princeton University Staff and Students through CAS authentication.
-
 Time Tables is a employee shift scheduling and management application for use by Princeton University student organizations. It was inspired in particular by Coffee Club, a group which was suffering from high enterprise shift management software costs.
 
 Features include:
@@ -19,27 +17,4 @@ Features include:
 - Front-end administrator panel to modify and delete system groups and users
 
 - Simple Web UI that is easy to navigate
-
-## Architecture 
-
-
-## How to Run
-
-To run this app you should:
-
-Create a python environment for this project. If you have a env/ folder already in your directory, delete it and make another folder also called env/.
-$ python3 -m venv env
-
-
-You should then activate the venv (same thing you do for the assignments) and run this command:
-$ pip install -r requirements.txt
-
-This will ensure that we are all running the same versions of packages
-
-Install autoenv (it will automatically run an .env files when you cd into a directory)
-Mac -   $ brew install autoenv
-        $ echo "source $(brew --prefix autoenv)/activate.sh" >> ~/.bash_profile
-
-Pip (linux) -  $ pip install autoenv
-               $ echo "source `which activate.sh`" >> ~/.bashrc 
 
