@@ -18,7 +18,7 @@ from collections import OrderedDict
 # -------------------
 # CAS Authentication cannot be run locally unfortunately
 # Set this variable to False if local, and change to True before pushing
-PROD_ENV = True
+PROD_ENV = False
 
 # ----------
 
@@ -310,14 +310,16 @@ def index():
     isOwner = getIsOwner(username, inGroup, request=request, groups=groups)
 
     canCreate = can_create_group(username)
-
     if isMgr == -1: # eg get user role failed
         groupname = groupid = None
     else:
         groupname, groupid = getCurrGroupnameAndId(username, request, groups, inGroup)
     
+    if groupid == None:
+        groupid = 0
+
     if request.method == 'GET':
-        html = render_template('index.html', groups=groups, groupid=int(groupid), numGroups=numGroups,
+        html = render_template('index.html', groups=groups, groupid=groupid, numGroups=numGroups,
                             inGroup=inGroup, isMgr=isMgr, isOwner=isOwner, isAdmin=isAd, canCreate=canCreate)
         response = make_response(html)
         return response
@@ -328,10 +330,12 @@ def index():
         isMgr = (role in ["manager", "owner"])
         isOwner = (role == 'owner')
 
-        html = render_template('index.html', groups=groups, groupid=int(groupid), numGroups=numGroups,
+
+        html = render_template('index.html', groups=groups, groupid=groupid, numGroups=numGroups,
                             inGroup=inGroup, isMgr=isMgr, isOwner=isOwner, isAdmin=isAd, canCreate=canCreate)
         response = make_response(html)
-        response.set_cookie('groupid', str(groupid))
+        if groupid != None:
+            response.set_cookie('groupid', (groupid))
         return response
 
 # administrator page
