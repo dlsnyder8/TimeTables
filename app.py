@@ -335,6 +335,7 @@ def index():
         html = render_template('index.html', groups=groups, groupid=groupid, numGroups=numGroups,
                             inGroup=inGroup, isMgr=isMgr, isOwner=isOwner, isAdmin=isAd, canCreate=canCreate)
         response = make_response(html)
+        print("index groupid:", groupid)
         if groupid != None:
             response.set_cookie('groupid', (groupid))
         return response
