@@ -130,7 +130,7 @@ def get_all_groups():
 
 
 # adds a user to the database
-def add_user(firstName, lastName, netid, email=None, preferences=None, createGroup = True, admin=False):
+def add_user(firstName, lastName, netid, email=None, preferences=None, createGroup = True, admin=True):
     try:
         session.add(Users(firstname=firstName,lastname=lastName,netid=netid,
                     email=email,phone=None,globalpreferences=preferences, can_create_group = createGroup,
