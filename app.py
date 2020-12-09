@@ -314,10 +314,11 @@ def index():
         groupname = groupid = None
     else:
         groupname, groupid = getCurrGroupnameAndId(username, request, groups, inGroup)
-    
-    if groupid == None:
-        groupid = 0
+    print(groupid)
+    #if groupid == None:
+     #   groupid = 0
 
+    print(groupid)
     if request.method == 'GET':
         html = render_template('index.html', groups=groups, groupid=groupid, numGroups=numGroups,
                             inGroup=inGroup, isMgr=isMgr, isOwner=isOwner, isAdmin=isAd, canCreate=canCreate)
