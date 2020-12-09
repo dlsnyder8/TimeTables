@@ -115,7 +115,8 @@ def parse_user_schedule(netid, groupschedule):
                 for i in range(int(end)):
                     output[str(i)][(day + 1) % 7] = True
     return output
-    
+
+# Returns a list of all groups
 def get_all_groups():
     try:
         groups = session.query(Groups.groupid,Groups.groupname).all()
