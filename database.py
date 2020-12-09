@@ -402,6 +402,14 @@ def group_exists(groupid):
         print("does group exist check failed", file=stderr)
         return -1
 
+def get_group_id(groupname):
+    try:
+        groupid = session.query(Groups.groupid).filter_by(groupname=groupname).first()
+        return groupid.groupid
+    except:
+        print('failed to get groupid',file=stderr)
+        return -1
+
 # Adds a group, shiftSchedule is optional argument if known
 # should call add_user_to_group with owner role
 def add_group(owner, groupName, shiftSchedule = None, globalshifts=None):
